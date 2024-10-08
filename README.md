@@ -18,6 +18,6 @@ d’un prospect.
 
 - Faugières Loïc / loic.faugieres@iut-rodez.fr / [xGk93](https://github.com/xGk93) 
 
-- Guiraud Simon / simon.guiraud@iut-rodez.fr / 
+- Guiraud Simon / simon.guiraud@iut-rodez.fr / [SyberSim](https://github.com/SyberSim) 
 
-- Miquel Noah / noah.miquel@iut-rodez.fr / 
+- Miquel Noah / noah.miquel@iut-rodez.fr / [NoahMiquel](https://github.com/NoahMiquel) 
