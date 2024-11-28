@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="app_padding">20dp</dimen>
+
+    <dimen name="footer_min_height">80dp</dimen>
+    <dimen name="footer_icon_padding_y">10dp</dimen>
+    <dimen name="footer_icon_margin_x">30dp</dimen>
+    <dimen name="footer_icon_dimens">70dp</dimen>
+</resources>

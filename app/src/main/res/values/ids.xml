@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="footer_icon_home" type="id"/>
+    <item name="footer_icon_client" type="id"/>
+    <item name="footer_icon_parcours" type="id"/>
+    <item name="footer_icon_itineraire" type="id"/>
+</resources>
