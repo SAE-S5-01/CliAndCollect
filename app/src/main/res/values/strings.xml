@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">CliAndCollect</string>
+    <string name="inscription">Inscription</string>
+    <string name="connexion">Connexion</string>
+    <string name="mail">Mail</string>
+    <string name="mdp">Mot de passe</string>
+    <string name="adresse">Adresse </string>
+    <string name="nom">Nom</string>
+    <string name="prenom">Prénom</string>
+    <string name="ville">Ville</string>
+    <string name="placeholder_nom">Entrez votre nom</string>
+    <string name="placeholder_prenom">Entrez votre prénom</string>
+    <string name="placeholder_mail">Entrez votre mail</string>
+    <string name="placeholder_mdp">Entrez votre mot de passe</string>
+    <string name="placeholder_adresse">Entrez votre adresse</string>
+    <string name="placeholder_ville">Entrez votre ville</string>
+    <string name="seSouvenir">Se souvenir de moi</string>
+    <string name="boutonInsription">Créer le compte</string>
 </resources>
