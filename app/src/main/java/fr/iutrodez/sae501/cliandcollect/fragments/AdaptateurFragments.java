@@ -1,8 +1,8 @@
 /*
- * FragmentAdapter.java                                             28 nov. 2024
+ * AdaptateurFragments.java                                          28 nov. 2024
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
-package fr.iutrodez.sae501.cliandcollect;
+package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -15,7 +15,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
  * createFragment et une méthode getItemCount
  * @author Loïc FAUGIERES
  */
-public class FragmentAdapter extends FragmentStateAdapter {
+public class AdaptateurFragments extends FragmentStateAdapter {
 
     /** Nombre de fragments gérés par cet adaptateur, ou nombre d'onglets de la vue */
    private static final int NB_FRAGMENT = 4;
@@ -24,7 +24,7 @@ public class FragmentAdapter extends FragmentStateAdapter {
      * Constructeur de base
      * @param activite Activité qui contient le ViewPager qui gèrera les fragments
      */
-    public FragmentAdapter(FragmentActivity activite) {
+    public AdaptateurFragments(FragmentActivity activite) {
         super(activite);
     }
 
@@ -38,7 +38,7 @@ public class FragmentAdapter extends FragmentStateAdapter {
          */
         switch (position) {
             case 0:
-                return FragmentHome.newInstance();
+                return FragmentAccueil.newInstance();
             case 1:
                 return FragmentClients.newInstance();
             case 2:

@@ -1,8 +1,6 @@
-package fr.iutrodez.sae501.cliandcollect;
+package fr.iutrodez.sae501.cliandcollect.activites;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +9,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
+import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+
 /**
  * Activité de la page de connexion.
  * @author Descriaud Lucas
  */
-public class PageConnexion extends AppCompatActivity {
+public class ActiviteConnexion extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> lanceurInscription;
     private EditText mail;
@@ -30,21 +32,21 @@ public class PageConnexion extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.page_connexion);
-        boolean reseau = ApiClient.reseauDisponible(this);
+        setContentView(R.layout.activite_connexion);
+        boolean reseau = ClientApi.reseauDisponible(this);
         Button boutonConnexion = findViewById(R.id.boutonConnexion);
         Button boutonInscription = findViewById(R.id.boutonInscription);
-        boutonConnexion.setEnabled(false);
-        boutonConnexion.setEnabled(false);
+
+        //boutonConnexion.setEnabled(false);
         /*
          * Affiche au lancement une eventuelle connexion réseau manquante ou alors l'impossibilité
          * de joindre l'api
          */
-        if(reseau) {
-            ApiClient.apijoignable(this);
+        /*if (reseau) {
+            ClientApi.apijoignable(this);
         } else {
-            messageErreur.setText(R.string.messageErreurReseau);
-        }
+            messageErreur.setText(R.string.erreur_reseau);
+        }*/
 
         mail = findViewById(R.id.saisieMail);
         mdp = findViewById(R.id.saisieMdp);
@@ -65,14 +67,14 @@ public class PageConnexion extends AppCompatActivity {
         mdp = this.mdp.getText().toString();
 
         if (mail.isEmpty() || mdp.isEmpty()) {
-            messageErreur.setText(R.string.messageErreurClient);
-        } else if (ApiClient.reseauDisponible(this)) {
-            ApiClient.connexion(this, mail, mdp, () -> {
-                Intent menuPrincipal = new Intent(PageConnexion.this, MainActivity.class);
+            messageErreur.setText(R.string.erreur_champ_connexion_vide);
+        } else if (ClientApi.reseauDisponible(this)) {
+            //ClientApi.connexion(this, mail, mdp, () -> {
+                Intent menuPrincipal = new Intent(ActiviteConnexion.this, ActivitePrincipale.class);
                 startActivity(menuPrincipal);
-            });
+            //});
         } else {
-            messageErreur.setText(R.string.messageErreurReseau);
+            messageErreur.setText(R.string.erreur_reseau);
         }
     }
 
@@ -82,7 +84,7 @@ public class PageConnexion extends AppCompatActivity {
      * @param bouton Le bouton d'inscription
      */
     private void clicInscription(View bouton) {
-        Intent incription = new Intent(PageConnexion.this, PageInscription.class);
+        Intent incription = new Intent(ActiviteConnexion.this, ActiviteInscription.class);
         startActivity(incription);
     }
 }

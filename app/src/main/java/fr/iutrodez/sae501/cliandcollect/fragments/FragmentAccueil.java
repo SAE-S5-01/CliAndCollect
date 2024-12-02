@@ -1,8 +1,8 @@
 /*
- * FragmentClients.java                                             28 nov. 2024
+ * FragmentAccueil.java                                                28 nov. 2024
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
-package fr.iutrodez.sae501.cliandcollect;
+package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,17 +12,19 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import fr.iutrodez.sae501.cliandcollect.R;
+
 /**
- * Gestion du fragment Clients.
+ * Gestion du fragment Home.
  * @author Loïc FAUGIERES
  */
-public class FragmentClients extends Fragment implements View.OnClickListener {
+public class FragmentAccueil extends Fragment implements View.OnClickListener {
 
     /**
-     * @return Une nouvelle instance de FragmentClients.
+     * @return Une nouvelle instance de FragmentAccueil.
      */
-    public static FragmentClients newInstance() {
-        return new FragmentClients();
+    public static FragmentAccueil newInstance() {
+        return new FragmentAccueil();
     }
 
     /**
@@ -54,7 +56,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
-        View vueDuFragment = inflater.inflate(R.layout.fragment_clients, container, false);
+        View vueDuFragment = inflater.inflate(R.layout.fragment_accueil, container, false);
 
         return vueDuFragment;
     }

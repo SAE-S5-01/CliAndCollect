@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="app_padding">20dp</dimen>
+    <dimen name="app_marge_interieure">20dp</dimen>
 
-    <dimen name="footer_min_height">80dp</dimen>
-    <dimen name="footer_icon_padding_y">10dp</dimen>
-    <dimen name="footer_icon_margin_x">30dp</dimen>
-    <dimen name="footer_icon_dimens">70dp</dimen>
+    <dimen name="pied_page_hauteur_min">80dp</dimen>
+    <dimen name="pied_page_marge_interieure_verticale_icone">10dp</dimen>
+    <dimen name="pied_page_marge_interieure_horizontale_icone">30dp</dimen>
+    <dimen name="pied_page_dimensions_icone">70dp</dimen>
 </resources>

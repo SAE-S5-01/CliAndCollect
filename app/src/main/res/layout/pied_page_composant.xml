@@ -13,9 +13,9 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/footer_layout"
         style="@style/FooterComponent"
-        app:tabBackground="@color/footer_background"
-        app:tabIndicatorColor="@color/footer_icon_active"
-        app:tabSelectedTextColor="@color/footer_icon_active"
-        app:tabTextColor="@color/footer_icon_inactive" />
+        app:tabBackground="@color/pied_page_fond"
+        app:tabIndicatorColor="@color/pied_page_icone_active"
+        app:tabSelectedTextColor="@color/pied_page_icone_active"
+        app:tabTextColor="@color/pied_page_icone_inactive" />
 
 </LinearLayout>

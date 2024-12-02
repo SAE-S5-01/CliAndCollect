@@ -1,4 +1,4 @@
-package fr.iutrodez.sae501.cliandcollect;
+package fr.iutrodez.sae501.cliandcollect.requetes;
 
 
 import android.content.Context;
