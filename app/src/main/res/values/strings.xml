@@ -16,4 +16,7 @@
     <string name="placeholder_ville">Entrez votre ville</string>
     <string name="seSouvenir">Se souvenir de moi</string>
     <string name="boutonInsription">Créer le compte</string>
+    <string name="messageErreurClient">Nom d\'utilisateur ou mot de passe vide</string>
+    <string name="messageErreurReseau">Aucune connexion internet detecté </string>
+    <string name="apiInjoignable">API injoignable</string>
 </resources>
