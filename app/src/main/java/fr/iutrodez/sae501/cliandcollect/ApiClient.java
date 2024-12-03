@@ -43,36 +43,6 @@ public class ApiClient {
         }
         return false;
     }
-    public static void apijoignable(Context context) {
-        String url = BASE_URL + "/api/apijoignable";
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String reponse) {
-                        Log.d("API : ", reponse.toString());
-                        ((PageConnexion) context).runOnUiThread(() -> {
-                            Button boutonConnexion = ((PageConnexion) context).findViewById(R.id.boutonConnexion);
-                            Button boutonInscription = ((PageConnexion) context).findViewById(R.id.boutonInscription);
-                            boutonConnexion.setEnabled(true);
-                            boutonInscription.setEnabled(true);
-                        });
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // L'api ne repond pas on affiche a l'utilisateur sur la page de connexion
-                // TODO : afficher un message d'erreur
-                Log.e("API : ", error.toString());
-                ((PageConnexion) context).runOnUiThread(() -> {
-                    TextView messageErreur = ((PageConnexion) context).findViewById(R.id.messageErreur);
-                    messageErreur.setText(R.string.apiInjoignable);
-                });
-            }
-        });
-
-        RequeteVolley.getInstance(context).ajoutFileRequete(stringRequest);
-    }
 
     public static void connexion(Context context, String mail, String mdp , Runnable connexionReussie) {
         String url = BASE_URL + "/api/connexion?mail=" + mail + "&motDePasse=" + mdp;
@@ -82,7 +52,8 @@ public class ApiClient {
                     @Override
                     public void onResponse(String reponse) {
                         Log.d("API : ", reponse.toString());
-                            ((PageConnexion) context).runOnUiThread(connexionReussie);
+                        // TODO : stocker le token dans les preferences
+                        ((PageConnexion) context).runOnUiThread(connexionReussie);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -90,15 +61,19 @@ public class ApiClient {
                 // L'api ne repond pas on affiche a l'utilisateur sur la page de connexion
                 Log.e("url : " , url);
                 Log.e("API : " , error.toString());
-                ((PageConnexion) context).runOnUiThread(() -> {
-                    TextView messageErreur = ((PageConnexion) context).findViewById(R.id.messageErreur);
-                    messageErreur.setText(new String(error.networkResponse.data));
-                });
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    ((PageConnexion) context).runOnUiThread(() -> {
+                        TextView messageErreur = ((PageConnexion) context).findViewById(R.id.messageErreur);
+                        messageErreur.setText(new String(error.networkResponse.data));
+                    });
+                } else {
+                    ((PageConnexion) context).runOnUiThread(() -> {
+                        TextView messageErreur = ((PageConnexion) context).findViewById(R.id.messageErreur);
+                        messageErreur.setText(R.string.apiInjoignable);
+                    });
+                }
             }
         });
-
         RequeteVolley.getInstance(context).ajoutFileRequete(stringRequest);
     }
-
-
 }

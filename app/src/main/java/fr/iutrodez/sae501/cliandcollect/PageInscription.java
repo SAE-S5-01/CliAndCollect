@@ -19,6 +19,13 @@ public class PageInscription extends AppCompatActivity {
     private  EditText mail;
     private  EditText mdp;
 
+    private EditText nom;
+    private EditText prenom;
+
+    private EditText adresse;
+
+    private EditText codePostal;
+
     /**
      * Méthode invoquée lors de la création de l'activité.
      * @param savedInstanceState
@@ -42,6 +49,7 @@ public class PageInscription extends AppCompatActivity {
      */
     private void inscription(View view) {
         // TODO : appelApi
+
         Intent menuPrincipal = new Intent(PageInscription.this, MainActivity.class);
         startActivity(menuPrincipal);
     }

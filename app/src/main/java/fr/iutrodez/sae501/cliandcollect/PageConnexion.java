@@ -31,21 +31,8 @@ public class PageConnexion extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.page_connexion);
-        boolean reseau = ApiClient.reseauDisponible(this);
         Button boutonConnexion = findViewById(R.id.boutonConnexion);
         Button boutonInscription = findViewById(R.id.boutonInscription);
-        boutonConnexion.setEnabled(false);
-        boutonConnexion.setEnabled(false);
-        /*
-         * Affiche au lancement une eventuelle connexion réseau manquante ou alors l'impossibilité
-         * de joindre l'api
-         */
-        if(reseau) {
-            ApiClient.apijoignable(this);
-        } else {
-            messageErreur.setText(R.string.messageErreurReseau);
-        }
-
         mail = findViewById(R.id.saisieMail);
         mdp = findViewById(R.id.saisieMdp);
         messageErreur = findViewById(R.id.messageErreur);
