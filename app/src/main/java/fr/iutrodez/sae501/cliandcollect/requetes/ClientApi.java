@@ -49,6 +49,7 @@ public class ClientApi {
     public static void connexion(Context context, String mail, String mdp , Runnable connexionReussie) {
         String url = BASE_URL + "/api/connexion?mail=" + mail + "&motDePasse=" + mdp;
 
+        // TODO : a retirer (permet de simuler une connexion réussie)
         ((ActiviteConnexion) context).runOnUiThread(connexionReussie);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -65,14 +66,14 @@ public class ClientApi {
                 Log.e("url : " , url);
                 Log.e("API : " , error.toString());
                 if (error.networkResponse != null && error.networkResponse.data != null) {
-                    ((PageConnexion) context).runOnUiThread(() -> {
-                        TextView messageErreur = ((PageConnexion) context).findViewById(R.id.messageErreur);
+                    ((ActiviteConnexion) context).runOnUiThread(() -> {
+                        TextView messageErreur = ((ActiviteConnexion) context).findViewById(R.id.messageErreur);
                         messageErreur.setText(new String(error.networkResponse.data));
                     });
                 } else {
-                    ((PageConnexion) context).runOnUiThread(() -> {
-                        TextView messageErreur = ((PageConnexion) context).findViewById(R.id.messageErreur);
-                        messageErreur.setText(R.string.apiInjoignable);
+                    ((ActiviteConnexion) context).runOnUiThread(() -> {
+                        TextView messageErreur = ((ActiviteConnexion) context).findViewById(R.id.messageErreur);
+                        messageErreur.setText(R.string.api_injoignable);
                     });
                 }
             }

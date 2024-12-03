@@ -4,10 +4,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.time.LocalDate;
 
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.R;
@@ -32,7 +35,7 @@ public class ActiviteConnexion extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.page_connexion);
+        setContentView(R.layout.activite_connexion);
         Button boutonConnexion = findViewById(R.id.boutonConnexion);
         Button boutonInscription = findViewById(R.id.boutonInscription);
         mail = findViewById(R.id.saisieMail);
@@ -50,16 +53,18 @@ public class ActiviteConnexion extends AppCompatActivity {
     private void clicConnexion(View bouton) {
         // TODO : appelApi pour verifier la connection
         String mail , mdp;
+        Log.d("Connexion", "Clic sur le bouton de connexion");
         mail = this.mail.getText().toString();
         mdp = this.mdp.getText().toString();
 
         if (mail.isEmpty() || mdp.isEmpty()) {
             messageErreur.setText(R.string.erreur_champ_connexion_vide);
         } else if (ClientApi.reseauDisponible(this)) {
-            //ClientApi.connexion(this, mail, mdp, () -> {
+            ClientApi.connexion(this, mail, mdp, () -> {
+                Log.d("Connexion", "Connexion réussie");
                 Intent menuPrincipal = new Intent(ActiviteConnexion.this, ActivitePrincipale.class);
                 startActivity(menuPrincipal);
-            //});
+            });
         } else {
             messageErreur.setText(R.string.erreur_reseau);
         }
