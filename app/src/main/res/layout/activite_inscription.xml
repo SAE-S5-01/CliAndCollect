@@ -39,7 +39,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/placeholder_nom" />
+                android:hint="@string/indication_nom" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                 android:id="@+id/saisieMail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/placeholder_mail" />
+                android:hint="@string/indication_email" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -60,7 +60,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/placeholder_adresse" />
+                android:hint="@string/indication_adresse" />
         </LinearLayout>
 
         <LinearLayout
@@ -77,7 +77,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/placeholder_prenom" />
+                android:hint="@string/indication_prenom" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -88,7 +88,7 @@
                 android:id="@+id/saisieMdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/placeholder_mdp" />
+                android:hint="@string/indication_mdp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -98,7 +98,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/placeholder_ville" />
+                android:hint="@string/indication_ville" />
         </LinearLayout>
     </LinearLayout>
 
@@ -120,7 +120,7 @@
             android:id="@+id/labelRememberMe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/seSouvenir" />
+            android:text="@string/se_souvenir" />
     </LinearLayout>
 
     <Button

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CliAndCollect</string>
+    <string name="app_nom">CliAndCollect</string>
     <string name="inscription">Inscription</string>
     <string name="connexion">Connexion</string>
     <string name="mail">Mail</string>
@@ -8,15 +8,15 @@
     <string name="nom">Nom</string>
     <string name="prenom">Prénom</string>
     <string name="ville">Ville</string>
-    <string name="placeholder_nom">Entrez votre nom</string>
-    <string name="placeholder_prenom">Entrez votre prénom</string>
-    <string name="placeholder_mail">Entrez votre mail</string>
-    <string name="placeholder_mdp">Entrez votre mot de passe</string>
-    <string name="placeholder_adresse">Entrez votre adresse</string>
-    <string name="placeholder_ville">Entrez votre ville</string>
-    <string name="seSouvenir">Se souvenir de moi</string>
-    <string name="boutonInsription">Créer le compte</string>
-    <string name="messageErreurClient">Nom d\'utilisateur ou mot de passe vide</string>
-    <string name="messageErreurReseau">Aucune connexion internet detecté </string>
-    <string name="apiInjoignable">API injoignable</string>
+    <string name="indication_nom">Entrez votre nom</string>
+    <string name="indication_prenom">Entrez votre prénom</string>
+    <string name="indication_email">Entrez votre mail</string>
+    <string name="indication_mdp">Entrez votre mot de passe</string>
+    <string name="indication_adresse">Entrez votre adresse</string>
+    <string name="indication_ville">Entrez votre ville</string>
+    <string name="se_souvenir">Se souvenir de moi</string>
+    <string name="bouton_insription">Créer le compte</string>
+    <string name="erreur_champ_connexion_vide">Nom d\'utilisateur ou mot de passe vide</string>
+    <string name="erreur_reseau">Aucune connexion internet detecté </string>
+    <string name="api_injoignable">API injoignable</string>
 </resources>

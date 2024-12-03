@@ -1,5 +1,5 @@
 /*
- * MainActivity.java                                                27 nov. 2024
+ * ActivitePrincipale.java                                                27 nov. 2024
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 package fr.iutrodez.sae501.cliandcollect;
@@ -13,11 +13,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import fr.iutrodez.sae501.cliandcollect.fragments.AdaptateurFragments;
+
 /**
  * Activité principale et point d'entrée de l'application.
  * @author Loïc FAUGIERES
  */
-public class MainActivity extends AppCompatActivity {
+public class ActivitePrincipale extends AppCompatActivity {
 
     TabLayout gestionnaireOnglet;
 
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activite_principale);
 
         /*
          * on récupère un accès sur le ViewPager et sur le TabLayout qui gèrera les onglets
@@ -43,13 +45,13 @@ public class MainActivity extends AppCompatActivity {
         /*
          * on associe au ViewPager un adaptateur pour gérer le défilement entre les fragments
          */
-        gestionnairePagination.setAdapter(new FragmentAdapter(this));
+        gestionnairePagination.setAdapter(new AdaptateurFragments(this));
 
         navigationButtonsIds = new int[] {
-            R.id.footer_icon_home,
-            R.id.footer_icon_client,
-            R.id.footer_icon_parcours,
-            R.id.footer_icon_itineraire
+            R.id.pied_page_icone_accueil,
+            R.id.pied_page_icone_client,
+            R.id.pied_page_icone_parcours,
+            R.id.pied_page_icone_itineraire
         };
 
         /*
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(gestionnaireOnglet, gestionnairePagination,
             (tab, position) -> {
                 // Associer manuellement des vues personnalisées
-                View customView = getLayoutInflater().inflate(R.layout.footer_icon_template, null);
+                View customView = getLayoutInflater().inflate(R.layout.pied_page_patron_icone, null);
                 ImageView icon = customView.findViewById(R.id.footer_icon);
 
                 // Configurer l'icône
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     throws IllegalStateException {
         switch (position) {
             case 0:
-                button.setImageResource(R.drawable.home);
+                button.setImageResource(R.drawable.accueil);
                 break;
             case 1:
                 button.setImageResource(R.drawable.client);
@@ -128,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
     private void setButtonState(ImageView button, boolean isActive) {
         button.setColorFilter(
             getResources().getColor(isActive
-                                    ? R.color.footer_icon_active
-                                    : R.color.footer_icon_inactive,
+                                    ? R.color.pied_page_icone_active
+                                    : R.color.pied_page_icone_inactive,
                               null));
     }
 

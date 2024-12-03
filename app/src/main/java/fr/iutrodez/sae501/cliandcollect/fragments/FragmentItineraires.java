@@ -2,7 +2,7 @@
  * FragmentItineraires.java                                         28 nov. 2024
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
-package fr.iutrodez.sae501.cliandcollect;
+package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+
+import fr.iutrodez.sae501.cliandcollect.R;
 
 /**
  * Gestion du fragment Itinéraires.

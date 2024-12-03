@@ -11,13 +11,13 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/app_nom"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CliAndCollect"
         tools:targetApi="31">
         <activity
-            android:name=".PageConnexion"
+            android:name=".activites.ActiviteConnexion"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,22 +25,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".PageInscription"/>
+        <activity android:name=".ActivitePrincipale"/>
+        <activity android:name=".activites.ActiviteInscription"/>
         <activity
-            android:name=".FragmentHome"
+            android:name=".fragments.FragmentAccueil"
             android:exported="true">
         </activity>
         <activity
-            android:name=".FragmentClients"
+            android:name=".fragments.FragmentClients"
             android:exported="true">
         </activity>
         <activity
-            android:name=".FragmentParcours"
+            android:name=".fragments.FragmentParcours"
             android:exported="true">
         </activity>
         <activity
-            android:name=".FragmentItineraires"
+            android:name=".fragments.FragmentItineraires"
             android:exported="true">
         </activity>
     </application>

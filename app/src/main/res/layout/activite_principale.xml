@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".ActivitePrincipale">
 
     <ScrollView
         style="@style/AppStyle">
@@ -19,6 +19,6 @@
     </ScrollView>
 
     <include
-        layout="@layout/footer_component" />
+        layout="@layout/pied_page_composant" />
 
 </LinearLayout>
