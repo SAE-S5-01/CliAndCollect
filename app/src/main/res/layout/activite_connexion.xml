@@ -75,7 +75,7 @@
         android:layout_marginTop="16dp">
 
         <CheckBox
-            android:id="@+id/rememberMe"
+            android:id="@+id/seRappelerDeMoi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

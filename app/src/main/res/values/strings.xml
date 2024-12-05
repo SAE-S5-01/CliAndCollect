@@ -19,4 +19,8 @@
     <string name="erreur_champ_connexion_vide">Nom d\'utilisateur ou mot de passe vide</string>
     <string name="erreur_reseau">Aucune connexion internet detecté </string>
     <string name="api_injoignable">API injoignable</string>
+    <string name="erreur_inscription">Erreur lors de l\'inscription , veuillez reessayer plus tard</string>
+    <string name="attente_connexion">Connexion en cours ...</string>
+    <string name="attente_inscription">Inscription en cours ...</string>
+    <string name="inscription_reussie">Inscription réussie ! Bienvenu !</string>
 </resources>

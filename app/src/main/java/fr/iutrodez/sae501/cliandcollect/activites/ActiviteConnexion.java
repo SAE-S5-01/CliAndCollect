@@ -3,16 +3,18 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.time.LocalDate;
+import android.widget.Toast;
 
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
+import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
@@ -27,6 +29,7 @@ public class ActiviteConnexion extends AppCompatActivity {
     private EditText mdp;
 
     private TextView messageErreur;
+    private CheckBox seRappelerdeMoi;
 
     /**
      * Méthode invoquée lors de la création de l'activité.
@@ -41,6 +44,7 @@ public class ActiviteConnexion extends AppCompatActivity {
         mail = findViewById(R.id.saisieMail);
         mdp = findViewById(R.id.saisieMdp);
         messageErreur = findViewById(R.id.messageErreur);
+        seRappelerdeMoi = findViewById(R.id.seRappelerDeMoi);
 
         boutonConnexion.setOnClickListener(this::clicConnexion);
         boutonInscription.setOnClickListener(this::clicInscription);
@@ -51,22 +55,20 @@ public class ActiviteConnexion extends AppCompatActivity {
      * @param bouton Le bouton de connexion
      */
     private void clicConnexion(View bouton) {
-        // TODO : appelApi pour verifier la connection
         String mail , mdp;
-        Log.d("Connexion", "Clic sur le bouton de connexion");
         mail = this.mail.getText().toString();
         mdp = this.mdp.getText().toString();
 
         if (mail.isEmpty() || mdp.isEmpty()) {
-            messageErreur.setText(R.string.erreur_champ_connexion_vide);
+            Toast.makeText(this, R.string.erreur_champ_connexion_vide ,  Toast.LENGTH_LONG).show();
         } else if (ClientApi.reseauDisponible(this)) {
             ClientApi.connexion(this, mail, mdp, () -> {
-                Log.d("Connexion", "Connexion réussie");
-                Intent menuPrincipal = new Intent(ActiviteConnexion.this, ActivitePrincipale.class);
+                ActivitePrincipale.preferencesConnexion(seRappelerdeMoi.isChecked() , mail, mdp);
+                Intent menuPrincipal = new Intent(ActiviteConnexion.this, GestionFragment.class);
                 startActivity(menuPrincipal);
-            });
+            } , () -> {});
         } else {
-            messageErreur.setText(R.string.erreur_reseau);
+            Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
         }
     }
 

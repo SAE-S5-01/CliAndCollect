@@ -4,26 +4,28 @@
  */
 package fr.iutrodez.sae501.cliandcollect;
 
+import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
+import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
-import fr.iutrodez.sae501.cliandcollect.fragments.AdaptateurFragments;
 
 /**
  * Activité principale et point d'entrée de l'application.
- * @author Loïc FAUGIERES
+ * @author Descriaud Lucas
  */
 public class ActivitePrincipale extends AppCompatActivity {
 
-    TabLayout gestionnaireOnglet;
 
-    int[] navigationButtonsIds;
+    public static SharedPreferences preferences;
+
+    private Intent activiteALancer;
 
     /**
      * Méthode invoquée lors de la création de l'activité.
@@ -34,123 +36,51 @@ public class ActivitePrincipale extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activite_principale);
+
+        preferences = getDefaultSharedPreferences(getApplicationContext());
 
         /*
-         * on récupère un accès sur le ViewPager et sur le TabLayout qui gèrera les onglets
+         * Verification uniquement du mail car le mail n'est jamais ecrit sans le mdp
+         * Si les valeurs n'ont pas changé dans la bd de l'api on redirige vers la vue principale
+         * Dans n'importe qu'elle autre cas on redirige vers la vue de connexion
          */
-        ViewPager2 gestionnairePagination = findViewById(R.id.activity_main_viewpager);
-        gestionnaireOnglet = findViewById(R.id.footer_layout);
-
-        /*
-         * on associe au ViewPager un adaptateur pour gérer le défilement entre les fragments
-         */
-        gestionnairePagination.setAdapter(new AdaptateurFragments(this));
-
-        navigationButtonsIds = new int[] {
-            R.id.pied_page_icone_accueil,
-            R.id.pied_page_icone_client,
-            R.id.pied_page_icone_parcours,
-            R.id.pied_page_icone_itineraire
-        };
-
-        /*
-         * On fait le lien entre
-         * le gestionnaire de pagination et le gestionnaire des onglets
-         */
-        new TabLayoutMediator(gestionnaireOnglet, gestionnairePagination,
-            (tab, position) -> {
-                // Associer manuellement des vues personnalisées
-                View customView = getLayoutInflater().inflate(R.layout.pied_page_patron_icone, null);
-                ImageView icon = customView.findViewById(R.id.footer_icon);
-
-                // Configurer l'icône
-                setResourceByPosition(icon, position);
-                // Configurer l'ID de l'image
-                icon.setId(navigationButtonsIds[position]);
-
-                // Associer la vue personnalisée à l'onglet
-                tab.setCustomView(customView);
-            }).attach();
-
-        // Mise à jour de la couleur lors du changement de page
-        gestionnairePagination.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-
-                TabLayout.Tab ongletActif = gestionnaireOnglet.getTabAt(position);
-
-                if (ongletActif != null && ongletActif.getCustomView() != null) {
-                    // Récupérer le bouton de l'onglet actif
-                    ImageView boutonActif
-                        = ongletActif.getCustomView()
-                                     .findViewById(navigationButtonsIds[position]);
-
-                    if (boutonActif != null) {
-                        setButtonState(boutonActif, true);
-                        resetOtherButtons(position);
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Modifie l'image d'un bouton en fonction de sa position.
-     * @param button Bouton à modifier
-     * @param position Position du bouton
-     * @throws IllegalStateException Si la position est inattendue
-     */
-    private void setResourceByPosition(ImageView button, int position)
-    throws IllegalStateException {
-        switch (position) {
-            case 0:
-                button.setImageResource(R.drawable.accueil);
-                break;
-            case 1:
-                button.setImageResource(R.drawable.client);
-                break;
-            case 2:
-                button.setImageResource(R.drawable.parcours);
-                break;
-            case 3:
-                button.setImageResource(R.drawable.itineraire);
-                break;
-            default:
-                throw new IllegalStateException("Position inattendue : " + position);
+        if (ClientApi.reseauDisponible(this) && preferences.contains("mail")) {
+            ClientApi.connexion(this,
+                    preferences.getString("mail", ""),
+                    preferences.getString("mdp", ""),
+                    () -> {lancementActivite(GestionFragment.class);},
+                    () -> {lancementActivite(ActiviteConnexion.class);}
+            );
+        } else {
+            activiteALancer = new Intent(this, ActiviteConnexion.class);
+            startActivity(activiteALancer);
+            finish();
         }
     }
 
     /**
-     * Modifie la couleur d'un bouton en fonction de son état
-     * @param button Bouton à modifier
-     * @param isActive Etat du bouton
+     * Méthode permettant de lancer une activité.
+     * @param activite L'activité à lancer
      */
-    private void setButtonState(ImageView button, boolean isActive) {
-        button.setColorFilter(
-            getResources().getColor(isActive
-                                    ? R.color.pied_page_icone_active
-                                    : R.color.pied_page_icone_inactive,
-                              null));
+    private void lancementActivite(Class<?> activite) {
+        Intent intent = new Intent(this, activite);
+        startActivity(intent);
+        finish();
     }
 
     /**
-     * Réinitialise les boutons des onglets non actifs
-     * @param activePosition Position de l'onglet actif
+     * Méthode permettant de gérer les préférences de connexion.
+     * @param seRappelerdeMoi Si l'utilisateur souhaite être rappelé
+     * @param mail Le mail de l'utilisateur
+     * @param mdp Le mot de passe de l'utilisateur
      */
-    private void resetOtherButtons(int activePosition) {
-        for (int i = 0; i < gestionnaireOnglet.getTabCount(); i++) {
-            if (i == activePosition) continue;
-
-            TabLayout.Tab tab = gestionnaireOnglet.getTabAt(i);
-            if (tab != null && tab.getCustomView() != null) {
-                ImageView button
-                        = tab.getCustomView().findViewById(navigationButtonsIds[i]);
-                if (button != null) {
-                    setButtonState(button, false);
-                }
-            }
+    public static void preferencesConnexion(boolean seRappelerdeMoi, String mail, String mdp) {
+        if (seRappelerdeMoi) {
+            preferences.edit().putString("mail", mail).apply();
+            preferences.edit().putString("mdp", mdp).apply();
+        } else if (preferences.contains("mail")) {
+            preferences.edit().remove("mail").apply();
+            preferences.edit().remove("mdp").apply();
         }
     }
 }

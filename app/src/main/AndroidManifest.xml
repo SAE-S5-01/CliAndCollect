@@ -17,7 +17,7 @@
         android:theme="@style/Theme.CliAndCollect"
         tools:targetApi="31">
         <activity
-            android:name=".activites.ActiviteConnexion"
+            android:name=".ActivitePrincipale"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ActivitePrincipale"/>
+        <activity android:name=".fragments.GestionFragment"/>
+        <activity android:name=".activites.ActiviteConnexion"/>
         <activity android:name=".activites.ActiviteInscription"/>
         <activity
             android:name=".fragments.FragmentAccueil"
