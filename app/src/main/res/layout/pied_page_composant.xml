@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <!-- tabTextColor : couleur du texte des boutons d'onglet
+         tabBackground : couleur de fond des boutons d'onglet
+         tabSelectedTextColor : couleur du texte du bouton de l'onglet actif
+         tabIndicatorColor : couleur trait qui souligne nom bouton onglet actif -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/footer_layout"
+        style="@style/FooterComponent"
+        app:tabBackground="@color/pied_page_fond"
+        app:tabIndicatorColor="@color/pied_page_icone_active"
+        app:tabSelectedTextColor="@color/pied_page_icone_active"
+        app:tabTextColor="@color/pied_page_icone_inactive" />
+
+</LinearLayout>

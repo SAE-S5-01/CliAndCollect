@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="pied_page_icone_accueil" type="id"/>
+    <item name="pied_page_icone_client" type="id"/>
+    <item name="pied_page_icone_parcours" type="id"/>
+    <item name="pied_page_icone_itineraire" type="id"/>
+</resources>
