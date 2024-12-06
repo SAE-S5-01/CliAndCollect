@@ -23,4 +23,6 @@
     <string name="attente_connexion">Connexion en cours ...</string>
     <string name="attente_inscription">Inscription en cours ...</string>
     <string name="inscription_reussie">Inscription réussie ! Bienvenu !</string>
+    <string name="menu_deconnecter">Se déconnecter</string>
+    <string name="menu_compte">Gérer mon compte</string>
 </resources>

@@ -8,11 +8,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import fr.iutrodez.sae501.cliandcollect.R;
 
+import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
+import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 
 
 /**
@@ -95,6 +103,26 @@ public class GestionFragment extends AppCompatActivity {
                 }
             }
         });
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.menu_option, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_deconnecter) {
+            ActivitePrincipale.preferences.edit().remove("mail");
+            ActivitePrincipale.preferences.edit().remove("mdp");
+            ActivitePrincipale.preferences.edit().remove("token");
+            Intent pageConnexion = new Intent(this, ActiviteConnexion.class);
+            startActivity(pageConnexion);
+            finish();
+        } else if (item.getItemId() == R.id.menu_compte) {
+            // TODO vue mon compte
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
