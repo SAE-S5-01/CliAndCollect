@@ -12,21 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <Button
+            android:id="@+id/boutonAjoutClient"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="Clients (TODO page)"
-            android:textSize="50sp" />
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dip"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="#0000FF" />
-
+            android:layout_margin="15dp"
+            android:text="@string/ajouter_client" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recycler_view_clients"/>
     </LinearLayout>
 
 </ScrollView>
