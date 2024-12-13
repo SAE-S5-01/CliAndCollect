@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 
@@ -34,6 +35,8 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 public class FragmentClients extends Fragment implements View.OnClickListener {
 
     private Intent intent;
+
+    private Intent detailClient;
 
     private ActivityResultLauncher<Intent> lanceurFille;
 
@@ -96,6 +99,10 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
         lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
         return vueDuFragment;
+    }
+
+    public void onClientClik(){
+        detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
     }
 
     @Override
