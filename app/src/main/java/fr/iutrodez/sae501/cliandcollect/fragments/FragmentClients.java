@@ -17,13 +17,16 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 
 /**
  * Gestion du fragment Clients.
@@ -32,6 +35,8 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 public class FragmentClients extends Fragment implements View.OnClickListener {
 
     private Intent intent;
+
+    private Intent detailClient;
 
     private ActivityResultLauncher<Intent> lanceurFille;
 
@@ -80,10 +85,24 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
         clients = new ArrayList<>();
+        clients.add(new Client("test","test","20:45",false));
+        clients.add(new Client("test2","test2","20:45",true));
+        clients.add(new Client("test3","test3","20:45",true));
+
+        LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
+        listeClients.setLayoutManager(gestionnaireLineaire);
+
+        ClientAdapter adapter = new ClientAdapter(clients);
+        listeClients.setHasFixedSize(true);
+        listeClients.setAdapter(adapter);
 
         intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
         lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
         return vueDuFragment;
+    }
+
+    public void onClientClik(){
+        detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
     }
 
     @Override
@@ -94,6 +113,10 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         lanceurFille.launch(intent);
+    }
+
+    private void initialiseClients(){
+
     }
 
     private void getNouveauClient(ActivityResult resultat) {
