@@ -154,7 +154,7 @@
                     android:checked="true"
                     android:layout_height="wrap_content" />
                 <RadioButton
-                    android:id="@+id/propspect"
+                    android:id="@+id/prospect"
                     android:layout_width="wrap_content"
                     android:text="@string/prospect"
                     android:layout_height="wrap_content"/>
@@ -189,6 +189,13 @@
             android:onClick="valider"
             android:layout_marginBottom="304dp"
             android:text="@string/valider" />
+        <Button
+            android:id="@+id/obtenirCoordonnees"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="obtenirCoordonnees"
+            android:layout_marginBottom="304dp"
+            android:text="@string/obtenircoordonnees" />
         <Button
             android:id="@+id/boutonRetour"
             android:layout_width="wrap_content"

@@ -12,18 +12,24 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 
 /**
@@ -101,6 +107,10 @@ public class ClientApi {
                     // Ajouter des headers si nécessaire
                     Map<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", "application/json");
+                    String token = ActivitePrincipale.preferences.getString("tokenApi", "");
+                    if (!token.isEmpty()) {
+                        headers.put("Authorization", "Bearer " + token);
+                    }
                     return headers;
                 }
             };
@@ -127,7 +137,7 @@ public class ClientApi {
         parametre.put("motDePasse", mdp);
         Toast toast = Toast.makeText(contexte, R.string.attente_connexion, Toast.LENGTH_LONG);
         try {
-            requeteApi(contexte, Request.Method.GET, "/api/connexion", parametre, null,
+            requeteApi(contexte, Request.Method.GET, "/api/utilisateur/connexion", parametre, null,
                 response -> {
                     /*
                      * Pas de gestion propre de l'erreur car l'API retourne un code 401 en cas d'erreur*
@@ -167,7 +177,7 @@ public class ClientApi {
     public static void inscription(Context contexte, JSONObject donnees, Runnable connexionReussie) {
         Toast toast = Toast.makeText(contexte, R.string.attente_inscription, Toast.LENGTH_LONG);
         try {
-            requeteApi(contexte, Request.Method.POST, "/api/inscription", null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/api/utilisateur/inscription", null , donnees,
                 response -> {
                     try {
                         JSONObject jsonReponse = new JSONObject(response);
@@ -188,6 +198,86 @@ public class ClientApi {
         } catch (Exception e) {
         }
     }
+
+    public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
+        try {
+            requeteApi(contexte, Request.Method.POST, "/api/contact", null , donnees,
+                response -> {
+                    try {
+                        JSONObject jsonReponse = new JSONObject(response);
+                        ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
+                    } catch (Exception e) {
+                        Log.e("erreur", e.toString());
+                        //throw new RuntimeException(e);
+                    }
+                } ,
+                error -> {
+                    //gestionErreur(contexte, error);
+                    Log.e("erreur", error.toString());
+                }
+            );
+        } catch (Exception e) {
+            Log.e("erreur", e.toString());
+        }
+    }
+
+
+    public static void verifierAddresse(String adresse, double[] viewbox ,Context contexte, VolleyCallback callback) throws UnsupportedEncodingException {
+
+        String urlApi = "https://nominatim.openstreetmap.org/search?q="
+                + URLEncoder.encode(adresse, "UTF-8")
+                + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
+                + "&bounded=1&format=json&addressdetails=1";
+        JsonArrayRequest requete = new JsonArrayRequest(
+                Request.Method.GET,
+                urlApi,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            // Liste pour stocker les résultats
+                            List<Map<String , String>> results = new ArrayList<>();
+
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject jsonObject = response.getJSONObject(i);
+
+                                Map<String, String> locationInfo = new HashMap<>();
+                                locationInfo.put("display_name", jsonObject.getString("display_name"));
+                                locationInfo.put("lat", jsonObject.getString("lat"));
+                                locationInfo.put("lon", jsonObject.getString("lon"));
+                                results.add(locationInfo);
+                            }
+
+                            // Retourner les résultats via le callback
+                            callback.onSuccess(results);
+
+                        } catch (JSONException e) {
+                            // Gérer l'exception JSON
+                            callback.onError("error catch : " + e.toString());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Retourner l'erreur via le callback
+                        callback.onError(error.toString());
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("User-Agent", "cliAndCollect/1.0 ");
+                return headers;
+            }
+        };
+
+        // Ajouter la requête à la file d'attente
+        RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
+    }
+//
 
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.
