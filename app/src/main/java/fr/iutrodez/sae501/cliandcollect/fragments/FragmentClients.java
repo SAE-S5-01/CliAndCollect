@@ -137,10 +137,13 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     }
 
     private void getNouveauClient(ActivityResult resultat) {
-        Intent retourFille = resultat.getData();
-
         if(resultat.getResultCode() == Activity.RESULT_OK){
+            clients.clear();
+            for ( Client client : SingletonListeClient.getListeClient()) {
+                clients.add(client);
+            }
 
+            adapter.notifyDataSetChanged();
         }
     }
 

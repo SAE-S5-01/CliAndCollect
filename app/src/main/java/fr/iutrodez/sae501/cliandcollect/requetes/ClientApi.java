@@ -209,19 +209,59 @@ public class ClientApi {
         }
     }
 
+    public static void getListeClient(Context contexte , Runnable callback) {
+        requeteApi(contexte, Request.Method.GET, "/api/contact", null, null,
+                response -> {
+                    try {
+                        JSONArray jsonReponse = new JSONArray(response);
+
+                        for (int i = 0; i < jsonReponse.length(); i++) {
+                            JSONObject jsonClient = jsonReponse.getJSONObject(i);
+                            Client client = new Client(
+                                    jsonClient.getString("nomEntreprise"),
+                                    jsonClient.getString("adresse"),
+                                    jsonClient.getDouble("longitude"),
+                                    jsonClient.getDouble("latitude") ,
+                                    jsonClient.getBoolean("prospect")
+                            );
+                            SingletonListeClient.getInstance().ajouterClient(client);
+                        }
+                        callback.run();
+                    } catch (Exception e) {
+                        Log.e("getListeClient", "Erreur lors du traitement de la réponse", e);
+                    }
+                },
+                error -> {
+                    Log.e("getListeClient", "Erreur reçue", error);
+                    gestionErreur(contexte, error);
+                }
+        );
+    }
+
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
             requeteApi(contexte, Request.Method.POST, "/api/contact", null , donnees,
                 response -> {
                     try {
+                        // En cas de succès, on ajoute le client au singleton pour faire l'affichage
                         JSONObject jsonReponse = new JSONObject(response);
                         ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
+                        Client clientCree = new Client(
+                            jsonReponse.getString("nomEntreprise"),
+                            jsonReponse.getString("adresse"),
+                            jsonReponse.getDouble("longitude"),
+                            jsonReponse.getDouble("latitude") ,
+                            jsonReponse.getBoolean("prospect")
+                        );
+                        SingletonListeClient.getInstance().ajouterClient(clientCree);
                     } catch (Exception e) {
+                        // TODO gestion erreur
                         Log.e("erreur", e.toString());
                         //throw new RuntimeException(e);
                     }
                 } ,
                 error -> {
+                // TODO gestion erreur api
                     //gestionErreur(contexte, error);
                     Log.e("erreur", error.toString());
                 }

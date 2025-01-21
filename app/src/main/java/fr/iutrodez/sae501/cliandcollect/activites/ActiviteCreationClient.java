@@ -87,9 +87,11 @@ public class ActiviteCreationClient extends AppCompatActivity {
             Toast.makeText(this, "L'adresse de l'entreprise est obligatoire", Toast.LENGTH_LONG).show();
         } else {
             JSONObject donnees = formulaireEnJson();
+            // TODO ajout toast ?
             if (ClientApi.reseauDisponible(this)) {
                 ClientApi.creationClient(this, donnees, () -> {
-                    Log.i("creation", "Client créé");
+                    setResult(AppCompatActivity.RESULT_OK);
+                    finish();
                 });
             } else {
                 Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
