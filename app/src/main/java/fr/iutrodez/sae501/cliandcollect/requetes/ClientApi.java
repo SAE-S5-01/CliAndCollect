@@ -15,7 +15,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,12 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
-import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 
 /**
  * Classe définissant les différentes méthodes pour communiquer avec l'API.
@@ -60,6 +59,19 @@ public class ClientApi {
             }
         }
         return false;
+    }
+
+    /**
+     * Méthode permettant de générer les headers pour les requêtes à l'API.
+     */
+    private static Map<String, String> genererHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        String token = ActivitePrincipale.preferences.getString("tokenApi", "");
+        if (!token.isEmpty()) {
+            headers.put("Authorization", "Bearer " + token);
+        }
+        return headers;
     }
 
     /**
@@ -104,19 +116,17 @@ public class ClientApi {
             request = new JsonObjectRequest(methode, url, donnees, response -> reussite.onResponse(response.toString()), erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    // Ajouter des headers si nécessaire
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Content-Type", "application/json");
-                    String token = ActivitePrincipale.preferences.getString("tokenApi", "");
-                    if (!token.isEmpty()) {
-                        headers.put("Authorization", "Bearer " + token);
-                    }
-                    return headers;
+                    return genererHeaders();
                 }
             };
         } else {
             // Utiliser StringRequest si aucun body JSON n'est fourni
-            request = new StringRequest(methode, url, reussite, erreur);
+            request = new StringRequest(methode, url, reussite, erreur) {
+                @Override
+                public Map<String, String> getHeaders() {
+                    return genererHeaders();
+                }
+            };
         }
         // Ajouter la requête à la file d'attente
         RequeteVolley.getInstance(contexte).ajoutFileRequete(request);

@@ -8,7 +8,9 @@ public class Client {
 
     private String description;
 
-    private String coordonnees;
+    private double x;
+
+    private double y;
 
     private String nomContact;
 
@@ -29,11 +31,12 @@ public class Client {
 
     }
 
-    public Client(String entreprise, String adresse,String coordonnees,boolean clientPropspect){
+    public Client(String entreprise, String adresse, double x , double y ,boolean clientPropspect){
         this.entreprise = entreprise;
         this.adresse = adresse;
         this.clientPropspect = clientPropspect;
-        this.coordonnees = coordonnees;
+        this.x = x;
+        this.y = y;
     }
 
     public String getDescription() {

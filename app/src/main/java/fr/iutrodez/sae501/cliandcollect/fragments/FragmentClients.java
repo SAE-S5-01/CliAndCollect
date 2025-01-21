@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
 /**
  * Gestion du fragment Clients.
@@ -44,6 +47,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
     private ArrayList<Client> clients;
 
+    private ClientAdapter adapter;
     /**
      * @return Une nouvelle instance de FragmentClients.
      */
@@ -85,19 +89,28 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
         clients = new ArrayList<>();
-        clients.add(new Client("test","test","20:45",false));
-        clients.add(new Client("test2","test2","20:45",true));
-        clients.add(new Client("test3","test3","20:45",true));
+        if (ClientApi.reseauDisponible(this.getContext())) {
 
-        LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
-        listeClients.setLayoutManager(gestionnaireLineaire);
+            ClientApi.getListeClient(this.getContext(), () -> {
+                for (Client client : SingletonListeClient.getListeClient()) {
+                    clients.add(client);
+                }
+                adapter.notifyDataSetChanged();
+            });
 
-        ClientAdapter adapter = new ClientAdapter(clients);
-        listeClients.setHasFixedSize(true);
-        listeClients.setAdapter(adapter);
+            LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
+            listeClients.setLayoutManager(gestionnaireLineaire);
 
-        intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
-        lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
+            adapter = new ClientAdapter(clients);
+            listeClients.setHasFixedSize(true);
+            listeClients.setAdapter(adapter);
+
+            intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
+            lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
+        // TODO : else : afficher un message d'erreur
+        } else {
+            Log.e("reseau", "Réseau indisponible");
+        }
         return vueDuFragment;
     }
 
@@ -108,6 +121,10 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        // TODO : Appeler l'API pour récupérer la liste des clients
+        if (ClientApi.reseauDisponible(this.getContext()) && clients.isEmpty()) {
+            Log.i("client fragment" , "reseau dispo et liste client vide call api requis");
+        }
     }
 
     @Override
