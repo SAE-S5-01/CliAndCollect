@@ -54,16 +54,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-apk  # Ce job dépend du job "build-apk"
     steps:
-      # 1. Télécharger l'APK depuis les artefacts
+      # 1. Récupérer le code source
+      - name: Récupérer le code source
+        uses: actions/checkout@v3  # Clone le dépôt GitHub
+        
+      # 2. Télécharger l'APK depuis les artefacts
       - name: Télécharger l'artefact APK
         uses: actions/download-artifact@v3
         with:
           name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
       
-      # 2. Récupérer le code source
-      - name: Récupérer le code source
-        uses: actions/checkout@v3  # Clone le dépôt GitHub
-
       - name: debug
         run: ls -a /home/runner/work/CliAndCollect/CliAndCollect/
 
