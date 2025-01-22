@@ -1,6 +1,7 @@
 package fr.iutrodez.sae501.cliandcollect.requetes;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
@@ -32,17 +34,16 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 
 /**
- * Classe définissant les différentes méthodes pour communiquer avec l'API.
- * @author Descriaud Lucas
+ * Différentes méthodes de communication avec l'API.
+ *
+ * @author Lucas DESCRIAUD
+ * @author Loïc FAUGIERES
  */
 public class ClientApi {
 
     private static final String BASE_URL = "http://10.0.2.2:8080";
 
-    /**
-     * Méthode permettant de verifier si l'API est joignable.
-     * @param context Le contexte de l'application
-     */
+    private static ProgressDialog spineurChargement;
 
     /**
      * Vérifie qu'une connexion internet est disponible.
@@ -50,14 +51,23 @@ public class ClientApi {
      * @return true si une connexion internet est disponible sinon false.
      */
     public static boolean reseauDisponible(Context context) {
+        spineurChargement = new ProgressDialog(context);
+        spineurChargement.setMessage(context.getString(R.string.attente_reseau));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
         if (cm != null) {
             Network network = cm.getActiveNetwork();
             if (network != null) {
                 NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+
+                spineurChargement.dismiss();
                 return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
             }
         }
+        spineurChargement.dismiss();
         return false;
     }
 
@@ -69,7 +79,7 @@ public class ClientApi {
         headers.put("Content-Type", "application/json");
         String token = ActivitePrincipale.preferences.getString("tokenApi", "");
         if (!token.isEmpty() && !(route.equals("/api/utilisateur/connexion")
-                || route.equals("/api/utilisateur/inscription"))) {
+            || route.equals("/api/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
         }
         return headers;
@@ -141,25 +151,32 @@ public class ClientApi {
      * @param mdp Le mot de passe de l'utilisateur
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
-    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie ,
-    Runnable erreurConnexion) {
+    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie,
+        Runnable erreurConnexion) {
         Map<String, String> parametre = new HashMap<>();
+
         parametre.put("mail", mail);
         parametre.put("motDePasse", mdp);
-        Toast toast = Toast.makeText(contexte, R.string.attente_connexion, Toast.LENGTH_LONG);
+
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_connexion));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
             requeteApi(contexte, Request.Method.GET, "/api/utilisateur/connexion", parametre, null,
                 response -> {
                     /*
-                     * Pas de gestion propre de l'erreur car l'API retourne un code 401 en cas d'erreur*
+                     * Pas de gestion propre de l'erreur car l'API retourne un code 401 en cas d'erreur
                      * On ne passera dans le catch que si le code de l'api venait a etre modifier en
                      * retirant le token obligatoire pour le reste de l'utilisation de l'application
                      * dans sa reponse
                      */
                     try {
+                        spineurChargement.dismiss();
+
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
-                        toast.cancel();
                         ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
                         ((Activity) contexte).runOnUiThread(connexionReussie);
                     } catch (JSONException e) {
@@ -167,15 +184,17 @@ public class ClientApi {
                     }
                 },
                 error -> {
-                    /* erreurConnexion ne sert que pour Activite principale*/
-                    if(erreurConnexion != null) {
+                    spineurChargement.dismiss();
+
+                    /* erreurConnexion ne sert que pour Activite principale */
+                    if (erreurConnexion != null) {
                         ((Activity) contexte).runOnUiThread(erreurConnexion);
                     }
-                    toast.cancel();
                     gestionErreur(contexte, error);
                 }
             );
         } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
 
@@ -186,27 +205,36 @@ public class ClientApi {
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
     public static void inscription(Context contexte, JSONObject donnees, Runnable connexionReussie) {
-        Toast toast = Toast.makeText(contexte, R.string.attente_inscription, Toast.LENGTH_LONG);
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_inscription));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
             requeteApi(contexte, Request.Method.POST, "/api/utilisateur/inscription", null , donnees,
                 response -> {
                     try {
+                        spineurChargement.dismiss();
+
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
                         ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
-                        toast.cancel();
-                        toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG).show();
+
+                        Toast toast = Toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG);
+                        toast.show();
+
                         ((ActiviteInscription) contexte).runOnUiThread(connexionReussie);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 } ,
                 error -> {
-                    toast.cancel();
+                    spineurChargement.dismiss();
                     gestionErreurInscription(contexte, error);
                 }
             );
         } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
 
