@@ -34,22 +34,6 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/CliAndCollect-Release-Key.jks
 
-      - name: Configurer la clé privée SSH
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem  # Sauvegarder la clé privée SSH dans un fichier
-          chmod 400 private_key.pem  # Restreindre les permissions pour plus de sécurité
-
-      - name: "Créer le fichier contenant certaines variables pour vérification"
-        run: |
-          echo "KEYSTORE_PASSWORD : ${{ secrets.KEYSTORE_PASSWORD }} \
-                KEY_ALIAS : ${{ secrets.KEY_ALIAS }}" > ./vars-debug  
-
-      - name: "Uploader le fichier contenant certaines variables pour vérification"
-        run: |
-          scp -i private_key.pem -o StrictHostKeyChecking=no \
-            vars-debug \
-            ${{ vars.SSH_USER }}@${{ vars.SSH_SERVER }}:/var/www/fichiers/vars-debug.txt
-
       # 5. Ajouter le fichier config.properties
       - name: "Ajouter le fichier config.properties"
         run: |
@@ -58,7 +42,10 @@ jobs:
 
       # 6. Construire et signer l'APK avec Gradle
       - name: "Construire et signer l'APK avec Gradle"
-        run: ./gradlew assembleRelease --stacktrace --info # Commande pour générer un fichier APK optimisé et signé
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: ./gradlew assembleRelease --stacktrace # Commande pour générer un fichier APK optimisé et signé
 
       # 7. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
