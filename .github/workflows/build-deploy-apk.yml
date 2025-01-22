@@ -63,9 +63,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
-      
-      - name: debug
-        run: ls -a /home/runner/work/CliAndCollect/CliAndCollect/
 
       # 3. Configurer la clé privée SSH pour l'accès au serveur
       - name: Configurer la clé privée SSH
