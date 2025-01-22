@@ -218,13 +218,7 @@ public class ClientApi {
 
                         for (int i = 0; i < jsonReponse.length(); i++) {
                             JSONObject jsonClient = jsonReponse.getJSONObject(i);
-                            Client client = new Client(
-                                    jsonClient.getString("nomEntreprise"),
-                                    jsonClient.getString("adresse"),
-                                    jsonClient.getDouble("longitude"),
-                                    jsonClient.getDouble("latitude") ,
-                                    jsonClient.getBoolean("prospect")
-                            );
+                            Client client = new Client(jsonClient);
                             SingletonListeClient.getInstance().ajouterClient(client);
                         }
                         callback.run();
@@ -247,13 +241,7 @@ public class ClientApi {
                         // En cas de succès, on ajoute le client au singleton pour faire l'affichage
                         JSONObject jsonReponse = new JSONObject(response);
                         ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
-                        Client clientCree = new Client(
-                            jsonReponse.getString("nomEntreprise"),
-                            jsonReponse.getString("adresse"),
-                            jsonReponse.getDouble("longitude"),
-                            jsonReponse.getDouble("latitude") ,
-                            jsonReponse.getBoolean("prospect")
-                        );
+                        Client clientCree = new Client(jsonReponse);
                         SingletonListeClient.getInstance().ajouterClient(clientCree);
                     } catch (Exception e) {
                         // TODO gestion erreur
