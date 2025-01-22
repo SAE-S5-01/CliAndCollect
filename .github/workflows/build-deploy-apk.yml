@@ -59,11 +59,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
-          path: ./artifact-output # Chemin dans lequel mettre les fichiers téléchargés
       
       # 2. Récupérer le code source
       - name: Récupérer le code source
         uses: actions/checkout@v3  # Clone le dépôt GitHub
+
+      - name: debug
+        run: ls -a /home/runner/work/CliAndCollect/CliAndCollect/
 
       # 3. Configurer la clé privée SSH pour l'accès au serveur
       - name: Configurer la clé privée SSH
@@ -75,7 +77,7 @@ jobs:
       - name: "Copier l'APK sur le serveur"
         run: |
           scp -i private_key.pem -o StrictHostKeyChecking=no \
-            ./artifact-output/*.apk \
+            /home/runner/work/CliAndCollect/CliAndCollect/*.apk \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
 
       # 5. Nettoyer la clé privée locale
