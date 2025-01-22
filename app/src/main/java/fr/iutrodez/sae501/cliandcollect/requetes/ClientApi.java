@@ -19,12 +19,16 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.R;
@@ -41,7 +45,25 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
  */
 public class ClientApi {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static String BASE_URL;
+
+    static {
+        Properties properties = new Properties();
+        try (InputStream inputStream
+             = ClientApi.class.getClassLoader()
+                        .getResourceAsStream("assets/config.properties")) {
+            if (inputStream != null) {
+                properties.load(inputStream);
+                BASE_URL = properties.getProperty("BASE_URL");
+            } else {
+                throw new RuntimeException("Fichier de configuration absent");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de lecture du fichier de configuration", e);
+        }
+
+        Log.d("TEST", BASE_URL);
+    }
 
     private static ProgressDialog spineurChargement;
 
