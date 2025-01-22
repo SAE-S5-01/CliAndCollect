@@ -1,0 +1,74 @@
+name: "Construction de l'APK et Copie sur le serveur"
+
+on:
+  push:
+    branches:
+      - 'production'  # Déclenchement automatique lors des pushs sur la branche "production"
+      - 'recette' # temp
+  workflow_dispatch:
+    # Permet de lancer manuellement le workflow avec une branche spécifique
+    inputs:
+      branch:
+        description: "Branche à utiliser pour le workflow"
+        default: "production"
+        required: true
+
+jobs:
+  build-apk:
+    name: "Construction de l'APK Android"  # Nom du job en français
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Récupérer le code source du dépôt
+      - name: Récupérer le code source
+        uses: actions/checkout@v3  # Clone le dépôt GitHub dans la VM
+
+      # 2. Installer JDK 17
+      - name: Installer JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # 3. Accorder la permission d'exécution au fichier gradlew
+      - name: "Accorder la permission d'exécution pour gradlew"
+        run: chmod +x gradlew
+
+      # 4. Construire l'APK avec Gradle
+      - name: "Construire l'APK avec Gradle"
+        run: ./gradlew assembleRelease  # Construire l'APK dans le mode release
+
+      # 5. Renommer l'APK généré
+      - name: "Renommer l'APK en CliAndCollect.apk"
+        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/CliAndCollect.apk  # Renommer l'APK
+
+      # 6. Vérification que l'APK a été généré et renommé
+      - name: "Vérifier la génération et le nom de l'APK"
+        run: ls app/build/outputs/apk/release  # Afficher le contenu du dossier contenant l'APK
+
+  deploy:
+    name: "Déploiement de l'APK sur le serveur"  # Nom du job en français
+    runs-on: ubuntu-latest
+    needs: build-apk  # Ce job dépend du job "build-apk"
+    steps:
+      # 1. Récupérer le code source
+      - name: Récupérer le code source
+        uses: actions/checkout@v3  # Clone le dépôt GitHub
+
+      # 2. Configurer la clé privée SSH pour l'accès au serveur
+      - name: Configurer la clé privée SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem  # Sauvegarder la clé privée SSH dans un fichier
+          chmod 400 private_key.pem  # Appliquer les bonnes permissions sur la clé
+
+      # 3. Transférer l'APK généré vers le serveur distant via SCP
+      - name: "Copier l'APK sur le serveur"
+        run: |
+          scp -i private_key.pem -o StrictHostKeyChecking=no \
+            app/build/outputs/apk/release/CliAndCollect.apk \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
+
+      # 4. Nettoyer la clé privée locale
+      - name: Supprimer la clé privée locale
+        if: always()  # Cette étape sera toujours exécutée, même si une autre étape échoue
+        run: rm -f private_key.pem  # Supprimer la clé privée pour des raisons de sécurité
