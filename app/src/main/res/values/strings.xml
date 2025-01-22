@@ -2,7 +2,7 @@
     <string name="app_nom">CliAndCollect</string>
     <string name="inscription">Inscription</string>
     <string name="connexion">Connexion</string>
-    <string name="mail">Mail</string>
+    <string name="mail">Adresse email</string>
     <string name="mdp">Mot de passe</string>
     <string name="adresse">Adresse </string>
     <string name="nom">Nom</string>
@@ -16,10 +16,11 @@
     <string name="indication_ville">Entrez votre ville</string>
     <string name="se_souvenir">Se souvenir de moi</string>
     <string name="bouton_insription">Créer le compte</string>
-    <string name="erreur_champ_connexion_vide">Nom d\'utilisateur ou mot de passe vide</string>
-    <string name="erreur_reseau">Aucune connexion internet detecté </string>
-    <string name="api_injoignable">API injoignable</string>
-    <string name="erreur_inscription">Erreur lors de l\'inscription , veuillez reessayer plus tard</string>
+    <string name="erreur_champ_connexion_vide">Adresse email ou mot de passe vide</string>
+    <string name="erreur_reseau">Aucune connexion internet detectée</string>
+    <string name="api_injoignable">L\'API n\'est pas joignable</string>
+    <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
+    <string name="attente_reseau">Vérification en cours du réseau ...</string>
     <string name="attente_connexion">Connexion en cours ...</string>
     <string name="attente_inscription">Inscription en cours ...</string>
     <string name="inscription_reussie">Inscription réussie ! Bienvenu !</string>
@@ -29,7 +30,7 @@
 
     <string name="ajouter_client">Ajouter un client/prospect</string>
     <string name="detail_client">Detail</string>
-    <string name="entreprise">Nom de l\'entreprise : </string>
+    <string name="entreprise">Nom de l\'entreprise :</string>
     <string name="adresse_client">Adresse du client :</string>
     <string name="description">Description :</string>
     <string name="nom_contact">Nom du contact :</string>

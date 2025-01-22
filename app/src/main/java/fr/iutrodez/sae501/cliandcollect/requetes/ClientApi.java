@@ -264,46 +264,46 @@ public class ClientApi {
     public static void verifierAddresse(String adresse, double[] viewbox ,Context contexte, 
                                         VolleyCallback callback) throws UnsupportedEncodingException {
         String urlApi = "https://nominatim.openstreetmap.org/search?q="
-                + URLEncoder.encode(adresse, "UTF-8")
-                + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
-                + "&bounded=1&format=json&addressdetails=1";
+            + URLEncoder.encode(adresse, "UTF-8")
+            + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
+            + "&bounded=1&format=json&addressdetails=1";
         JsonArrayRequest requete = new JsonArrayRequest(
-                Request.Method.GET,
-                urlApi,
-                null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            // Liste pour stocker les résultats
-                            List<Map<String , String>> results = new ArrayList<>();
+            Request.Method.GET,
+            urlApi,
+            null,
+            new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    try {
+                        // Liste pour stocker les résultats
+                        List<Map<String , String>> results = new ArrayList<>();
 
-                            for (int i = 0; i < response.length(); i++) {
-                                JSONObject jsonObject = response.getJSONObject(i);
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject jsonObject = response.getJSONObject(i);
 
-                                Map<String, String> locationInfo = new HashMap<>();
-                                locationInfo.put("display_name", jsonObject.getString("display_name"));
-                                locationInfo.put("lat", jsonObject.getString("lat"));
-                                locationInfo.put("lon", jsonObject.getString("lon"));
-                                results.add(locationInfo);
-                            }
-
-                            // Retourner les résultats via le callback
-                            callback.onSuccess(results);
-
-                        } catch (JSONException e) {
-                            // Gérer l'exception JSON
-                            callback.onError("error catch : " + e.toString());
+                            Map<String, String> locationInfo = new HashMap<>();
+                            locationInfo.put("display_name", jsonObject.getString("display_name"));
+                            locationInfo.put("lat", jsonObject.getString("lat"));
+                            locationInfo.put("lon", jsonObject.getString("lon"));
+                            results.add(locationInfo);
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Retourner l'erreur via le callback
-                        callback.onError(error.toString());
+
+                        // Retourner les résultats via le callback
+                        callback.onSuccess(results);
+
+                    } catch (JSONException e) {
+                        // Gérer l'exception JSON
+                        callback.onError("error catch : " + e.toString());
                     }
                 }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // Retourner l'erreur via le callback
+                    callback.onError(error.toString());
+                }
+            }
         ) {
             @Override
             public Map<String, String> getHeaders() {
@@ -316,7 +316,7 @@ public class ClientApi {
         // Ajouter la requête à la file d'attente
         RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
     }
-//
+
 
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.
@@ -330,7 +330,7 @@ public class ClientApi {
             });
         } else {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable ,  Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.api_injoignable,  Toast.LENGTH_LONG).show();
             });
         }
     }
@@ -355,7 +355,7 @@ public class ClientApi {
             }
         } else {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable ,  Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
             });
         }
     }
