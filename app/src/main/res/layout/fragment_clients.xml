@@ -1,10 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".fragments.FragmentClients">
+
+    <Button
+        android:id="@+id/boutonAjoutClient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="@string/ajouter_client"
+        app:layout_constraintBaseline_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_clients"
+        android:layout_width="match_parent"
+        android:layout_marginTop="45dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/boutonAjoutClient" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.FragmentClients">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/boutonAjoutClient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            app:layout_constraintBaseline_toTopOf="parent"
+            android:text="@string/ajouter_client" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_clients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/boutonAjoutClient"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/layout_clients"
@@ -12,21 +58,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <Button
+            android:id="@+id/boutonAjoutClient"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="Clients (TODO page)"
-            android:textSize="50sp" />
+            android:layout_margin="15dp"
+            android:text="@string/ajouter_client" />
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dip"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="#0000FF" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_clients"
+            android:layout_width="match_parent"
+            android:gravity="bottom"
+            android:layout_height="match_parent" />
+    </LinearLayout>-->
 
-    </LinearLayout>
-
-</ScrollView>
+<!--</ScrollView>-->

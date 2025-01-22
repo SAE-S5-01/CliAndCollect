@@ -31,26 +31,14 @@
         <activity
             android:name=".activites.ActiviteInscription"
             android:screenOrientation="portrait" />
+
+        <activity 
+            android:name=".activites.ActiviteCreationClient"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".fragments.GestionFragment"
             android:screenOrientation="portrait" />
         <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
-        <activity
-            android:name=".fragments.FragmentAccueil"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".fragments.FragmentClients"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".fragments.FragmentParcours"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".fragments.FragmentItineraires"
-            android:exported="true">
-        </activity>
     </application>
 
 </manifest>

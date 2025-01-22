@@ -4,15 +4,32 @@
  */
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
 /**
  * Gestion du fragment Clients.
@@ -20,6 +37,17 @@ import fr.iutrodez.sae501.cliandcollect.R;
  */
 public class FragmentClients extends Fragment implements View.OnClickListener {
 
+    private Intent intent;
+
+    private Intent detailClient;
+
+    private ActivityResultLauncher<Intent> lanceurFille;
+
+    private RecyclerView listeClients;
+
+    private ArrayList<Client> clients;
+
+    private ClientAdapter adapter;
     /**
      * @return Une nouvelle instance de FragmentClients.
      */
@@ -57,18 +85,66 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_clients, container, false);
+        vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
 
+        listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
+        clients = new ArrayList<>();
+        if (ClientApi.reseauDisponible(this.getContext())) {
+
+            ClientApi.getListeClient(this.getContext(), () -> {
+                for (Client client : SingletonListeClient.getListeClient()) {
+                    clients.add(client);
+                }
+                adapter.notifyDataSetChanged();
+            });
+
+            LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
+            listeClients.setLayoutManager(gestionnaireLineaire);
+
+            adapter = new ClientAdapter(clients);
+            listeClients.setHasFixedSize(true);
+            listeClients.setAdapter(adapter);
+
+            intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
+            lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
+        // TODO : else : afficher un message d'erreur
+        } else {
+            Log.e("reseau", "Réseau indisponible");
+        }
         return vueDuFragment;
+    }
+
+    public void onClientClik(){
+        detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        // TODO : Appeler l'API pour récupérer la liste des clients
+        if (ClientApi.reseauDisponible(this.getContext()) && clients.isEmpty()) {
+            Log.i("client fragment" , "reseau dispo et liste client vide call api requis");
+        }
     }
 
     @Override
     public void onClick(View v) {
+        lanceurFille.launch(intent);
+    }
 
+    private void initialiseClients(){
+
+    }
+
+    private void getNouveauClient(ActivityResult resultat) {
+        if(resultat.getResultCode() == Activity.RESULT_OK){
+            clients.clear();
+            for ( Client client : SingletonListeClient.getListeClient()) {
+                clients.add(client);
+            }
+
+            adapter.notifyDataSetChanged();
+        }
     }
 
 }
