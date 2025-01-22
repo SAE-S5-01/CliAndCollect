@@ -6,11 +6,6 @@ on:
       - 'production'  # Déclenchement automatique lors des pushs sur la branche "production"
   workflow_dispatch:
     # Permet de lancer manuellement le workflow avec une branche spécifique
-    inputs:
-      branch:
-        description: "Branche à utiliser pour le workflow"
-        default: "production"
-        required: true
 
 jobs:
   build-apk:
@@ -43,7 +38,7 @@ jobs:
 
       # 7. Sauvegarder l'APK comme artefact
       - name: "Uploader l'APK comme artefact"
-        uses: actions/upload-artifact@v3 # Sauvegarder le fichier pour le partager avec d'autres jobs
+        uses: actions/upload-artifact@v4 # Sauvegarder le fichier pour le partager avec d'autres jobs
         with:
           name: CliAndCollect-APK
           path: app/build/outputs/apk/release/*.apk # Chemin vers le(s) fichier(s) APK généré(s)
@@ -59,7 +54,7 @@ jobs:
         
       # 2. Télécharger l'APK depuis les artefacts
       - name: "Télécharger l'artefact APK"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
 
