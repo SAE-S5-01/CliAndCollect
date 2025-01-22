@@ -10,9 +10,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_nom"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/icone"
+        android:roundIcon="@mipmap/icone_ronde"
         android:supportsRtl="true"
         android:theme="@style/Theme.CliAndCollect"
         tools:targetApi="31">
@@ -25,10 +25,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activites.ActiviteCreationClient"/>
-        <activity android:name=".fragments.GestionFragment"/>
-        <activity android:name=".activites.ActiviteConnexion"/>
-        <activity android:name=".activites.ActiviteInscription"/>
+        <activity
+            android:name=".activites.ActiviteConnexion"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activites.ActiviteInscription"
+            android:screenOrientation="portrait" />
+
+        <activity 
+            android:name=".activites.ActiviteCreationClient"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".fragments.GestionFragment"
+            android:screenOrientation="portrait" />
+        <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
         <activity
             android:name=".fragments.FragmentAccueil"
             android:exported="true">
