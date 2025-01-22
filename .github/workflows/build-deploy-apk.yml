@@ -28,10 +28,10 @@ jobs:
       - name: "Accorder la permission d'exécution pour gradlew"
         run: chmod +x gradlew
 
-      # 4. Configurer le fichier JKS à partir du secret
-      - name: "Configurer le fichier JKS"
+      # 4. Décode la clé et la place dans app/
+      - name: Décode la clé et génère le fichier JKS
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > CliAndCollect-Release-Key.jks  # Reconstruire le fichier JKS à partir du secret
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/CliAndCollect-Release-Key.jks
 
       # 5. Ajouter le fichier config.properties
       - name: "Ajouter le fichier config.properties"
@@ -43,10 +43,7 @@ jobs:
       - name: "Construire et signer l'APK avec Gradle"
         run: | # Commande pour générer un fichier APK optimisé et signé
           ./gradlew assembleRelease \ 
-            -Pandroid.injected.signing.store.file=CliAndCollect-Release-Key.jks \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ vars.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEYSTORE_PASSWORD }}
+            --stacktrace --info
 
       # 7. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
