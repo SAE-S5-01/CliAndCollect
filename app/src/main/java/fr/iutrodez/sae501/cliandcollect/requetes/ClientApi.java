@@ -61,8 +61,6 @@ public class ClientApi {
         } catch (IOException e) {
             throw new RuntimeException("Erreur de lecture du fichier de configuration", e);
         }
-
-        Log.d("TEST", BASE_URL);
     }
 
     private static ProgressDialog spineurChargement;
