@@ -21,13 +21,15 @@ public class Client {
     private boolean clientPropspect;
 
     public Client(String entreprise, String adresse,String nomContact,String prenomContact,
-                  String telephone, boolean clientPropspect){
+                  String telephone, boolean clientPropspect,double x , double y){
         this.entreprise = entreprise;
         this.adresse = adresse;
         this.nomContact = nomContact;
         this.prenomContact = prenomContact;
         this.telephone = telephone;
         this.clientPropspect = clientPropspect;
+        this.x = x;
+        this.y = y;
 
     }
 
@@ -66,6 +68,42 @@ public class Client {
 
     public boolean isClientPropspect() {
         return clientPropspect;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setClientPropspect(boolean clientPropspect) {
+        this.clientPropspect = clientPropspect;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public void setPrenomContact(String prenomContact) {
+        this.prenomContact = prenomContact;
+    }
+
+    public void setNomContact(String nomContact) {
+        this.nomContact = nomContact;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setEntreprise(String entreprise) {
+        this.entreprise = entreprise;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 
 }
