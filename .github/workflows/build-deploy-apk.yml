@@ -59,6 +59,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
+          path: ./artifact-output # Chemin dans lequel mettre les fichiers téléchargés
       
       # 2. Récupérer le code source
       - name: Récupérer le code source
@@ -74,7 +75,7 @@ jobs:
       - name: "Copier l'APK sur le serveur"
         run: |
           scp -i private_key.pem -o StrictHostKeyChecking=no \
-            *.apk \
+            ./artifact-output/*.apk \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
 
       # 5. Nettoyer la clé privée locale
