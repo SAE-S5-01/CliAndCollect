@@ -38,9 +38,8 @@ jobs:
       - name: "Construire l'APK avec Gradle"
         run: ./gradlew assembleRelease  # Construire l'APK dans le mode release
 
-      # 5. Renommer l'APK généré
-      - name: "Renommer l'APK en CliAndCollect.apk"
-        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/CliAndCollect.apk  # Renommer l'APK
+      - name: "Voir les releases"
+        run: ls app/build/outputs/apk/release/
 
       # 6. Vérification que l'APK a été généré et renommé
       - name: "Vérifier la génération et le nom de l'APK"
