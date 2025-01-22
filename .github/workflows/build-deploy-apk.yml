@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
+          cache: gradle # Activer le cache Gradle pour accélérer les prochaines constructions
 
       # 3. Accorder la permission d'exécution au fichier gradlew
       - name: "Accorder la permission d'exécution pour gradlew"
@@ -36,38 +36,48 @@ jobs:
 
       # 4. Construire l'APK avec Gradle
       - name: "Construire l'APK avec Gradle"
-        run: ./gradlew assembleRelease  # Construire l'APK dans le mode release
+        run: ./gradlew assembleRelease  # Commande pour générer un fichier APK optimisé
 
-      - name: "Voir les releases"
-        run: ls app/build/outputs/apk/release/
-
-      # 6. Vérification que l'APK a été généré et renommé
+      # 6. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
         run: ls app/build/outputs/apk/release  # Afficher le contenu du dossier contenant l'APK
+
+      # 7. Sauvegarder l'APK comme artefact
+      - name: "Uploader l'APK comme artefact"
+        uses: actions/upload-artifact@v3 # Sauvegarder le fichier pour le partager avec d'autres jobs
+        with:
+          name: CliAndCollect-APK
+          path: app/build/outputs/apk/release/*.apk # Chemin vers le fichier APK généré
 
   deploy:
     name: "Déploiement de l'APK sur le serveur"  # Nom du job en français
     runs-on: ubuntu-latest
     needs: build-apk  # Ce job dépend du job "build-apk"
     steps:
-      # 1. Récupérer le code source
+      # 1. Télécharger l'APK depuis les artefacts
+      - name: Télécharger l'artefact APK
+        uses: actions/download-artifact@v3
+        with:
+          name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
+      
+      # 2. Récupérer le code source
       - name: Récupérer le code source
         uses: actions/checkout@v3  # Clone le dépôt GitHub
 
-      # 2. Configurer la clé privée SSH pour l'accès au serveur
+      # 3. Configurer la clé privée SSH pour l'accès au serveur
       - name: Configurer la clé privée SSH
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem  # Sauvegarder la clé privée SSH dans un fichier
-          chmod 400 private_key.pem  # Appliquer les bonnes permissions sur la clé
+          chmod 400 private_key.pem  # Restreindre les permissions pour plus de sécurité
 
-      # 3. Transférer l'APK généré vers le serveur distant via SCP
+      # 4. Transférer l'APK généré vers le serveur distant via SCP
       - name: "Copier l'APK sur le serveur"
         run: |
           scp -i private_key.pem -o StrictHostKeyChecking=no \
-            app/build/outputs/apk/release/CliAndCollect.apk \
+            *.apk \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
 
-      # 4. Nettoyer la clé privée locale
+      # 5. Nettoyer la clé privée locale
       - name: Supprimer la clé privée locale
         if: always()  # Cette étape sera toujours exécutée, même si une autre étape échoue
         run: rm -f private_key.pem  # Supprimer la clé privée pour des raisons de sécurité
