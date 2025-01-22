@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v3 # Sauvegarder le fichier pour le partager avec d'autres jobs
         with:
           name: CliAndCollect-APK
-          path: app/build/outputs/apk/release/*.apk # Chemin vers le fichier APK généré
+          path: app/build/outputs/apk/release/*.apk # Chemin vers le(s) fichier(s) APK généré(s)
 
   deploy:
     name: "Déploiement de l'APK sur le serveur"  # Nom du job en français
@@ -59,7 +59,7 @@ jobs:
         uses: actions/checkout@v3  # Clone le dépôt GitHub
         
       # 2. Télécharger l'APK depuis les artefacts
-      - name: Télécharger l'artefact APK
+      - name: "Télécharger l'artefact APK"
         uses: actions/download-artifact@v3
         with:
           name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
@@ -78,7 +78,7 @@ jobs:
         run: |
           scp -i private_key.pem -o StrictHostKeyChecking=no \
             /home/runner/work/CliAndCollect/CliAndCollect/*.apk \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
+            ${{ vars.SSH_USER }}@${{ vars.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
 
       # 5. Nettoyer la clé privée locale
       - name: Supprimer la clé privée locale
