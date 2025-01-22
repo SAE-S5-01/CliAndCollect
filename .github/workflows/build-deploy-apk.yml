@@ -34,17 +34,23 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/CliAndCollect-Release-Key.jks
 
-      - name: debug
-        run : ls -al app
+      - name: Configurer la clé privée SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem  # Sauvegarder la clé privée SSH dans un fichier
+          chmod 400 private_key.pem  # Restreindre les permissions pour plus de sécurité
+
+      # 4.5. Uploader le fichier JKS sur le serveur pour vérification
+      - name: "Uploader le fichier JKS pour vérification"
+        run: |
+          scp -i private_key.pem -o StrictHostKeyChecking=no \
+            app/CliAndCollect-Release-Key.jks \
+            ${{ vars.SSH_USER }}@${{ vars.SSH_SERVER }}:/var/www/fichiers/CliAndCollect-Release-Key-Serv.jks
 
       # 5. Ajouter le fichier config.properties
       - name: "Ajouter le fichier config.properties"
         run: |
           mkdir -p app/src/main/assets
           echo "BASE_URL=http://${{ vars.SSH_SERVER }}:8080/" > app/src/main/assets/config.properties
-
-      - name: debug2
-        run : cat app/src/main/assets/config.properties
 
       # 6. Construire et signer l'APK avec Gradle
       - name: "Construire et signer l'APK avec Gradle"
