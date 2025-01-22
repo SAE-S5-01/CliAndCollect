@@ -28,21 +28,31 @@ jobs:
       - name: "Accorder la permission d'exécution pour gradlew"
         run: chmod +x gradlew
 
-      # 4. Ajouter le fichier config.properties
+      # 4. Configurer le fichier JKS à partir du secret
+      - name: "Configurer le fichier JKS"
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > CliAndCollect-Release-Key.jks  # Reconstruire le fichier JKS à partir du secret
+
+      # 5. Ajouter le fichier config.properties
       - name: "Ajouter le fichier config.properties"
         run: |
           mkdir -p app/src/main/assets
           echo "BASE_URL=http://${{ vars.SSH_SERVER }}:8080/" > app/src/main/assets/config.properties
 
-      # 5. Construire l'APK avec Gradle
-      - name: "Construire l'APK avec Gradle"
-        run: ./gradlew assembleRelease  # Commande pour générer un fichier APK optimisé
+      # 6. Construire et signer l'APK avec Gradle
+      - name: "Construire et signer l'APK avec Gradle"
+        run: | # Commande pour générer un fichier APK optimisé et signé
+          ./gradlew assembleRelease \ 
+            -Pandroid.injected.signing.store.file=CliAndCollect-Release-Key.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ vars.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEYSTORE_PASSWORD }}
 
-      # 6. Vérification que l'APK a été généré
+      # 7. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
         run: ls app/build/outputs/apk/release  # Afficher le contenu du dossier contenant l'APK
 
-      # 7. Sauvegarder l'APK comme artefact
+      # 8. Sauvegarder l'APK comme artefact
       - name: "Uploader l'APK comme artefact"
         uses: actions/upload-artifact@v4 # Sauvegarder le fichier pour le partager avec d'autres jobs
         with:
