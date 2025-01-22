@@ -27,7 +27,7 @@ jobs:
 
       # 3. Accorder la permission d'exécution au fichier gradlew
       - name: "Accorder la permission d'exécution pour gradlew"
-        run: chmod +x gradlew
+        run: chmod +x ./gradlew
 
       # 4. Décode la clé et la place dans app/
       - name: Décode la clé et génère le fichier JKS
@@ -48,7 +48,7 @@ jobs:
 
       # 6. Construire et signer l'APK avec Gradle
       - name: "Construire et signer l'APK avec Gradle"
-        run: gradlew assembleRelease --stacktrace --info # Commande pour générer un fichier APK optimisé et signé
+        run: ./gradlew assembleRelease --stacktrace --info # Commande pour générer un fichier APK optimisé et signé
 
       # 7. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
