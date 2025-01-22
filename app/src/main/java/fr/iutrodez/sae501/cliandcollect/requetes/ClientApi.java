@@ -64,11 +64,12 @@ public class ClientApi {
     /**
      * Méthode permettant de générer les headers pour les requêtes à l'API.
      */
-    private static Map<String, String> genererHeaders() {
+    private static Map<String, String> genererHeaders(String route) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         String token = ActivitePrincipale.preferences.getString("tokenApi", "");
-        if (!token.isEmpty()) {
+        if (!token.isEmpty() && !(route.equals("/api/utilisateur/connexion")
+                || route.equals("/api/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
         }
         return headers;
@@ -116,7 +117,7 @@ public class ClientApi {
             request = new JsonObjectRequest(methode, url, donnees, response -> reussite.onResponse(response.toString()), erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    return genererHeaders();
+                    return genererHeaders(route);
                 }
             };
         } else {
@@ -124,7 +125,7 @@ public class ClientApi {
             request = new StringRequest(methode, url, reussite, erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    return genererHeaders();
+                    return genererHeaders(route);
                 }
             };
         }
@@ -272,8 +273,8 @@ public class ClientApi {
     }
 
 
-    public static void verifierAddresse(String adresse, double[] viewbox ,Context contexte, VolleyCallback callback) throws UnsupportedEncodingException {
-
+    public static void verifierAddresse(String adresse, double[] viewbox ,Context contexte, 
+                                        VolleyCallback callback) throws UnsupportedEncodingException {
         String urlApi = "https://nominatim.openstreetmap.org/search?q="
                 + URLEncoder.encode(adresse, "UTF-8")
                 + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
