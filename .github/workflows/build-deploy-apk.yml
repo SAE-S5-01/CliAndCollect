@@ -32,7 +32,7 @@ jobs:
       # 4. Décode la clé et la place dans app/
       - name: Décode la clé et génère le fichier JKS
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/CliAndCollect-Release-Key.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/CliAndCollect-Key.jks
 
       # 5. Ajouter le fichier config.properties
       - name: "Ajouter le fichier config.properties"
@@ -45,8 +45,7 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --stacktrace # Commande pour générer un fichier APK optimisé et signé
+        run: ./gradlew assembleRelease # Commande pour générer un fichier APK optimisé et signé
 
       # 7. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
