@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'production'  # Déclenchement automatique lors des pushs sur la branche "production"
-      - 'feature/config-et-spineur'
   workflow_dispatch:
     # Permet de lancer manuellement le workflow avec une branche spécifique
 
