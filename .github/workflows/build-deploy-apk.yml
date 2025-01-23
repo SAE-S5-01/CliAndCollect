@@ -39,13 +39,14 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           echo "BASE_URL=http://${{ vars.SSH_SERVER }}:8080/" > app/src/main/assets/config.properties
+        # Configuration utilisée par l'application pour contacter l'API
 
       # 6. Construire et signer l'APK avec Gradle
       - name: "Construire et signer l'APK avec Gradle"
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        run: ./gradlew assembleRelease # Commande pour générer un fichier APK optimisé et signé
+        run: ./gradlew assembleRelease # Commande pour générer un fichier APK optimisé et signé de "release" et non de "debug"
 
       # 7. Vérification que l'APK a été généré
       - name: "Vérifier la génération et le nom de l'APK"
