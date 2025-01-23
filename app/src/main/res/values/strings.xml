@@ -18,7 +18,7 @@
     <string name="bouton_insription">Créer le compte</string>
     <string name="erreur_champ_connexion_vide">Adresse email ou mot de passe vide</string>
     <string name="erreur_reseau">Aucune connexion internet detectée</string>
-    <string name="api_injoignable">L\'API n\'est pas joignable</string>
+    <string name="api_injoignable">L\'API n\'est pas joignable à l\'URL : %s</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
     <string name="attente_reseau">Vérification en cours du réseau ...</string>
     <string name="attente_connexion">Connexion en cours ...</string>
