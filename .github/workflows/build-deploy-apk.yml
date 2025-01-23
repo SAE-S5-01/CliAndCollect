@@ -37,7 +37,7 @@ jobs:
       - name: "Ajouter le fichier config.properties"
         run: |
           mkdir -p app/src/main/assets
-          echo "BASE_URL=http://${{ vars.SSH_SERVER }}:8080/api" > app/src/main/assets/config.properties
+          echo "BASE_URL=http://${{ vars.API_SERVER }}/api" > app/src/main/assets/config.properties
         # Configuration utilisée par l'application pour contacter l'API
 
       # 6. Construire et signer l'APK avec Gradle
