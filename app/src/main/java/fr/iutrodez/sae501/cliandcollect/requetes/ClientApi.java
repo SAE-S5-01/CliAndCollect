@@ -377,10 +377,7 @@ public class ClientApi {
             });
         } else {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte,
-                               String.format(contexte.getString(R.string.api_injoignable),
-                                             BASE_URL),
-                               Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
             });
         }
     }
@@ -405,10 +402,7 @@ public class ClientApi {
             }
         } else {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte,
-                               String.format(contexte.getString(R.string.api_injoignable),
-                                             BASE_URL),
-                               Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
             });
         }
     }
