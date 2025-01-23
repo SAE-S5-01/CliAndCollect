@@ -94,8 +94,7 @@ public class ActiviteCreationClient extends AppCompatActivity {
                     finish();
                 });
             } else {
-                Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
-
+                Toast.makeText(this, R.string.erreur_reseau, Toast.LENGTH_LONG).show();
             }
         }
     }

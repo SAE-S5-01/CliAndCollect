@@ -66,9 +66,9 @@ public class ActiviteConnexion extends AppCompatActivity {
                 ActivitePrincipale.preferencesConnexion(seRappelerdeMoi.isChecked() , mail, mdp);
                 Intent menuPrincipal = new Intent(ActiviteConnexion.this, GestionFragment.class);
                 startActivity(menuPrincipal);
-            } , () -> {});
+            }, () -> {});
         } else {
-            Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.erreur_reseau, Toast.LENGTH_LONG).show();
         }
     }
 
