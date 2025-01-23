@@ -98,8 +98,8 @@ public class ClientApi {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         String token = ActivitePrincipale.preferences.getString("tokenApi", "");
-        if (!token.isEmpty() && !(route.equals("/api/utilisateur/connexion")
-            || route.equals("/api/utilisateur/inscription"))) {
+        if (!token.isEmpty() && !(route.equals("/utilisateur/connexion")
+            || route.equals("/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
         }
         return headers;
@@ -184,7 +184,7 @@ public class ClientApi {
         spineurChargement.show();
 
         try {
-            requeteApi(contexte, Request.Method.GET, "/api/utilisateur/connexion", parametre, null,
+            requeteApi(contexte, Request.Method.GET, "/utilisateur/connexion", parametre, null,
                 response -> {
                     /*
                      * Pas de gestion propre de l'erreur car l'API retourne un code 401 en cas d'erreur
@@ -231,7 +231,7 @@ public class ClientApi {
         spineurChargement.show();
 
         try {
-            requeteApi(contexte, Request.Method.POST, "/api/utilisateur/inscription", null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/utilisateur/inscription", null , donnees,
                 response -> {
                     try {
                         spineurChargement.dismiss();
@@ -259,7 +259,7 @@ public class ClientApi {
     }
 
     public static void getListeClient(Context contexte , Runnable callback) {
-        requeteApi(contexte, Request.Method.GET, "/api/contact", null, null,
+        requeteApi(contexte, Request.Method.GET, "/contact", null, null,
                 response -> {
                     try {
                         JSONArray jsonReponse = new JSONArray(response);
@@ -283,7 +283,7 @@ public class ClientApi {
 
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
-            requeteApi(contexte, Request.Method.POST, "/api/contact", null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/contact", null , donnees,
                 response -> {
                     try {
                         // En cas de succès, on ajoute le client au singleton pour faire l'affichage
