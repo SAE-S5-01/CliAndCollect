@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pied_page_marge_interieure_horizontale_icone">30dp</dimen>
+</resources>

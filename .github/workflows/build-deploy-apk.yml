@@ -1,0 +1,92 @@
+name: "Construction de l'APK et Copie sur le serveur"
+
+on:
+  push:
+    branches:
+      - 'production'  # Déclenchement automatique lors des pushs sur la branche "production"
+  workflow_dispatch:
+    # Permet de lancer manuellement le workflow avec une branche spécifique
+
+jobs:
+  build-apk:
+    name: "Construction de l'APK Android"  # Nom du job en français
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Récupérer le code source du dépôt
+      - name: Récupérer le code source
+        uses: actions/checkout@v3  # Clone le dépôt GitHub dans la VM
+
+      # 2. Installer JDK 17
+      - name: Installer JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle # Activer le cache Gradle pour accélérer les prochaines constructions
+
+      # 3. Accorder la permission d'exécution au fichier gradlew
+      - name: "Accorder la permission d'exécution pour gradlew"
+        run: chmod +x ./gradlew
+
+      # 4. Décode la clé et la place dans app/
+      - name: Décode la clé et génère le fichier JKS
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/CliAndCollect-Key.jks
+
+      # 5. Ajouter le fichier config.properties
+      - name: "Ajouter le fichier config.properties"
+        run: |
+          mkdir -p app/src/main/assets
+          echo "BASE_URL=http://${{ vars.SSH_SERVER }}:8080/api" > app/src/main/assets/config.properties
+        # Configuration utilisée par l'application pour contacter l'API
+
+      # 6. Construire et signer l'APK avec Gradle
+      - name: "Construire et signer l'APK avec Gradle"
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: ./gradlew assembleRelease # Commande pour générer un fichier APK optimisé et signé de "release" et non de "debug"
+
+      # 7. Vérification que l'APK a été généré
+      - name: "Vérifier la génération et le nom de l'APK"
+        run: ls app/build/outputs/apk/release  # Afficher le contenu du dossier contenant l'APK
+
+      # 8. Sauvegarder l'APK comme artefact
+      - name: "Uploader l'APK comme artefact"
+        uses: actions/upload-artifact@v4 # Sauvegarder le fichier pour le partager avec d'autres jobs
+        with:
+          name: CliAndCollect-APK
+          path: app/build/outputs/apk/release/*.apk # Chemin vers le(s) fichier(s) APK généré(s)
+
+  deploy:
+    name: "Déploiement de l'APK sur le serveur"  # Nom du job en français
+    runs-on: ubuntu-latest
+    needs: build-apk  # Ce job dépend du job "build-apk"
+    steps:
+      # 1. Récupérer le code source
+      - name: Récupérer le code source
+        uses: actions/checkout@v3  # Clone le dépôt GitHub
+        
+      # 2. Télécharger l'APK depuis les artefacts
+      - name: "Télécharger l'artefact APK"
+        uses: actions/download-artifact@v4
+        with:
+          name: CliAndCollect-APK # Nom de l'artefact défini dans le job précédent
+
+      # 3. Configurer la clé privée SSH pour l'accès au serveur
+      - name: Configurer la clé privée SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem  # Sauvegarder la clé privée SSH dans un fichier
+          chmod 400 private_key.pem  # Restreindre les permissions pour plus de sécurité
+
+      # 4. Transférer l'APK généré vers le serveur distant via SCP
+      - name: "Copier l'APK sur le serveur"
+        run: |
+          scp -i private_key.pem -o StrictHostKeyChecking=no \
+            /home/runner/work/CliAndCollect/CliAndCollect/*.apk \
+            ${{ vars.SSH_USER }}@${{ vars.SSH_SERVER }}:/var/www/fichiers  # Copier l'APK sur le serveur
+
+      # 5. Nettoyer la clé privée locale
+      - name: Supprimer la clé privée locale
+        if: always()  # Cette étape sera toujours exécutée, même si une autre étape échoue
+        run: rm -f private_key.pem  # Supprimer la clé privée pour des raisons de sécurité

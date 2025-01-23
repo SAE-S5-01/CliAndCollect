@@ -4,6 +4,6 @@
 
     <dimen name="pied_page_hauteur_min">80dp</dimen>
     <dimen name="pied_page_marge_interieure_verticale_icone">10dp</dimen>
-    <dimen name="pied_page_marge_interieure_horizontale_icone">30dp</dimen>
+    <dimen name="pied_page_marge_interieure_horizontale_icone">0dp</dimen>
     <dimen name="pied_page_dimensions_icone">70dp</dimen>
 </resources>

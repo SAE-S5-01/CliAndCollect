@@ -16,10 +16,29 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            // Utilisation des variables d'environnement pour configurer la signature
+            storeFile file("./CliAndCollect-Key.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias System.getenv("KEY_ALIAS") ?: ""
+            keyPassword System.getenv("KEYSTORE_PASSWORD") ?: ""
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            applicationVariants.all { variant ->
+                if (variant.buildType.name == "release") {
+                    variant.outputs.all { output ->
+                        outputFileName = "CliAndCollect.apk"
+                    }
+                }
+            }
         }
     }
     compileOptions {
@@ -29,7 +48,6 @@ android {
 }
 
 dependencies {
-
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'

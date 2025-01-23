@@ -1,5 +1,8 @@
 package fr.iutrodez.sae501.cliandcollect.clientUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Client {
 
     private String entreprise;
@@ -20,27 +23,21 @@ public class Client {
 
     private boolean clientPropspect;
 
-    public Client(String entreprise, String adresse,String nomContact,String prenomContact,
-                  String telephone, boolean clientPropspect,double x , double y){
-        this.entreprise = entreprise;
-        this.adresse = adresse;
-        this.nomContact = nomContact;
-        this.prenomContact = prenomContact;
-        this.telephone = telephone;
-        this.clientPropspect = clientPropspect;
-        this.x = x;
-        this.y = y;
+    public Client(JSONObject clientFromApi){
 
+        // Valeur obligatoirement retourné par l'api
+        this.entreprise = clientFromApi.optString("nomEntreprise");
+        this.adresse = clientFromApi.optString("adresse");
+        this.x = clientFromApi.optDouble("longitude");
+        this.y = clientFromApi.optDouble("latitude");
+        this.clientPropspect = clientFromApi.optBoolean("prospect");
+
+        // Valeur optionnelles
+        this.description = clientFromApi.optString("description" , null);
+        this.nomContact = clientFromApi.optString("nomContact" , null);
+        this.prenomContact = clientFromApi.optString("prenomContact" , null);
+        this.telephone = clientFromApi.optString("telephone" , null);
     }
-
-    public Client(String entreprise, String adresse, double x , double y ,boolean clientPropspect){
-        this.entreprise = entreprise;
-        this.adresse = adresse;
-        this.clientPropspect = clientPropspect;
-        this.x = x;
-        this.y = y;
-    }
-
     public String getDescription() {
         return description;
     }
