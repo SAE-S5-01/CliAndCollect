@@ -218,15 +218,6 @@ public class ClientApi {
         spineurChargement.setCancelable(false);
         spineurChargement.show();
 
-        viderChamps((ActiviteInscription) contexte, new int[] {
-            R.id.saisieMail,
-            R.id.saisieMdp,
-            R.id.saisieNom,
-            R.id.saisiePrenom,
-            R.id.saisieAdresse,
-            R.id.saisieVille
-        });
-
         try {
             requeteApi(contexte, Request.Method.POST, "/utilisateur/inscription", null , donnees,
                 response -> {
@@ -391,13 +382,26 @@ public class ClientApi {
         if (erreur.networkResponse != null && erreur.networkResponse.data != null) {
             try {
                 String responseBody = new String(erreur.networkResponse.data, "UTF-8");
+
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 JSONObject erreurs = jsonResponse.getJSONObject("erreur");
-                JSONObject saisie = jsonResponse.getJSONObject("saisie");
+                //JSONObject saisie = jsonResponse.getJSONObject("saisie");
 
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                    remplirChampsInscription((ActiviteInscription) contexte, saisie);
-                    afficherErreursInscription((ActiviteInscription) contexte, erreurs);
+                    /*remplirChampsInscription((ActiviteInscription) contexte, erreurs, new int[] {
+                        R.id.saisieMail, R.id.saisieMdp, R.id.saisieNom,
+                        R.id.saisiePrenom, R.id.saisieAdresse, R.id.saisieVille
+                    }, new String[] {
+                        "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
+                    });*/
+                    // TODO : voir utilité de resaisir des valeurs déjà saisies ?
+
+                    afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
+                        R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
+                        R.id.messageErreurPrenom, R.id.messageErreurAdresse, R.id.messageErreurVille
+                    }, new String[] {
+                        "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
+                    });
                 });
             } catch (Exception e) {
                 Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
@@ -411,91 +415,43 @@ public class ClientApi {
     }
 
     /**
-     * Méthode permettant de remplir les champs du formulaire d'inscription.
+     * Méthode permettant de re-remplir les champs du formulaire d'inscription.
      * @param activite L'activité d'inscription
-     * @param saisie Les données saisies par l'utilisateur
+     * @param donnees Les données saisies par l'utilisateur
+     *                et retournées par l'API
      */
-    private static void remplirChampsInscription(ActiviteInscription activite, JSONObject saisie) {
-        try {
-            EditText mail = activite.findViewById(R.id.saisieMail);
-            EditText mdp = activite.findViewById(R.id.saisieMdp);
-            EditText nom = activite.findViewById(R.id.saisieNom);
-            EditText prenom = activite.findViewById(R.id.saisiePrenom);
-            EditText adresse = activite.findViewById(R.id.saisieAdresse);
-            EditText ville = activite.findViewById(R.id.saisieVille);
-
-            if (saisie.has("mail")) {
-                mail.setText(saisie.getString("mail"));
+    private static void remplirChampsInscription(AppCompatActivity activite, JSONObject donnees,
+                                                 int[] idChampsTextuels, String[] cleChampsTextuels) {
+        for (int i = 0; i < idChampsTextuels.length; i++) {
+            try {
+                EditText champTextuel = activite.findViewById(idChampsTextuels[i]);
+                if (donnees.has(cleChampsTextuels[i])) {
+                    champTextuel.setText(donnees.getString(cleChampsTextuels[i]));
+                }
+            } catch (JSONException e) {
             }
-            if (saisie.has("motDePasse")) {
-                mdp.setText(saisie.getString("motDePasse"));
-            }
-            if (saisie.has("nom")) {
-                nom.setText(saisie.getString("nom"));
-            }
-            if (saisie.has("prenom")) {
-                prenom.setText(saisie.getString("prenom"));
-            }
-            if (saisie.has("adresse")) {
-                adresse.setText(saisie.getString("adresse"));
-            }
-            if (saisie.has("ville")) {
-                ville.setText(saisie.getString("ville"));
-            }
-        } catch (JSONException e) {
         }
     }
 
     /**
-     * Méthode permettant d'afficher les erreurs lors de l'inscription.
+     * Afficher les erreurs lors de l'inscription.
      * @param activite L'activité d'inscription
      * @param erreurs Les erreurs retournées par l'API
+     * @param idChampsTextuels Les identifiants des inputs des champs textuels
+     * @param cleChampsTextuels Les clés de réponse de l'API des champs textuels
      */
-    private static void afficherErreursInscription(ActiviteInscription activite, JSONObject erreurs) {
-        try {
-            TextView messageErreurMail = activite.findViewById(R.id.messageErreurMail);
-            TextView messageErreurMdp = activite.findViewById(R.id.messageErreurMdp);
-            TextView messageErreurNom = activite.findViewById(R.id.messageErreurNom);
-            TextView messageErreurPrenom = activite.findViewById(R.id.messageErreurPrenom);
-            TextView messageErreurAdresse = activite.findViewById(R.id.messageErreurAdresse);
-            TextView messageErreurVille = activite.findViewById(R.id.messageErreurVille);
-            messageErreurMail.setText("");
-            messageErreurMdp.setText("");
-            messageErreurNom.setText("");
-            messageErreurPrenom.setText("");
-            messageErreurAdresse.setText("");
-            messageErreurVille.setText("");
-            if (erreurs.has("mail")) {
-                messageErreurMail.setText(erreurs.getString("mail"));
+    private static void afficherErreursInscription(ActiviteInscription activite, JSONObject erreurs,
+                                                   int[] idChampsTextuels, String [] cleChampsTextuels) {
+        for (int i = 0; i < idChampsTextuels.length; i++) {
+            try {
+                TextView messageErreur = activite.findViewById(idChampsTextuels[i]);
+                if (erreurs.has(cleChampsTextuels[i])) {
+                    messageErreur.setText(erreurs.getString(cleChampsTextuels[i]));
+                } else {
+                    messageErreur.setText("");
+                }
+            } catch (JSONException e) {
             }
-            if (erreurs.has("motDePasse")) {
-                messageErreurMdp.setText(erreurs.getString("motDePasse"));
-            }
-            if (erreurs.has("nom")) {
-                messageErreurNom.setText(erreurs.getString("nom"));
-            }
-            if (erreurs.has("prenom")) {
-                messageErreurPrenom.setText(erreurs.getString("prenom"));
-            }
-            if (erreurs.has("adresse")) {
-                messageErreurAdresse.setText(erreurs.getString("adresse"));
-            }
-            if (erreurs.has("ville")) {
-                messageErreurVille.setText(erreurs.getString("ville"));
-            }
-        } catch (JSONException e) {
-        }
-    }
-
-    /**
-     * Vider les champs textuels d'une activité.
-     * @param activite L'activité dont les champs textuels doivent être vidés
-     * @param champsTextuels Les identifiants des champs textuels à vider
-     */
-    private static void viderChamps(AppCompatActivity activite, int[] champsTextuels) {
-        for (int champ : champsTextuels) {
-            EditText champTextuel = activite.findViewById(champ);
-            champTextuel.setText("");
         }
     }
 }

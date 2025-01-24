@@ -41,6 +41,7 @@
     <string name="tel_contact">Numéro de téléphone :</string>
     <string name="valider">Valider</string>
     <string name="obtenircoordonnees">Obtenir mes coordonnées</string>
+    <string name="coordonnees_non_calculees">Veuillez d\'abord obtenir vos coordonnées</string>
     <string name="adresseClient">Adresse :</string>
     <string name="retour">Retour</string>
     <string name="indication_entreprise">Veuillez entrer le nom de l\'entreprise</string>

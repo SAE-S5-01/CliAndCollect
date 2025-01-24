@@ -113,6 +113,7 @@ public class ActiviteInscription extends AppCompatActivity {
                         longitude = Double.parseDouble(lon);
                         adresse.setText(selectedLocation.get("display_name"));
                         boutonSubmitInscription.setEnabled(true);
+                        messageErreur.setText("");
                     });
                     builder.show();
                 }
@@ -142,7 +143,9 @@ public class ActiviteInscription extends AppCompatActivity {
             donnees.put("latitude", latitude);
             donnees.put("longitude", longitude);
         } catch (Exception e) {
-            messageErreur.setText(R.string.erreur_inscription);
+            messageErreur.setText(e.getMessage().equals("Forbidden numeric value: NaN")
+                                  ? R.string.coordonnees_non_calculees
+                                  : R.string.erreur_inscription);
             donnees = null;
         }
         return donnees;
