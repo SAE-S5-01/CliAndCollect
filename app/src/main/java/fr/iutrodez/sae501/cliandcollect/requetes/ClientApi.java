@@ -1,3 +1,8 @@
+/*
+ * ClientApi.java                                                   24 jan. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.requetes;
 
 import android.app.Activity;
@@ -10,12 +15,16 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
@@ -45,51 +54,30 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
  */
 public class ClientApi {
 
+    private final static String CHEMIN_FICHIER_CONFIGURATION
+        = "assets/config.properties";
+
     private static String BASE_URL;
 
     static {
         Properties properties = new Properties();
         try (InputStream inputStream
              = ClientApi.class.getClassLoader()
-                        .getResourceAsStream("assets/config.properties")) {
+                        .getResourceAsStream(CHEMIN_FICHIER_CONFIGURATION)) {
             if (inputStream != null) {
                 properties.load(inputStream);
                 BASE_URL = properties.getProperty("BASE_URL");
             } else {
-                throw new RuntimeException("Fichier de configuration absent");
+                throw new RuntimeException("Fichier de configuration illisible : "
+                                           + CHEMIN_FICHIER_CONFIGURATION);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Erreur de lecture du fichier de configuration", e);
+            throw new RuntimeException("Erreur de lecture du fichier de configuration :"
+                                       + CHEMIN_FICHIER_CONFIGURATION, e);
         }
     }
 
     private static ProgressDialog spineurChargement;
-
-    /**
-     * Vérifie qu'une connexion internet est disponible.
-     * @param context Le contexte de l'application
-     * @return true si une connexion internet est disponible sinon false.
-     */
-    public static boolean reseauDisponible(Context context) {
-        spineurChargement = new ProgressDialog(context);
-        spineurChargement.setMessage(context.getString(R.string.attente_reseau));
-        spineurChargement.setCancelable(false);
-        spineurChargement.show();
-
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (cm != null) {
-            Network network = cm.getActiveNetwork();
-            if (network != null) {
-                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
-
-                spineurChargement.dismiss();
-                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-            }
-        }
-        spineurChargement.dismiss();
-        return false;
-    }
 
     /**
      * Méthode permettant de générer les headers pour les requêtes à l'API.
@@ -230,6 +218,15 @@ public class ClientApi {
         spineurChargement.setCancelable(false);
         spineurChargement.show();
 
+        viderChamps((ActiviteInscription) contexte, new int[] {
+            R.id.saisieMail,
+            R.id.saisieMdp,
+            R.id.saisieNom,
+            R.id.saisiePrenom,
+            R.id.saisieAdresse,
+            R.id.saisieVille
+        });
+
         try {
             requeteApi(contexte, Request.Method.POST, "/utilisateur/inscription", null , donnees,
                 response -> {
@@ -247,7 +244,7 @@ public class ClientApi {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                } ,
+                },
                 error -> {
                     spineurChargement.dismiss();
                     gestionErreurInscription(contexte, error);
@@ -319,38 +316,32 @@ public class ClientApi {
             Request.Method.GET,
             urlApi,
             null,
-            new Response.Listener<JSONArray>() {
-                @Override
-                public void onResponse(JSONArray response) {
-                    try {
-                        // Liste pour stocker les résultats
-                        List<Map<String , String>> results = new ArrayList<>();
+            response -> {
+                try {
+                    // Liste pour stocker les résultats
+                    List<Map<String , String>> results = new ArrayList<>();
 
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject jsonObject = response.getJSONObject(i);
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject jsonObject = response.getJSONObject(i);
 
-                            Map<String, String> locationInfo = new HashMap<>();
-                            locationInfo.put("display_name", jsonObject.getString("display_name"));
-                            locationInfo.put("lat", jsonObject.getString("lat"));
-                            locationInfo.put("lon", jsonObject.getString("lon"));
-                            results.add(locationInfo);
-                        }
-
-                        // Retourner les résultats via le callback
-                        callback.onSuccess(results);
-
-                    } catch (JSONException e) {
-                        // Gérer l'exception JSON
-                        callback.onError("error catch : " + e.toString());
+                        Map<String, String> locationInfo = new HashMap<>();
+                        locationInfo.put("display_name", jsonObject.getString("display_name"));
+                        locationInfo.put("lat", jsonObject.getString("lat"));
+                        locationInfo.put("lon", jsonObject.getString("lon"));
+                        results.add(locationInfo);
                     }
+
+                    // Retourner les résultats via le callback
+                    callback.onSuccess(results);
+
+                } catch (JSONException e) {
+                    // Gérer l'exception JSON
+                    callback.onError("error catch : " + e.toString());
                 }
             },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // Retourner l'erreur via le callback
-                    callback.onError(error.toString());
-                }
+            error -> {
+                // Retourner l'erreur via le callback
+                callback.onError(error.toString());
             }
         ) {
             @Override
@@ -374,7 +365,15 @@ public class ClientApi {
     private static void gestionErreur(Context contexte, VolleyError erreur) {
         if (erreur.networkResponse != null && erreur.networkResponse.data != null) {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, new String(erreur.networkResponse.data), Toast.LENGTH_LONG).show();
+                try {
+                    String erreurToString = new String(erreur.networkResponse.data, "UTF-8");
+                    JSONObject objetErreur = new JSONObject(erreurToString);
+
+                    Toast.makeText(contexte, objetErreur.getString("description"), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                    throw new RuntimeException(e);
+                }
             });
         } else {
             ((Activity) contexte).runOnUiThread(() -> {
@@ -395,11 +394,14 @@ public class ClientApi {
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 JSONObject erreurs = jsonResponse.getJSONObject("erreur");
                 JSONObject saisie = jsonResponse.getJSONObject("saisie");
+
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
                     remplirChampsInscription((ActiviteInscription) contexte, saisie);
                     afficherErreursInscription((ActiviteInscription) contexte, erreurs);
                 });
             } catch (Exception e) {
+                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                throw new RuntimeException(e);
             }
         } else {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
@@ -482,6 +484,18 @@ public class ClientApi {
                 messageErreurVille.setText(erreurs.getString("ville"));
             }
         } catch (JSONException e) {
+        }
+    }
+
+    /**
+     * Vider les champs textuels d'une activité.
+     * @param activite L'activité dont les champs textuels doivent être vidés
+     * @param champsTextuels Les identifiants des champs textuels à vider
+     */
+    private static void viderChamps(AppCompatActivity activite, int[] champsTextuels) {
+        for (int champ : champsTextuels) {
+            EditText champTextuel = activite.findViewById(champ);
+            champTextuel.setText("");
         }
     }
 }
