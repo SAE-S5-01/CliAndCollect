@@ -11,8 +11,8 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:label="@string/app_nom"
-        android:icon="@mipmap/icone"
-        android:roundIcon="@mipmap/icone_ronde"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CliAndCollect"
         tools:targetApi="31">
