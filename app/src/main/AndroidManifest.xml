@@ -11,6 +11,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:label="@string/app_nom"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/icone"
         android:roundIcon="@mipmap/icone_ronde"
         android:supportsRtl="true"
@@ -31,7 +32,9 @@
         <activity
             android:name=".activites.ActiviteInscription"
             android:screenOrientation="portrait" />
-
+        <activity 
+            android:name=".activites.ActiviteDetailClient"
+            android:screenOrientation="portrait" />
         <activity 
             android:name=".activites.ActiviteCreationClient"
             android:screenOrientation="portrait" />
