@@ -25,6 +25,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
 import fr.iutrodez.sae501.cliandcollect.utile.Distance;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 public class ActiviteDetailClient extends AppCompatActivity {
 
@@ -123,7 +124,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
 
             JSONObject donnees = formulaireEnJson();
 
-            if (ClientApi.reseauDisponible(this)) {
+            if (Reseau.reseauDisponible(this,true)) {
                 ClientApi.modificationClient(this, donnees, client.getID().toString());
                 setResult(AppCompatActivity.RESULT_OK,intentionRetour);
                 finish();
