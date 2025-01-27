@@ -26,6 +26,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
 import fr.iutrodez.sae501.cliandcollect.utile.Distance;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 public class ActiviteCreationClient extends AppCompatActivity {
 
@@ -87,15 +88,12 @@ public class ActiviteCreationClient extends AppCompatActivity {
             Toast.makeText(this, "L'adresse de l'entreprise est obligatoire", Toast.LENGTH_LONG).show();
         } else {
             JSONObject donnees = formulaireEnJson();
-            // TODO ajout toast ?
-            if (ClientApi.reseauDisponible(this)) {
+            // TODO modifier gestion erreur réseau ?
+            if (Reseau.reseauDisponible(this, true)) {
                 ClientApi.creationClient(this, donnees, () -> {
                     setResult(AppCompatActivity.RESULT_OK);
                     finish();
                 });
-            } else {
-                Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
-
             }
         }
     }
@@ -108,21 +106,29 @@ public class ActiviteCreationClient extends AppCompatActivity {
                 @Override
                 public void onSuccess(List<Map<String , String>> results) {
                     String[] options = new String[results.size()];
+
                     for (int i = 0; i < results.size(); i++) {
                         options[i] = results.get(i).get("display_name");
                     }
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(ActiviteCreationClient.this);
-                    builder.setTitle("Choisissez une option");
-                    builder.setItems(options, (dialog, which) -> {
-                        Map<String, String> selectedLocation = results.get(which);
-                        String lat = selectedLocation.get("lat");
-                        String lon = selectedLocation.get("lon");
-                        latitude = Double.parseDouble(lat);
-                        longitude = Double.parseDouble(lon);
-                        saisieAdresse.setText(selectedLocation.get("display_name"));
-                        boutonValider.setEnabled(true);
-                    });
+
+                    if (options.length > 0) {
+                        builder.setTitle("Choisissez une option");
+                        builder.setItems(options, (dialog, which) -> {
+                            Map<String, String> selectedLocation = results.get(which);
+                            String lat = selectedLocation.get("lat");
+                            String lon = selectedLocation.get("lon");
+                            latitude = Double.parseDouble(lat);
+                            longitude = Double.parseDouble(lon);
+                            saisieAdresse.setText(selectedLocation.get("display_name"));
+                            boutonValider.setEnabled(true);
+                        });
+                    } else {
+                        builder.setTitle("Aucun résultat");
+                        builder.setMessage("Aucun résultat n'a été trouvé pour cette adresse");
+                    }
+
                     builder.show();
                 }
                 @Override

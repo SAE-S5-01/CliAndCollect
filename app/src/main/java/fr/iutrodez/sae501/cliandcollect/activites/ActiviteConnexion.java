@@ -17,6 +17,7 @@ import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
  * Activité de la page de connexion.
@@ -61,14 +62,12 @@ public class ActiviteConnexion extends AppCompatActivity {
 
         if (mail.isEmpty() || mdp.isEmpty()) {
             Toast.makeText(this, R.string.erreur_champ_connexion_vide ,  Toast.LENGTH_LONG).show();
-        } else if (ClientApi.reseauDisponible(this)) {
+        } else if (Reseau.reseauDisponible(this, true)) {
             ClientApi.connexion(this, mail, mdp, () -> {
                 ActivitePrincipale.preferencesConnexion(seRappelerdeMoi.isChecked() , mail, mdp);
                 Intent menuPrincipal = new Intent(ActiviteConnexion.this, GestionFragment.class);
                 startActivity(menuPrincipal);
-            } , () -> {});
-        } else {
-            Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
+            }, null);
         }
     }
 

@@ -1,6 +1,8 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
+
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,10 +15,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
+import fr.iutrodez.sae501.cliandcollect.utile.Distance;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
  * Activité de la page d'inscription.
@@ -33,7 +43,10 @@ public class ActiviteInscription extends AppCompatActivity {
     private TextView messageErreur;
     public static SharedPreferences preferences;
 
+    private static double latitude = Double.NaN;
+    private static double longitude = Double.NaN;
     private CheckBox seRappelerdeMoi;
+    private Button boutonSubmitInscription;
 
     /**
      * Méthode invoquée lors de la création de l'activité.
@@ -52,7 +65,7 @@ public class ActiviteInscription extends AppCompatActivity {
         messageErreur = findViewById(R.id.messageErreur);
         seRappelerdeMoi = findViewById(R.id.seRappelerDeMoi);
         preferences = getDefaultSharedPreferences(getApplicationContext());
-        Button boutonSubmitInscription = findViewById(R.id.boutonInscription);
+        boutonSubmitInscription = findViewById(R.id.boutonInscription);
         boutonSubmitInscription.setOnClickListener(this::inscription);
     }
 
@@ -65,15 +78,52 @@ public class ActiviteInscription extends AppCompatActivity {
      */
     private void inscription(View view) {
         JSONObject donnees = donneeFormulaireEnJson();
-        if (ClientApi.reseauDisponible(this)) {
+        if (Reseau.reseauDisponible(this, true) && donnees != null) {
             ClientApi.inscription(this, donnees, () -> {
-                ActivitePrincipale.preferencesConnexion(seRappelerdeMoi.isChecked(),
-                        mail.getText().toString(), mdp.getText().toString());
+                ActivitePrincipale
+                .preferencesConnexion(seRappelerdeMoi.isChecked(),
+                                      mail.getText().toString(),
+                                      mdp.getText().toString());
+
                 Intent menuPrincipal = new Intent(ActiviteInscription.this, GestionFragment.class);
                 startActivity(menuPrincipal);
             });
-        } else {
-            Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void obtenirCoordonnees(View view) {
+        try {
+            // STUB (rodez) TODO remplacer par geoloc
+            double[] viewBox = Distance.creationViewBox(44.333333  , 2.566667);
+            ClientApi.verifierAddresse(adresse.getText().toString(),  viewBox,this, new VolleyCallback() {
+                @Override
+                public void onSuccess(List<Map<String , String>> results) {
+                    String[] options = new String[results.size()];
+                    for (int i = 0; i < results.size(); i++) {
+                        options[i] = results.get(i).get("display_name");
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ActiviteInscription.this);
+                    builder.setTitle("Choisissez une option");
+                    builder.setItems(options, (dialog, which) -> {
+                        Map<String, String> selectedLocation = results.get(which);
+                        String lat = selectedLocation.get("lat");
+                        String lon = selectedLocation.get("lon");
+                        latitude = Double.parseDouble(lat);
+                        longitude = Double.parseDouble(lon);
+                        adresse.setText(selectedLocation.get("display_name"));
+                        boutonSubmitInscription.setEnabled(true);
+                        messageErreur.setText("");
+                    });
+                    builder.show();
+                }
+                @Override
+                public void onError(String error) {
+                    Log.e("error", "------------------------------------" + error);
+                }
+            });
+        } catch (UnsupportedEncodingException e) {
+            Log.e("erreur", "------------------------------------" + e);
         }
     }
 
@@ -90,8 +140,13 @@ public class ActiviteInscription extends AppCompatActivity {
             donnees.put("prenom", prenom.getText().toString());
             donnees.put("adresse", adresse.getText().toString());
             donnees.put("ville", ville.getText().toString());
+            donnees.put("latitude", latitude);
+            donnees.put("longitude", longitude);
         } catch (Exception e) {
-            messageErreur.setText(R.string.erreur_inscription);
+            messageErreur.setText(e.getMessage().equals("Forbidden numeric value: NaN")
+                                  ? R.string.coordonnees_non_calculees
+                                  : R.string.erreur_inscription);
+            donnees = null;
         }
         return donnees;
     }

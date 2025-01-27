@@ -1,6 +1,12 @@
+/*
+ * ClientApi.java                                                   24 jan. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.requetes;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -9,57 +15,69 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
+import java.util.Properties;
+
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 
 /**
- * Classe définissant les différentes méthodes pour communiquer avec l'API.
- * @author Descriaud Lucas
+ * Différentes méthodes de communication avec l'API.
+ *
+ * @author Lucas DESCRIAUD
+ * @author Loïc FAUGIERES
  */
 public class ClientApi {
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private final static String CHEMIN_FICHIER_CONFIGURATION
+        = "assets/config.properties";
 
-    /**
-     * Méthode permettant de verifier si l'API est joignable.
-     * @param context Le contexte de l'application
-     */
+    private static String BASE_URL;
 
-    /**
-     * Vérifie qu'une connexion internet est disponible.
-     * @param context Le contexte de l'application
-     * @return true si une connexion internet est disponible sinon false.
-     */
-    public static boolean reseauDisponible(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            Network network = cm.getActiveNetwork();
-            if (network != null) {
-                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
-                return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+    static {
+        Properties properties = new Properties();
+        try (InputStream inputStream
+             = ClientApi.class.getClassLoader()
+                        .getResourceAsStream(CHEMIN_FICHIER_CONFIGURATION)) {
+            if (inputStream != null) {
+                properties.load(inputStream);
+                BASE_URL = properties.getProperty("BASE_URL");
+            } else {
+                throw new RuntimeException("Fichier de configuration illisible : "
+                                           + CHEMIN_FICHIER_CONFIGURATION);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de lecture du fichier de configuration :"
+                                       + CHEMIN_FICHIER_CONFIGURATION, e);
         }
-        return false;
     }
+
+    private static ProgressDialog spineurChargement;
 
     /**
      * Méthode permettant de générer les headers pour les requêtes à l'API.
@@ -68,8 +86,8 @@ public class ClientApi {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         String token = ActivitePrincipale.preferences.getString("tokenApi", "");
-        if (!token.isEmpty() && !(route.equals("/api/utilisateur/connexion")
-                || route.equals("/api/utilisateur/inscription"))) {
+        if (!token.isEmpty() && !(route.equals("/utilisateur/connexion")
+            || route.equals("/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
         }
         return headers;
@@ -141,25 +159,32 @@ public class ClientApi {
      * @param mdp Le mot de passe de l'utilisateur
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
-    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie ,
-    Runnable erreurConnexion) {
+    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie,
+        Runnable erreurConnexion) {
         Map<String, String> parametre = new HashMap<>();
+
         parametre.put("mail", mail);
         parametre.put("motDePasse", mdp);
-        Toast toast = Toast.makeText(contexte, R.string.attente_connexion, Toast.LENGTH_LONG);
+
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_connexion));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
-            requeteApi(contexte, Request.Method.GET, "/api/utilisateur/connexion", parametre, null,
+            requeteApi(contexte, Request.Method.GET, "/utilisateur/connexion", parametre, null,
                 response -> {
                     /*
-                     * Pas de gestion propre de l'erreur car l'API retourne un code 401 en cas d'erreur*
+                     * Pas de gestion propre de l'erreur car l'API retourne un code 401 en cas d'erreur
                      * On ne passera dans le catch que si le code de l'api venait a etre modifier en
                      * retirant le token obligatoire pour le reste de l'utilisation de l'application
                      * dans sa reponse
                      */
                     try {
+                        spineurChargement.dismiss();
+
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
-                        toast.cancel();
                         ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
                         ((Activity) contexte).runOnUiThread(connexionReussie);
                     } catch (JSONException e) {
@@ -167,15 +192,17 @@ public class ClientApi {
                     }
                 },
                 error -> {
-                    /* erreurConnexion ne sert que pour Activite principale*/
-                    if(erreurConnexion != null) {
+                    spineurChargement.dismiss();
+
+                    /* erreurConnexion ne sert que pour Activite principale */
+                    if (erreurConnexion != null) {
                         ((Activity) contexte).runOnUiThread(erreurConnexion);
                     }
-                    toast.cancel();
                     gestionErreur(contexte, error);
                 }
             );
         } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
 
@@ -186,32 +213,41 @@ public class ClientApi {
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
     public static void inscription(Context contexte, JSONObject donnees, Runnable connexionReussie) {
-        Toast toast = Toast.makeText(contexte, R.string.attente_inscription, Toast.LENGTH_LONG);
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_inscription));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
-            requeteApi(contexte, Request.Method.POST, "/api/utilisateur/inscription", null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/utilisateur/inscription", null , donnees,
                 response -> {
                     try {
+                        spineurChargement.dismiss();
+
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
                         ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
-                        toast.cancel();
-                        toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG).show();
+
+                        Toast toast = Toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG);
+                        toast.show();
+
                         ((ActiviteInscription) contexte).runOnUiThread(connexionReussie);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                } ,
+                },
                 error -> {
-                    toast.cancel();
+                    spineurChargement.dismiss();
                     gestionErreurInscription(contexte, error);
                 }
             );
         } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
 
     public static void getListeClient(Context contexte , Runnable callback) {
-        requeteApi(contexte, Request.Method.GET, "/api/contact", null, null,
+        requeteApi(contexte, Request.Method.GET, "/contact", null, null,
                 response -> {
                     try {
                         JSONArray jsonReponse = new JSONArray(response);
@@ -235,7 +271,7 @@ public class ClientApi {
 
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
-            requeteApi(contexte, Request.Method.POST, "/api/contact", null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/contact", null , donnees,
                 response -> {
                     try {
                         // En cas de succès, on ajoute le client au singleton pour faire l'affichage
@@ -264,46 +300,40 @@ public class ClientApi {
     public static void verifierAddresse(String adresse, double[] viewbox ,Context contexte, 
                                         VolleyCallback callback) throws UnsupportedEncodingException {
         String urlApi = "https://nominatim.openstreetmap.org/search?q="
-                + URLEncoder.encode(adresse, "UTF-8")
-                + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
-                + "&bounded=1&format=json&addressdetails=1";
+            + URLEncoder.encode(adresse, "UTF-8")
+            + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
+            + "&bounded=1&format=json&addressdetails=1";
         JsonArrayRequest requete = new JsonArrayRequest(
-                Request.Method.GET,
-                urlApi,
-                null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            // Liste pour stocker les résultats
-                            List<Map<String , String>> results = new ArrayList<>();
+            Request.Method.GET,
+            urlApi,
+            null,
+            response -> {
+                try {
+                    // Liste pour stocker les résultats
+                    List<Map<String , String>> results = new ArrayList<>();
 
-                            for (int i = 0; i < response.length(); i++) {
-                                JSONObject jsonObject = response.getJSONObject(i);
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject jsonObject = response.getJSONObject(i);
 
-                                Map<String, String> locationInfo = new HashMap<>();
-                                locationInfo.put("display_name", jsonObject.getString("display_name"));
-                                locationInfo.put("lat", jsonObject.getString("lat"));
-                                locationInfo.put("lon", jsonObject.getString("lon"));
-                                results.add(locationInfo);
-                            }
-
-                            // Retourner les résultats via le callback
-                            callback.onSuccess(results);
-
-                        } catch (JSONException e) {
-                            // Gérer l'exception JSON
-                            callback.onError("error catch : " + e.toString());
-                        }
+                        Map<String, String> locationInfo = new HashMap<>();
+                        locationInfo.put("display_name", jsonObject.getString("display_name"));
+                        locationInfo.put("lat", jsonObject.getString("lat"));
+                        locationInfo.put("lon", jsonObject.getString("lon"));
+                        results.add(locationInfo);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Retourner l'erreur via le callback
-                        callback.onError(error.toString());
-                    }
+
+                    // Retourner les résultats via le callback
+                    callback.onSuccess(results);
+
+                } catch (JSONException e) {
+                    // Gérer l'exception JSON
+                    callback.onError("error catch : " + e.toString());
                 }
+            },
+            error -> {
+                // Retourner l'erreur via le callback
+                callback.onError(error.toString());
+            }
         ) {
             @Override
             public Map<String, String> getHeaders() {
@@ -316,7 +346,7 @@ public class ClientApi {
         // Ajouter la requête à la file d'attente
         RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
     }
-//
+
 
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.
@@ -326,11 +356,19 @@ public class ClientApi {
     private static void gestionErreur(Context contexte, VolleyError erreur) {
         if (erreur.networkResponse != null && erreur.networkResponse.data != null) {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, new String(erreur.networkResponse.data), Toast.LENGTH_LONG).show();
+                try {
+                    String erreurToString = new String(erreur.networkResponse.data, "UTF-8");
+                    JSONObject objetErreur = new JSONObject(erreurToString);
+
+                    Toast.makeText(contexte, objetErreur.getString("description"), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                    throw new RuntimeException(e);
+                }
             });
         } else {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable ,  Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
             });
         }
     }
@@ -344,96 +382,76 @@ public class ClientApi {
         if (erreur.networkResponse != null && erreur.networkResponse.data != null) {
             try {
                 String responseBody = new String(erreur.networkResponse.data, "UTF-8");
+
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 JSONObject erreurs = jsonResponse.getJSONObject("erreur");
-                JSONObject saisie = jsonResponse.getJSONObject("saisie");
+                //JSONObject saisie = jsonResponse.getJSONObject("saisie");
+
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                    remplirChampsInscription((ActiviteInscription) contexte, saisie);
-                    afficherErreursInscription((ActiviteInscription) contexte, erreurs);
+                    /*remplirChampsInscription((ActiviteInscription) contexte, erreurs, new int[] {
+                        R.id.saisieMail, R.id.saisieMdp, R.id.saisieNom,
+                        R.id.saisiePrenom, R.id.saisieAdresse, R.id.saisieVille
+                    }, new String[] {
+                        "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
+                    });*/
+                    // TODO : voir utilité de resaisir des valeurs déjà saisies ?
+
+                    afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
+                        R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
+                        R.id.messageErreurPrenom, R.id.messageErreurAdresse, R.id.messageErreurVille
+                    }, new String[] {
+                        "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
+                    });
                 });
             } catch (Exception e) {
+                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                throw new RuntimeException(e);
             }
         } else {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable ,  Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
             });
         }
     }
 
     /**
-     * Méthode permettant de remplir les champs du formulaire d'inscription.
+     * Méthode permettant de re-remplir les champs du formulaire d'inscription.
      * @param activite L'activité d'inscription
-     * @param saisie Les données saisies par l'utilisateur
+     * @param donnees Les données saisies par l'utilisateur
+     *                et retournées par l'API
      */
-    private static void remplirChampsInscription(ActiviteInscription activite, JSONObject saisie) {
-        try {
-            EditText mail = activite.findViewById(R.id.saisieMail);
-            EditText mdp = activite.findViewById(R.id.saisieMdp);
-            EditText nom = activite.findViewById(R.id.saisieNom);
-            EditText prenom = activite.findViewById(R.id.saisiePrenom);
-            EditText adresse = activite.findViewById(R.id.saisieAdresse);
-            EditText ville = activite.findViewById(R.id.saisieVille);
-
-            if (saisie.has("mail")) {
-                mail.setText(saisie.getString("mail"));
+    private static void remplirChampsInscription(AppCompatActivity activite, JSONObject donnees,
+                                                 int[] idChampsTextuels, String[] cleChampsTextuels) {
+        for (int i = 0; i < idChampsTextuels.length; i++) {
+            try {
+                EditText champTextuel = activite.findViewById(idChampsTextuels[i]);
+                if (donnees.has(cleChampsTextuels[i])) {
+                    champTextuel.setText(donnees.getString(cleChampsTextuels[i]));
+                }
+            } catch (JSONException e) {
             }
-            if (saisie.has("motDePasse")) {
-                mdp.setText(saisie.getString("motDePasse"));
-            }
-            if (saisie.has("nom")) {
-                nom.setText(saisie.getString("nom"));
-            }
-            if (saisie.has("prenom")) {
-                prenom.setText(saisie.getString("prenom"));
-            }
-            if (saisie.has("adresse")) {
-                adresse.setText(saisie.getString("adresse"));
-            }
-            if (saisie.has("ville")) {
-                ville.setText(saisie.getString("ville"));
-            }
-        } catch (JSONException e) {
         }
     }
 
     /**
-     * Méthode permettant d'afficher les erreurs lors de l'inscription.
+     * Afficher les erreurs lors de l'inscription.
      * @param activite L'activité d'inscription
      * @param erreurs Les erreurs retournées par l'API
+     * @param idChampsTextuels Les identifiants des inputs des champs textuels
+     * @param cleChampsTextuels Les clés de réponse de l'API des champs textuels
      */
-    private static void afficherErreursInscription(ActiviteInscription activite, JSONObject erreurs) {
-        try {
-            TextView messageErreurMail = activite.findViewById(R.id.messageErreurMail);
-            TextView messageErreurMdp = activite.findViewById(R.id.messageErreurMdp);
-            TextView messageErreurNom = activite.findViewById(R.id.messageErreurNom);
-            TextView messageErreurPrenom = activite.findViewById(R.id.messageErreurPrenom);
-            TextView messageErreurAdresse = activite.findViewById(R.id.messageErreurAdresse);
-            TextView messageErreurVille = activite.findViewById(R.id.messageErreurVille);
-            messageErreurMail.setText("");
-            messageErreurMdp.setText("");
-            messageErreurNom.setText("");
-            messageErreurPrenom.setText("");
-            messageErreurAdresse.setText("");
-            messageErreurVille.setText("");
-            if (erreurs.has("mail")) {
-                messageErreurMail.setText(erreurs.getString("mail"));
+    private static void afficherErreursInscription(ActiviteInscription activite, JSONObject erreurs,
+                                                   int[] idChampsTextuels, String [] cleChampsTextuels) {
+        for (int i = 0; i < idChampsTextuels.length; i++) {
+            try {
+                TextView messageErreur = activite.findViewById(idChampsTextuels[i]);
+                if (erreurs.has(cleChampsTextuels[i])) {
+                    messageErreur.setText(erreurs.getString(cleChampsTextuels[i]));
+                } else {
+                    messageErreur.setText("");
+                }
+            } catch (JSONException e) {
             }
-            if (erreurs.has("motDePasse")) {
-                messageErreurMdp.setText(erreurs.getString("motDePasse"));
-            }
-            if (erreurs.has("nom")) {
-                messageErreurNom.setText(erreurs.getString("nom"));
-            }
-            if (erreurs.has("prenom")) {
-                messageErreurPrenom.setText(erreurs.getString("prenom"));
-            }
-            if (erreurs.has("adresse")) {
-                messageErreurAdresse.setText(erreurs.getString("adresse"));
-            }
-            if (erreurs.has("ville")) {
-                messageErreurVille.setText(erreurs.getString("ville"));
-            }
-        } catch (JSONException e) {
         }
     }
 }

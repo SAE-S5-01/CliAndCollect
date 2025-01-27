@@ -16,6 +16,7 @@ import android.os.Bundle;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 
 /**
@@ -23,7 +24,6 @@ import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
  * @author Descriaud Lucas
  */
 public class ActivitePrincipale extends AppCompatActivity {
-
 
     public static SharedPreferences preferences;
 
@@ -42,16 +42,17 @@ public class ActivitePrincipale extends AppCompatActivity {
         preferences = getDefaultSharedPreferences(getApplicationContext());
 
         /*
-         * Verification uniquement du mail car le mail n'est jamais ecrit sans le mdp
+         * Vérification uniquement du mail car le mail n'est jamais écrit sans le mot de passe.
          * Si les valeurs n'ont pas changé dans la bd de l'api on redirige vers la vue principale
-         * Dans n'importe qu'elle autre cas on redirige vers la vue de connexion
+         * Dans n'importe qu'elle autre cas on redirige vers la vue de connexion.
          */
-        if (ClientApi.reseauDisponible(this) && preferences.contains("mail")) {
+        if (Reseau.reseauDisponible(this, true)
+            && preferences.contains("mail")) {
             ClientApi.connexion(this,
-                    preferences.getString("mail", ""),
-                    preferences.getString("mdp", ""),
-                    () -> {lancementActivite(GestionFragment.class);},
-                    () -> {lancementActivite(ActiviteConnexion.class);}
+                preferences.getString("mail", ""),
+                preferences.getString("mdp", ""),
+                () -> { lancementActivite(GestionFragment.class); },
+                () -> { lancementActivite(ActiviteConnexion.class); }
             );
         } else {
             activiteALancer = new Intent(this, ActiviteConnexion.class);

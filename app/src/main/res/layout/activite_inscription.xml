@@ -169,14 +169,28 @@
             android:text="@string/se_souvenir" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/boutonInscription"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="304dp"
-        android:text="@string/inscription"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/messageErreur"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginTop="50dp">
+
+        <Button
+            android:id="@+id/obtenirCoordonnees"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="obtenirCoordonnees"
+            android:layout_marginBottom="304dp"
+            android:text="@string/obtenircoordonnees" />
+        <Button
+            android:id="@+id/boutonInscription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="304dp"
+            android:text="@string/inscription" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
