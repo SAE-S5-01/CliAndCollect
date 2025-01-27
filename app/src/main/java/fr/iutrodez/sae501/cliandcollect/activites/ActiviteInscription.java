@@ -26,6 +26,7 @@ import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
 import fr.iutrodez.sae501.cliandcollect.utile.Distance;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
  * Activité de la page d'inscription.
@@ -77,15 +78,16 @@ public class ActiviteInscription extends AppCompatActivity {
      */
     private void inscription(View view) {
         JSONObject donnees = donneeFormulaireEnJson();
-        if (ClientApi.reseauDisponible(this)) {
+        if (Reseau.reseauDisponible(this, true) && donnees != null) {
             ClientApi.inscription(this, donnees, () -> {
-                ActivitePrincipale.preferencesConnexion(seRappelerdeMoi.isChecked(),
-                        mail.getText().toString(), mdp.getText().toString());
+                ActivitePrincipale
+                .preferencesConnexion(seRappelerdeMoi.isChecked(),
+                                      mail.getText().toString(),
+                                      mdp.getText().toString());
+
                 Intent menuPrincipal = new Intent(ActiviteInscription.this, GestionFragment.class);
                 startActivity(menuPrincipal);
             });
-        } else {
-            Toast.makeText(this, R.string.erreur_reseau ,  Toast.LENGTH_LONG).show();
         }
     }
 
@@ -111,12 +113,13 @@ public class ActiviteInscription extends AppCompatActivity {
                         longitude = Double.parseDouble(lon);
                         adresse.setText(selectedLocation.get("display_name"));
                         boutonSubmitInscription.setEnabled(true);
+                        messageErreur.setText("");
                     });
                     builder.show();
                 }
                 @Override
                 public void onError(String error) {
-                    Log.e("erro", "------------------------------------" + error);
+                    Log.e("error", "------------------------------------" + error);
                 }
             });
         } catch (UnsupportedEncodingException e) {
@@ -139,9 +142,11 @@ public class ActiviteInscription extends AppCompatActivity {
             donnees.put("ville", ville.getText().toString());
             donnees.put("latitude", latitude);
             donnees.put("longitude", longitude);
-
         } catch (Exception e) {
-            messageErreur.setText(R.string.erreur_inscription);
+            messageErreur.setText(e.getMessage().equals("Forbidden numeric value: NaN")
+                                  ? R.string.coordonnees_non_calculees
+                                  : R.string.erreur_inscription);
+            donnees = null;
         }
         return donnees;
     }

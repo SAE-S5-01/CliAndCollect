@@ -31,6 +31,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
  * Gestion du fragment Clients.
@@ -94,7 +95,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
         clients = new ArrayList<>();
 
-        if (ClientApi.reseauDisponible(this.getContext())) {
+        if (Reseau.reseauDisponible(this.getContext(), false)) {
             ClientApi.getListeClient(this.getContext(), () -> {
                 for (Client client : SingletonListeClient.getListeClient()) {
                     clients.add(client);
@@ -128,7 +129,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         // TODO : Appeler l'API pour récupérer la liste des clients
-        if (ClientApi.reseauDisponible(this.getContext()) && clients.isEmpty()) {
+        if (Reseau.reseauDisponible(this.getContext(), true) && clients.isEmpty()) {
             Log.i("client fragment" , "reseau dispo et liste client vide call api requis");
         }
     }
