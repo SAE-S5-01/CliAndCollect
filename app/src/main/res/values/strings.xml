@@ -56,5 +56,5 @@
     <string name="indication_coordonnees">longitude:latitude</string>
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
-    <string name="pasModifier">Aucune informations n\'a était modifié</string>
+    <string name="pasModifier">Aucune information n\'a été modifiée</string>
 </resources>

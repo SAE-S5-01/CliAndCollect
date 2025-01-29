@@ -106,26 +106,7 @@ public class ClientApi {
         String url = BASE_URL + route;
 
         // Gestion des paramètres pour les requêtes GET
-        if (methode == Request.Method.GET && parametres != null && !parametres.isEmpty()) {
-            StringBuilder urlACompleter = new StringBuilder(url);
-            urlACompleter.append("?"); // Début de la query string
-
-            for (Map.Entry<String, String> parametre : parametres.entrySet()) {
-                try {
-                    // Encodage des clés et valeurs des paramètres pour les rendre compatibles avec l'URL
-                    urlACompleter.append(URLEncoder.encode(parametre.getKey(), "UTF-8")) // Encode la clé
-                            .append("=")
-                            .append(URLEncoder.encode(parametre.getValue(), "UTF-8")) // Encode la valeur
-                            .append("&"); // Ajoute un '&' pour séparer les paramètres
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-            // Supprimer le dernier '&' ajouté
-            url = urlACompleter.substring(0, urlACompleter.length() - 1);
-        }
-
-        if (methode == Request.Method.PUT && parametres != null && !parametres.isEmpty()) {
+        if ((methode == Request.Method.GET || methode == Request.Method.PUT) && parametres != null && !parametres.isEmpty()) {
             StringBuilder urlACompleter = new StringBuilder(url);
             urlACompleter.append("?"); // Début de la query string
 
@@ -310,7 +291,7 @@ public class ClientApi {
         HashMap<String,String> parametre = new HashMap<>();
         parametre.put("id",id);
         try {
-            requeteApi(contexte, Request.Method.PUT, "/modifier", parametre , donnees,
+            requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
                     response -> {} ,
                     error -> {}
             );
