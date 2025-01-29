@@ -5,22 +5,23 @@
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
+import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 
 
 /**
@@ -30,7 +31,6 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 public class GestionFragment extends AppCompatActivity {
 
     TabLayout gestionnaireOnglet;
-
 
     int[] navigationButtonsIds;
 
@@ -44,6 +44,11 @@ public class GestionFragment extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_principale);
+
+        ImageButton boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
+        registerForContextMenu(boutonOptionMenu);
+
+        boutonOptionMenu.setOnClickListener(view -> afficherMenuContextuel(view));
 
         /*
          * on récupère un accès sur le ViewPager et sur le TabLayout qui gèrera les onglets
@@ -104,25 +109,55 @@ public class GestionFragment extends AppCompatActivity {
             }
         });
     }
-    
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        new MenuInflater(this).inflate(R.menu.menu_option, menu);
-        return super.onCreateOptionsMenu(menu);
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.menu_contextuel_entete, menu);
     }
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item) {
+        boolean handled = gestionItemMenuSelectionne(item);
+
+        // Si l'élément a été traité, retourne true. Sinon, passe au comportement par défaut
+        return handled || super.onContextItemSelected(item);
+    }
+
+    /**
+     * Affiche un menu contextuel et gère les éléments sélectionnés
+     * @param view Vue sur laquelle le menu contextuel s'affiche
+     */
+    private void afficherMenuContextuel(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.menu_contextuel_entete, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(item -> gestionItemMenuSelectionne(item));
+
+        popupMenu.show();
+    }
+
+    /**
+     * Gère les actions lors de la sélection d'un item dans le menu
+     * @param item L'élément du menu sélectionné
+     * @return true si l'action est traitée, false sinon
+     */
+    private boolean gestionItemMenuSelectionne(MenuItem item) {
+        boolean resultat = false;
+
         if (item.getItemId() == R.id.menu_deconnecter) {
-            ActivitePrincipale.preferences.edit().remove("mail");
-            ActivitePrincipale.preferences.edit().remove("mdp");
-            ActivitePrincipale.preferences.edit().remove("token");
+            Preferences.effacerInfosConnexion(this);
             Intent pageConnexion = new Intent(this, ActiviteConnexion.class);
             startActivity(pageConnexion);
             finish();
+            resultat = true;
         } else if (item.getItemId() == R.id.menu_compte) {
             // TODO vue mon compte
+            resultat = true;
         }
-        return super.onOptionsItemSelected(item);
+
+        return resultat;
     }
 
     /**

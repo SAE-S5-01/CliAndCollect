@@ -1,75 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.FragmentClients">
+    tools:context=".fragments.FragmentClient">
 
     <Button
         android:id="@+id/boutonAjoutClient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:text="@string/ajouter_client"
-        app:layout_constraintBaseline_toTopOf="parent" />
+        android:text="@string/ajouter_client" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_clients"
         android:layout_width="match_parent"
         android:layout_marginTop="45dp"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/boutonAjoutClient" />
+        android:layout_height="match_parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.FragmentClients">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/boutonAjoutClient"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            app:layout_constraintBaseline_toTopOf="parent"
-            android:text="@string/ajouter_client" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_clients"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/boutonAjoutClient"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_clients"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/boutonAjoutClient"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:text="@string/ajouter_client" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_clients"
-            android:layout_width="match_parent"
-            android:gravity="bottom"
-            android:layout_height="match_parent" />
-    </LinearLayout>-->
-
-<!--</ScrollView>-->
+</LinearLayout>

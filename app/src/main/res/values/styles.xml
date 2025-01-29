@@ -1,34 +1,9 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
     <style name="AppStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <!-- Utilise l'espace restant avec weight = 1 -->
         <item name="android:padding">@dimen/app_marge_interieure</item>
-    </style>
-
-    <style name="FooterComponent">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">@dimen/pied_page_hauteur_min</item>
-        <item name="android:gravity">center</item>
-        <item name="android:contentDescription">Fragments</item>
-        <item name="android:background">@color/pied_page_fond</item>
-    </style>
-
-    <style name="FooterImage">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">@dimen/pied_page_dimensions_icone</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:paddingVertical">@dimen/pied_page_marge_interieure_verticale_icone</item>
-        <item name="android:layout_marginHorizontal">@dimen/pied_page_marge_interieure_horizontale_icone</item>
-        <item name="android:scaleType">centerCrop</item>
-        <item name="android:adjustViewBounds">true</item>
     </style>
 </resources>
