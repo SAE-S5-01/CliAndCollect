@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
@@ -28,6 +28,7 @@ import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
 import fr.iutrodez.sae501.cliandcollect.utile.Distance;
 import fr.iutrodez.sae501.cliandcollect.utile.GestionBouton;
 import fr.iutrodez.sae501.cliandcollect.utile.LocalisationAdapter;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
@@ -66,6 +67,9 @@ public class ActiviteInscription extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_inscription);
 
+        ImageView boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
+        boutonOptionMenu.setVisibility(View.INVISIBLE);
+
         mail = findViewById(R.id.saisieMail);
         mdp =  findViewById(R.id.saisieMdp);
         nom = findViewById(R.id.saisieNom);
@@ -101,13 +105,15 @@ public class ActiviteInscription extends AppCompatActivity {
         JSONObject donnees = donneeFormulaireEnJson();
         if (Reseau.reseauDisponible(this, R.id.messageErreur, R.string.erreur_reseau) && donnees != null) {
             ClientApi.inscription(this, donnees, () -> {
-                ActivitePrincipale
-                .preferencesConnexion(seRappelerDeMoi.isChecked(),
-                                      mail.getText().toString(),
-                                      mdp.getText().toString());
+                Preferences
+                .sauvegarderInfosConnexion(this,
+                                           mail.getText().toString(),
+                                           mdp.getText().toString(),
+                                           seRappelerDeMoi.isChecked());
 
                 Intent menuPrincipal = new Intent(ActiviteInscription.this, GestionFragment.class);
                 startActivity(menuPrincipal);
+                finish();
             });
         }
     }

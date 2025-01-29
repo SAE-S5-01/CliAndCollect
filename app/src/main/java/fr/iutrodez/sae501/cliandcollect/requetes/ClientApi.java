@@ -10,11 +10,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -38,11 +35,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.R;
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 
 /**
  * Différentes méthodes de communication avec l'API.
@@ -80,10 +77,10 @@ public class ClientApi {
     /**
      * Méthode permettant de générer les headers pour les requêtes à l'API.
      */
-    private static Map<String, String> genererHeaders(String route) {
+    private static Map<String, String> genererHeaders(String route, Context contexte) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        String token = ActivitePrincipale.preferences.getString("tokenApi", "");
+        String token = Preferences.getTokenApi(contexte);
         if (!token.isEmpty() && !(route.equals("/utilisateur/connexion")
             || route.equals("/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
@@ -133,7 +130,7 @@ public class ClientApi {
             request = new JsonObjectRequest(methode, url, donnees, response -> reussite.onResponse(response.toString()), erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    return genererHeaders(route);
+                    return genererHeaders(route, contexte);
                 }
             };
         } else {
@@ -141,7 +138,7 @@ public class ClientApi {
             request = new StringRequest(methode, url, reussite, erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    return genererHeaders(route);
+                    return genererHeaders(route, contexte);
                 }
             };
         }
@@ -157,8 +154,7 @@ public class ClientApi {
      * @param mdp Le mot de passe de l'utilisateur
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
-    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie,
-        Runnable erreurConnexion) {
+    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie) {
         Map<String, String> parametre = new HashMap<>();
 
         parametre.put("mail", mail);
@@ -183,7 +179,7 @@ public class ClientApi {
 
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
-                        ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
+                        Preferences.sauvegarderTokenApi(contexte, token);
                         ((Activity) contexte).runOnUiThread(connexionReussie);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
@@ -191,11 +187,6 @@ public class ClientApi {
                 },
                 error -> {
                     spineurChargement.dismiss();
-
-                    /* erreurConnexion ne sert que pour Activite principale */
-                    if (erreurConnexion != null) {
-                        ((Activity) contexte).runOnUiThread(erreurConnexion);
-                    }
                     gestionErreur(contexte, error);
                 }
             );
@@ -224,7 +215,7 @@ public class ClientApi {
 
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
-                        ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
+                        Preferences.sauvegarderTokenApi(contexte, token);
 
                         Toast toast = Toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG);
                         toast.show();
