@@ -40,4 +40,8 @@ public class SingletonListeClient {
      * Retourne la liste des clients.
      */
     public static List<Client> getListeClient(){ return instance.listeClient; }
+
+    public static Client getClient(int id){
+        return instance.listeClient.get(id);
+    }
 }

@@ -23,6 +23,7 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,7 @@ import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
@@ -104,7 +106,7 @@ public class ClientApi {
         String url = BASE_URL + route;
 
         // Gestion des paramètres pour les requêtes GET
-        if (methode == Request.Method.GET && parametres != null && !parametres.isEmpty()) {
+        if ((methode == Request.Method.GET || methode == Request.Method.PUT) && parametres != null && !parametres.isEmpty()) {
             StringBuilder urlACompleter = new StringBuilder(url);
             urlACompleter.append("?"); // Début de la query string
 
@@ -285,6 +287,20 @@ public class ClientApi {
         }
     }
 
+    public static void modificationClient(Context contexte, JSONObject donnees, String id) {
+        HashMap<String,String> parametre = new HashMap<>();
+        parametre.put("id",id);
+        try {
+            requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
+                    response -> {} ,
+                    error -> {}
+            );
+        } catch (Exception e) {
+            Log.e("erreur", e.toString());
+        }
+    }
+
+
 
     public static void verifierAdresse(String adresse, double[] viewbox , Context contexte,
                                        VolleyCallback callback) throws UnsupportedEncodingException {
@@ -333,7 +349,6 @@ public class ClientApi {
         // Ajouter la requête à la file d'attente
         RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
     }
-
 
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.

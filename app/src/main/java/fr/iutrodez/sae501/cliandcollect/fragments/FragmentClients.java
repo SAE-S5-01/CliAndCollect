@@ -43,7 +43,9 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
     private Intent detailClient;
 
-    private ActivityResultLauncher<Intent> lanceurFille;
+    private ActivityResultLauncher<Intent> lanceurCreation;
+
+    private ActivityResultLauncher<Intent> lanceurDetails;
 
     private RecyclerView listeClients;
 
@@ -88,6 +90,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_clients, container, false);
         vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
+        detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
 
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
         clients = new ArrayList<>();
@@ -103,12 +106,13 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
             LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
             listeClients.setLayoutManager(gestionnaireLineaire);
 
-            adapter = new ClientAdapter(clients);
+            adapter = new ClientAdapter(clients,this::onDetailClientClick);
             listeClients.setHasFixedSize(true);
             listeClients.setAdapter(adapter);
 
             intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
-            lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
+            lanceurCreation = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
+            lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getModifClient);
         // TODO : else : afficher un message d'erreur + personnalisé
         } else {
             Toast.makeText(this.getContext(), R.string.erreur_reseau, Toast.LENGTH_LONG).show();
@@ -116,8 +120,9 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         return vueDuFragment;
     }
 
-    public void onClientClik() {
-        detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
+    public void onDetailClientClick(int i){
+        detailClient.putExtra("ID", i);
+        lanceurDetails.launch(detailClient);
     }
 
     @Override
@@ -131,11 +136,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        lanceurFille.launch(intent);
-    }
-
-    private void initialiseClients(){
-
+        lanceurCreation.launch(intent);
     }
 
     private void getNouveauClient(ActivityResult resultat) {
@@ -146,6 +147,17 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
             }
 
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void getModifClient(ActivityResult resultat) {
+        Intent retourFille = resultat.getData();
+        if(resultat.getResultCode() == Activity.RESULT_OK){
+            int id = retourFille.getIntExtra("ID",0);
+           Client client = SingletonListeClient.getClient(id);
+           clients.remove(id);
+           clients.add(id,client);
+           listeClients.setAdapter(adapter);
         }
     }
 

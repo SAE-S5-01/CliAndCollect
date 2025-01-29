@@ -62,4 +62,5 @@
     <string name="nom_itineraire">Nom :</string>
     <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
     <string name="ajouter_itineraire">Ajouter un itinéraire</string>
+    <string name="pasModifier">Aucune information n\'a été modifiée</string>
 </resources>
