@@ -2,21 +2,19 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ImageView;
 
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
@@ -25,12 +23,10 @@ import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
  */
 public class ActiviteConnexion extends AppCompatActivity {
 
-    private ActivityResultLauncher<Intent> lanceurInscription;
     private EditText mail;
     private EditText mdp;
 
-    private TextView messageErreur;
-    private CheckBox seRappelerdeMoi;
+    private CheckBox seRappelerDeMoi;
 
     /**
      * Méthode invoquée lors de la création de l'activité.
@@ -40,15 +36,27 @@ public class ActiviteConnexion extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_connexion);
-        Button boutonConnexion = findViewById(R.id.boutonConnexion);
-        Button boutonInscription = findViewById(R.id.boutonInscription);
-        mail = findViewById(R.id.saisieMail);
-        mdp = findViewById(R.id.saisieMdp);
-        messageErreur = findViewById(R.id.messageErreur);
-        seRappelerdeMoi = findViewById(R.id.seRappelerDeMoi);
 
-        boutonConnexion.setOnClickListener(this::clicConnexion);
-        boutonInscription.setOnClickListener(this::clicInscription);
+        if (Reseau.reseauDisponible(this, true)
+            && Preferences.estConnecte(this)) {
+            ClientApi.connexion(this,
+                Preferences.getEmail(this),
+                Preferences.getMotDePasse(this),
+                () -> lancerMenuPrincipal()
+            );
+        } else {
+            ImageView boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
+            Button boutonConnexion = findViewById(R.id.boutonConnexion);
+            Button boutonInscription = findViewById(R.id.boutonInscription);
+            mail = findViewById(R.id.saisieMail);
+            mdp = findViewById(R.id.saisieMdp);
+            seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
+
+            boutonOptionMenu.setVisibility(View.INVISIBLE);
+
+            boutonConnexion.setOnClickListener(this::clicConnexion);
+            boutonInscription.setOnClickListener(this::clicInscription);
+        }
     }
 
     /**
@@ -56,18 +64,19 @@ public class ActiviteConnexion extends AppCompatActivity {
      * @param bouton Le bouton de connexion
      */
     private void clicConnexion(View bouton) {
-        String mail , mdp;
+        String mail, mdp;
         mail = this.mail.getText().toString();
         mdp = this.mdp.getText().toString();
 
-        if (mail.isEmpty() || mdp.isEmpty()) {
-            Toast.makeText(this, R.string.erreur_champ_connexion_vide ,  Toast.LENGTH_LONG).show();
+        if (mail.isEmpty()) {
+            this.mail.setError(getString(R.string.erreur_mail_non_renseigne));
+        } else if (mdp.isEmpty()) {
+            this.mdp.setError(getString(R.string.erreur_mdp_non_renseigne));
         } else if (Reseau.reseauDisponible(this, true)) {
             ClientApi.connexion(this, mail, mdp, () -> {
-                ActivitePrincipale.preferencesConnexion(seRappelerdeMoi.isChecked() , mail, mdp);
-                Intent menuPrincipal = new Intent(ActiviteConnexion.this, GestionFragment.class);
-                startActivity(menuPrincipal);
-            }, null);
+                Preferences.sauvegarderInfosConnexion(this, mail, mdp, seRappelerDeMoi.isChecked());
+                lancerMenuPrincipal();
+            });
         }
     }
 
@@ -77,7 +86,17 @@ public class ActiviteConnexion extends AppCompatActivity {
      * @param bouton Le bouton d'inscription
      */
     private void clicInscription(View bouton) {
-        Intent incription = new Intent(ActiviteConnexion.this, ActiviteInscription.class);
+        Intent incription = new Intent(this, ActiviteInscription.class);
         startActivity(incription);
+    }
+
+    /**
+     * Méthode invoquée lors de la connexion réussie.
+     * Redirige vers l'activité principale.
+     */
+    private void lancerMenuPrincipal() {
+        Intent menuPrincipal = new Intent(this, GestionFragment.class);
+        startActivity(menuPrincipal);
+        finish();
     }
 }
