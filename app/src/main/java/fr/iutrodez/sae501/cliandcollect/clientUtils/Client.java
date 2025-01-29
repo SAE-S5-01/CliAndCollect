@@ -21,6 +21,8 @@ public class Client {
 
     private String telephone;
 
+    private Long ID;
+
     private boolean clientPropspect;
 
     public Client(JSONObject clientFromApi){
@@ -31,6 +33,7 @@ public class Client {
         this.x = clientFromApi.optDouble("longitude");
         this.y = clientFromApi.optDouble("latitude");
         this.clientPropspect = clientFromApi.optBoolean("prospect");
+        this.ID = clientFromApi.optLong("id");
 
         // Valeur optionnelles
         this.description = clientFromApi.optString("description" , null);
@@ -63,12 +66,16 @@ public class Client {
         return telephone;
     }
 
-    public boolean isClientPropspect() {
+    public boolean isClient() {
         return clientPropspect;
     }
 
     public double getX() {
         return x;
+    }
+
+    public Long getID(){
+        return ID;
     }
 
     public void setClientPropspect(boolean clientPropspect) {
@@ -101,6 +108,14 @@ public class Client {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
     }
 
 }

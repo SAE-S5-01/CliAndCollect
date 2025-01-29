@@ -28,7 +28,9 @@
         <activity
             android:name=".activites.ActiviteInscription"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".activites.ActiviteDetailClient"
+            android:screenOrientation="portrait" />
         <activity 
             android:name=".activites.ActiviteCreationClient"
             android:screenOrientation="portrait" />
