@@ -182,7 +182,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         try {
             // STUB (rodez) TODO remplacer par geoloc
             double[] viewBox = Distance.creationViewBox(44.333333  , 2.566667);
-            ClientApi.verifierAddresse(saisieAdresse.getText().toString(),  viewBox,this, new VolleyCallback() {
+            ClientApi.verifierAdresse(saisieAdresse.getText().toString(),  viewBox,this, new VolleyCallback() {
                 @Override
                 public void onSuccess(List<Map<String , String>> results) {
                     String[] options = new String[results.size()];

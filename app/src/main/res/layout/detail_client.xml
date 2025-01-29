@@ -150,7 +150,7 @@
             android:layout_height="wrap_content"
             android:onClick="obtenirCoordonnees"
             android:layout_marginBottom="304dp"
-            android:text="@string/obtenircoordonnees" />
+            android:text="@string/obtenir_coordonnees" />
         <Button
             android:id="@+id/boutonModifier"
             android:layout_width="wrap_content"
