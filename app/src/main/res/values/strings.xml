@@ -33,6 +33,9 @@
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
 
+    <string name="valider">Valider</string>
+    <string name="retour">Retour</string>
+
     <string name="ajouter_client">Ajouter un client / prospect</string>
     <string name="detail_client">Détails du client</string>
     <string name="entreprise">Nom de l\'entreprise :</string>
@@ -42,11 +45,10 @@
     <string name="prenom_contact">Prénom du contact :</string>
     <string name="coordonnees">Coordonnées entreprise :</string>
     <string name="tel_contact">Numéro de téléphone :</string>
-    <string name="valider">Valider</string>
     <string name="obtenir_coordonnees">Obtenir mes coordonnées</string>
     <string name="coordonnees_non_calculees">Veuillez d\'abord obtenir vos coordonnées</string>
     <string name="adresseClient">Adresse :</string>
-    <string name="retour">Retour</string>
+
     <string name="indication_entreprise">Veuillez entrer le nom de l\'entreprise</string>
     <string name="indication_adresse_entreprise">Veuillez entrer l\'adresse de l\'entreprise</string>
     <string name="indication_prenom_contact">Veuillez entrer le prénom de votre contact</string>
@@ -56,4 +58,8 @@
     <string name="indication_coordonnees">longitude:latitude</string>
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
+
+    <string name="nom_itineraire">Nom :</string>
+    <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
+    <string name="ajouter_itineraire">Ajouter un itinéraire</string>
 </resources>
