@@ -6,19 +6,26 @@
     android:orientation="vertical"
     tools:context=".fragments.GestionFragment">
 
+    <include
+        layout="@layout/entete_page_composant" />
+
     <ScrollView
-        style="@style/AppStyle">
+        style="@style/AppStyle"
+        android:fillViewport="true">
 
-        <!-- ViewPager qui va gérer le défilement, via un "glisser", entre les onglets -->
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/activity_main_viewpager"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <!-- ViewPager qui va gérer le défilement, via un "glisser", entre les onglets -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/activity_main_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent" />
+        </LinearLayout>
     </ScrollView>
 
     <include
         layout="@layout/pied_page_composant" />
-
 </LinearLayout>

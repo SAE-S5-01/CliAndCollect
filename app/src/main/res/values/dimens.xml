@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="app_marge_interieure">20dp</dimen>
+    <dimen name="app_marge_interieure">15dp</dimen>
 
-    <dimen name="pied_page_hauteur_min">80dp</dimen>
-    <dimen name="pied_page_marge_interieure_verticale_icone">10dp</dimen>
-    <dimen name="pied_page_marge_interieure_horizontale_icone">0dp</dimen>
-    <dimen name="pied_page_dimensions_icone">70dp</dimen>
+    <dimen name="pied_page_hauteur_min">60dp</dimen>
+    <dimen name="pied_page_icone_padding_haut">12dp</dimen>
+    <dimen name="pied_page_icone_espace_barre">12dp</dimen>
+    <dimen name="pied_page_icone_padding_bas">9dp</dimen>
+    <dimen name="pied_page_icone_marge_exterieure_horizontale">0dp</dimen>
+    <dimen name="pied_page_icone_dimensions">57dp</dimen>
 </resources>

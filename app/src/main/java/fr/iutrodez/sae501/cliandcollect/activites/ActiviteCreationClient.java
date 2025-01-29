@@ -2,13 +2,11 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,7 +100,7 @@ public class ActiviteCreationClient extends AppCompatActivity {
         try {
             // STUB (rodez) TODO remplacer par geoloc
             double[] viewBox = Distance.creationViewBox(44.333333  , 2.566667);
-            ClientApi.verifierAddresse(saisieAdresse.getText().toString(),  viewBox,this, new VolleyCallback() {
+            ClientApi.verifierAdresse(saisieAdresse.getText().toString(),  viewBox,this, new VolleyCallback() {
                 @Override
                 public void onSuccess(List<Map<String , String>> results) {
                     String[] options = new String[results.size()];

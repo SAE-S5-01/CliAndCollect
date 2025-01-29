@@ -1,109 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textViewInscription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/connexion"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/labelMail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/mail"
-        app:layout_constraintTop_toBottomOf="@id/textViewInscription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <EditText
-        android:id="@+id/saisieMail"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/indication_email"
-        app:layout_constraintTop_toBottomOf="@id/labelMail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
-
-    <TextView
-        android:id="@+id/labelMdp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/mdp"
-        app:layout_constraintTop_toBottomOf="@id/saisieMail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <EditText
-        android:id="@+id/saisieMdp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/indication_mdp"
-        app:layout_constraintTop_toBottomOf="@id/labelMdp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
-
-    <TextView
-        android:id="@+id/messageErreur"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        app:layout_constraintTop_toBottomOf="@id/saisieMdp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+    <include
+        layout="@layout/entete_page_composant" />
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/messageErreur"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
+        style="@style/AppStyle"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
-        <CheckBox
-            android:id="@+id/seRappelerDeMoi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <TableLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp">
 
-        <TextView
-            android:id="@+id/labelRememberMe"
+            <TextView
+                android:id="@+id/labelMail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mail"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/saisieMail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/indication_email"
+                android:maxLines="1"
+                android:inputType="textEmailAddress" />
+
+        </TableLayout>
+
+        <TableLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp">
+
+            <TextView
+                android:id="@+id/labelMdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/mdp"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/saisieMdp"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/indication_mdp"
+                android:maxLines="1"
+                android:inputType="textPassword" />
+
+        </TableLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/se_souvenir" />
+            android:paddingVertical="16dp">
+
+            <CheckBox
+                android:id="@+id/seRappelerDeMoi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/labelRememberMe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/se_souvenir" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/boutonConnexion"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/connexion"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/boutonInscription"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/inscription"
+            android:textSize="25sp"
+            android:layout_marginTop="16dp" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/boutonConnexion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/connexion"
-        app:layout_constraintTop_toBottomOf="@id/saisieMdp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <Button
-        android:id="@+id/boutonInscription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/inscription"
-        app:layout_constraintTop_toBottomOf="@id/boutonConnexion"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

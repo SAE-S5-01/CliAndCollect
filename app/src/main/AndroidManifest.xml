@@ -17,7 +17,7 @@
         android:theme="@style/Theme.CliAndCollect"
         tools:targetApi="31">
         <activity
-            android:name=".ActivitePrincipale"
+            android:name=".activites.ActiviteConnexion"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,9 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activites.ActiviteConnexion"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".activites.ActiviteInscription"
             android:screenOrientation="portrait" />

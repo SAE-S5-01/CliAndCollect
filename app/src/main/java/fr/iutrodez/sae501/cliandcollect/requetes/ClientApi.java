@@ -8,15 +8,10 @@ package fr.iutrodez.sae501.cliandcollect.requetes;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
 import android.util.Log;
-import android.widget.EditText;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -41,12 +36,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.R;
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 
 /**
  * Différentes méthodes de communication avec l'API.
@@ -84,10 +79,10 @@ public class ClientApi {
     /**
      * Méthode permettant de générer les headers pour les requêtes à l'API.
      */
-    private static Map<String, String> genererHeaders(String route) {
+    private static Map<String, String> genererHeaders(String route, Context contexte) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        String token = ActivitePrincipale.preferences.getString("tokenApi", "");
+        String token = Preferences.getTokenApi(contexte);
         if (!token.isEmpty() && !(route.equals("/utilisateur/connexion")
             || route.equals("/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
@@ -156,7 +151,7 @@ public class ClientApi {
             request = new JsonObjectRequest(methode, url, donnees, response -> reussite.onResponse(response.toString()), erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    return genererHeaders(route);
+                    return genererHeaders(route, contexte);
                 }
             };
         } else {
@@ -164,7 +159,7 @@ public class ClientApi {
             request = new StringRequest(methode, url, reussite, erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    return genererHeaders(route);
+                    return genererHeaders(route, contexte);
                 }
             };
         }
@@ -180,8 +175,7 @@ public class ClientApi {
      * @param mdp Le mot de passe de l'utilisateur
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
-    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie,
-        Runnable erreurConnexion) {
+    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie) {
         Map<String, String> parametre = new HashMap<>();
 
         parametre.put("mail", mail);
@@ -206,7 +200,7 @@ public class ClientApi {
 
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
-                        ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
+                        Preferences.sauvegarderTokenApi(contexte, token);
                         ((Activity) contexte).runOnUiThread(connexionReussie);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
@@ -214,11 +208,6 @@ public class ClientApi {
                 },
                 error -> {
                     spineurChargement.dismiss();
-
-                    /* erreurConnexion ne sert que pour Activite principale */
-                    if (erreurConnexion != null) {
-                        ((Activity) contexte).runOnUiThread(erreurConnexion);
-                    }
                     gestionErreur(contexte, error);
                 }
             );
@@ -247,7 +236,7 @@ public class ClientApi {
 
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
-                        ActivitePrincipale.preferences.edit().putString("tokenApi", token).apply();
+                        Preferences.sauvegarderTokenApi(contexte, token);
 
                         Toast toast = Toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG);
                         toast.show();
@@ -332,8 +321,8 @@ public class ClientApi {
 
 
 
-    public static void verifierAddresse(String adresse, double[] viewbox ,Context contexte, 
-                                        VolleyCallback callback) throws UnsupportedEncodingException {
+    public static void verifierAdresse(String adresse, double[] viewbox , Context contexte,
+                                       VolleyCallback callback) throws UnsupportedEncodingException {
         String urlApi = "https://nominatim.openstreetmap.org/search?q="
             + URLEncoder.encode(adresse, "UTF-8")
             + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
@@ -356,10 +345,8 @@ public class ClientApi {
                         locationInfo.put("lon", jsonObject.getString("lon"));
                         results.add(locationInfo);
                     }
-
                     // Retourner les résultats via le callback
                     callback.onSuccess(results);
-
                 } catch (JSONException e) {
                     // Gérer l'exception JSON
                     callback.onError("error catch : " + e.toString());
@@ -373,7 +360,7 @@ public class ClientApi {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("User-Agent", "cliAndCollect/1.0 ");
+                headers.put("User-Agent", "cliAndCollect/1.0");
                 return headers;
             }
         };
@@ -419,22 +406,13 @@ public class ClientApi {
 
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 JSONObject erreurs = jsonResponse.getJSONObject("erreur");
-                //JSONObject saisie = jsonResponse.getJSONObject("saisie");
 
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                    /*remplirChampsInscription((ActiviteInscription) contexte, erreurs, new int[] {
-                        R.id.saisieMail, R.id.saisieMdp, R.id.saisieNom,
-                        R.id.saisiePrenom, R.id.saisieAdresse, R.id.saisieVille
-                    }, new String[] {
-                        "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
-                    });*/
-                    // TODO : voir utilité de resaisir des valeurs déjà saisies ?
-
                     afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
                         R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
-                        R.id.messageErreurPrenom, R.id.messageErreurAdresse, R.id.messageErreurVille
+                        R.id.messageErreurPrenom, R.id.messageErreurAdresse
                     }, new String[] {
-                        "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
+                        "mail", "motDePasse", "nom", "prenom", "adresse"
                     });
                 });
             } catch (Exception e) {
@@ -445,25 +423,6 @@ public class ClientApi {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
                 Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
             });
-        }
-    }
-
-    /**
-     * Méthode permettant de re-remplir les champs du formulaire d'inscription.
-     * @param activite L'activité d'inscription
-     * @param donnees Les données saisies par l'utilisateur
-     *                et retournées par l'API
-     */
-    private static void remplirChampsInscription(AppCompatActivity activite, JSONObject donnees,
-                                                 int[] idChampsTextuels, String[] cleChampsTextuels) {
-        for (int i = 0; i < idChampsTextuels.length; i++) {
-            try {
-                EditText champTextuel = activite.findViewById(idChampsTextuels[i]);
-                if (donnees.has(cleChampsTextuels[i])) {
-                    champTextuel.setText(donnees.getString(cleChampsTextuels[i]));
-                }
-            } catch (JSONException e) {
-            }
         }
     }
 
@@ -481,8 +440,10 @@ public class ClientApi {
                 TextView messageErreur = activite.findViewById(idChampsTextuels[i]);
                 if (erreurs.has(cleChampsTextuels[i])) {
                     messageErreur.setText(erreurs.getString(cleChampsTextuels[i]));
+                    messageErreur.setVisibility(View.VISIBLE);
                 } else {
                     messageErreur.setText("");
+                    messageErreur.setVisibility(View.GONE);
                 }
             } catch (JSONException e) {
             }
