@@ -55,5 +55,7 @@
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
 
+    <string name="nom_itineraire">Nom :</string>
+    <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
     <string name="ajouter_itineraire">Ajouter un itinéraire</string>
 </resources>
