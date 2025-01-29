@@ -1,196 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textViewInscription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/inscription"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <include
+        layout="@layout/entete_page_composant" />
 
     <LinearLayout
-        android:id="@+id/formulaireInsription"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/textViewInscription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/nom" />
-            <TextView
-                android:id="@+id/messageErreurNom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <EditText
-                android:id="@+id/saisieNom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_nom" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/mail" />
-            <TextView
-                android:id="@+id/messageErreurMail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <EditText
-                android:id="@+id/saisieMail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_email" />
-
-            <TextView
-                android:id="@+id/messageErreurAdresse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:text="@string/adresse" />
-
-            <EditText
-                android:id="@+id/saisieAdresse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_adresse" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/prenom" />
-            <TextView
-                android:id="@+id/messageErreurPrenom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-
-            <EditText
-                android:id="@+id/saisiePrenom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_prenom" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/mdp" />
-            <TextView
-                android:id="@+id/messageErreurMdp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-            <EditText
-                android:id="@+id/saisieMdp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_mdp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/ville" />
-            <TextView
-                android:id="@+id/messageErreurVille"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <EditText
-                android:id="@+id/saisieVille"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_ville" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/messageErreur"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        app:layout_constraintTop_toBottomOf="@id/formulaireInsription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <LinearLayout
-
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/messageErreur"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
-
-        <CheckBox
-            android:id="@+id/seRappelerDeMoi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        style="@style/AppStyle"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/labelRememberMe"
+            android:id="@+id/textViewInscription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/se_souvenir" />
-    </LinearLayout>
+            android:text="@string/inscription"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/messageErreur"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="50dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nom" />
+        <TextView
+            android:id="@+id/messageErreurNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/saisieNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:hint="@string/indication_nom" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mail" />
+        <TextView
+            android:id="@+id/messageErreurMail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/saisieMail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:hint="@string/indication_email" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/adresse" />
+        <TextView
+            android:id="@+id/messageErreurAdresse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/saisieAdresse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/indication_adresse" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prenom" />
+        <TextView
+            android:id="@+id/messageErreurPrenom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/saisiePrenom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:hint="@string/indication_prenom" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mdp" />
+        <TextView
+            android:id="@+id/messageErreurMdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="" />
+        <EditText
+            android:id="@+id/saisieMdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:hint="@string/indication_mdp" />
+
+        <TextView
+            android:id="@+id/messageErreur"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text=""
+            android:layout_marginTop="16dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/seRappelerDeMoi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/labelRememberMe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/se_souvenir" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/obtenirCoordonnees"
+            android:id="@+id/boutonObtenirCoordonnees"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
             android:onClick="obtenirCoordonnees"
-            android:layout_marginBottom="304dp"
-            android:text="@string/obtenircoordonnees" />
+            android:enabled="false"
+            android:text="@string/obtenir_coordonnees" />
+        <!-- TODO vue téléphone avec tailles dans dimens adaptées taille écran -->
+        <Button
+            android:id="@+id/boutonEditerAdresse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+            android:text="@string/editer_adresse" />
         <Button
             android:id="@+id/boutonInscription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="304dp"
+            android:enabled="false"
             android:text="@string/inscription" />
-    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</LinearLayout>

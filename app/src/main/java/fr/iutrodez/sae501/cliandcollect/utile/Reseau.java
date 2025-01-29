@@ -5,11 +5,14 @@
 
 package fr.iutrodez.sae501.cliandcollect.utile;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import fr.iutrodez.sae501.cliandcollect.R;
@@ -33,7 +36,7 @@ public class Reseau {
     }
 
     /**
-     * Vérifie qu'une connexion internet est disponible et affiche un message d'erreur.
+     * Vérifie qu'une connexion internet est disponible et affiche un toast d'erreur.
      * @param contexte Le contexte de l'application.
      * @param afficherToastSiErreur true pour afficher un toast en cas de réseau
      *                              indisponible, false sinon.
@@ -42,6 +45,43 @@ public class Reseau {
      */
     public static boolean reseauDisponible(Context contexte, boolean afficherToastSiErreur,
                                            int idMessageErreur) {
+        if (!reseauDisponible(contexte)) {
+            if (afficherToastSiErreur) {
+                Toast.makeText(contexte, idMessageErreur, Toast.LENGTH_LONG).show();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Vérifie qu'une connexion internet est disponible et affiche un message d'erreur.
+     * @param contexte Le contexte de l'application.
+     * @param idEntreeMessageErreur L'identifiant de l'entrée de texte où afficher le message d'erreur.
+     * @param idMessageErreur L'identifiant du message d'erreur à afficher.
+     * @return true si une connexion internet est disponible sinon false.
+     */
+    public static boolean reseauDisponible(Context contexte, int idEntreeMessageErreur,
+                                           int idMessageErreur) {
+        if (!reseauDisponible(contexte)) {
+            Activity activite = (Activity) contexte;
+            TextView vue = activite.findViewById(idEntreeMessageErreur);
+
+            if (vue != null) {
+                vue.setVisibility(View.VISIBLE);
+                vue.setText(idMessageErreur);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Vérifie qu'une connexion internet est disponible.
+     * @param contexte Le contexte de l'application.
+     * @return true si une connexion internet est disponible sinon false.
+     */
+    public static boolean reseauDisponible(Context contexte) {
         boolean resultat = false;
 
         ProgressDialog spineurChargement = new ProgressDialog(contexte);
@@ -61,9 +101,6 @@ public class Reseau {
         }
         spineurChargement.dismiss();
 
-        if (afficherToastSiErreur && !resultat) {
-            Toast.makeText(contexte, idMessageErreur, Toast.LENGTH_LONG).show();
-        }
         return resultat;
     }
 
