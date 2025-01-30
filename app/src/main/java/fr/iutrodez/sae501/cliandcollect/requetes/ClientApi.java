@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -298,56 +299,6 @@ public class ClientApi {
         }
     }
 
-
-
-    public static void verifierAdresse(String adresse, double[] viewbox , Context contexte,
-                                       VolleyCallback callback) throws UnsupportedEncodingException {
-        String urlApi = "https://nominatim.openstreetmap.org/search?q="
-            + URLEncoder.encode(adresse, "UTF-8")
-            + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
-            + "&bounded=1&format=json&addressdetails=1";
-        JsonArrayRequest requete = new JsonArrayRequest(
-            Request.Method.GET,
-            urlApi,
-            null,
-            response -> {
-                try {
-                    // Liste pour stocker les résultats
-                    List<Map<String , String>> results = new ArrayList<>();
-
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject jsonObject = response.getJSONObject(i);
-
-                        Map<String, String> locationInfo = new HashMap<>();
-                        locationInfo.put("display_name", jsonObject.getString("display_name"));
-                        locationInfo.put("lat", jsonObject.getString("lat"));
-                        locationInfo.put("lon", jsonObject.getString("lon"));
-                        results.add(locationInfo);
-                    }
-                    // Retourner les résultats via le callback
-                    callback.onSuccess(results);
-                } catch (JSONException e) {
-                    // Gérer l'exception JSON
-                    callback.onError("error catch : " + e.toString());
-                }
-            },
-            error -> {
-                // Retourner l'erreur via le callback
-                callback.onError(error.toString());
-            }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("User-Agent", "cliAndCollect/1.0");
-                return headers;
-            }
-        };
-
-        // Ajouter la requête à la file d'attente
-        RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
-    }
-
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.
      * @param contexte Le contexte de l'application
@@ -388,8 +339,8 @@ public class ClientApi {
 
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
                     afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
-                        R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
-                        R.id.messageErreurPrenom, R.id.messageErreurAdresse
+                        R.id.saisieMail, R.id.saisieMdp, R.id.saisieNom,
+                        R.id.saisiePrenom, R.id.saisieAdresse
                     }, new String[] {
                         "mail", "motDePasse", "nom", "prenom", "adresse"
                     });
@@ -416,13 +367,9 @@ public class ClientApi {
                                                    int[] idChampsTextuels, String [] cleChampsTextuels) {
         for (int i = 0; i < idChampsTextuels.length; i++) {
             try {
-                TextView messageErreur = activite.findViewById(idChampsTextuels[i]);
+                EditText champ = activite.findViewById(idChampsTextuels[i]);
                 if (erreurs.has(cleChampsTextuels[i])) {
-                    messageErreur.setText(erreurs.getString(cleChampsTextuels[i]));
-                    messageErreur.setVisibility(View.VISIBLE);
-                } else {
-                    messageErreur.setText("");
-                    messageErreur.setVisibility(View.GONE);
+                    champ.setError(erreurs.getString(cleChampsTextuels[i]));
                 }
             } catch (JSONException e) {
             }

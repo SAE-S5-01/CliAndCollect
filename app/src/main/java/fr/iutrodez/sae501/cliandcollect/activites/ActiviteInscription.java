@@ -1,6 +1,16 @@
+/*
+ * ActiviteInscription.java                                         30 jan. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,34 +19,29 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
+
 import org.json.JSONObject;
+
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Activité de la page d'inscription.
- * @author Descriaud Lucas
+ *
+ * @author Loïc FAUGIERES
+ * @author Lucas DESCRIAUD
  */
 public class ActiviteInscription extends AppCompatActivity {
-
-    final static int NB_MAX_ADRESSES_PROPOSEES = 7;
 
     private EditText mail;
     private EditText mdp;
     private EditText nom;
     private EditText prenom;
     private EditText adresse;
-    private TextView messageErreur;
-    private TextView messageErreurAdresse;
 
     public static SharedPreferences preferences;
 
@@ -44,6 +49,8 @@ public class ActiviteInscription extends AppCompatActivity {
     private static double longitude = Double.NaN;
 
     private CheckBox seRappelerDeMoi;
+
+    private Button boutonObtenirCoordonnees;
     private Button boutonSubmitInscription;
 
     private ActivityResultLauncher<Intent> lanceurMap;
@@ -66,19 +73,18 @@ public class ActiviteInscription extends AppCompatActivity {
         prenom = findViewById(R.id.saisiePrenom);
         adresse = findViewById(R.id.saisieAdresse);
         adresse.setEnabled(false);
-        messageErreur = findViewById(R.id.messageErreur);
-        messageErreurAdresse = findViewById(R.id.messageErreurAdresse);
         seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
+        boutonObtenirCoordonnees = findViewById(R.id.boutonObtenirCoordonnees);
         boutonSubmitInscription = findViewById(R.id.boutonInscription);
 
         preferences = getDefaultSharedPreferences(getApplicationContext());
 
+        boutonObtenirCoordonnees.setOnClickListener(this::obtenirCoordonnees);
         boutonSubmitInscription.setOnClickListener(this::inscription);
 
         lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                        this::retourMap);
+                                               this::retourMap);
     }
-
 
     /**
      * Méthode invoquée lors du clic sur le bouton d'inscription.
@@ -88,10 +94,8 @@ public class ActiviteInscription extends AppCompatActivity {
      *
      */
     private void inscription(View view) {
-        masquerMessageErreur();
-
         JSONObject donnees = donneeFormulaireEnJson();
-        if (Reseau.reseauDisponible(this, R.id.messageErreur, R.string.erreur_reseau) && donnees != null) {
+        if (Reseau.reseauDisponible(this) && donnees != null) {
             ClientApi.inscription(this, donnees, () -> {
                 Preferences
                 .sauvegarderInfosConnexion(this,
@@ -105,6 +109,8 @@ public class ActiviteInscription extends AppCompatActivity {
                 startActivity(menuPrincipal);
                 finish();
             });
+        } else {
+            SnackbarCustom.show(this, R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
         }
     }
 
@@ -113,7 +119,6 @@ public class ActiviteInscription extends AppCompatActivity {
      * @param view Le bouton "Obtenir les coordonnées"
      */
     public void obtenirCoordonnees(View view) {
-
         Intent map = new Intent(ActiviteInscription.this, ActiviteMap.class);
         lanceurMap.launch(map);
     }
@@ -133,32 +138,16 @@ public class ActiviteInscription extends AppCompatActivity {
             donnees.put("latitude", latitude);
             donnees.put("longitude", longitude);
         } catch (Exception e) {
-            afficherMessageErreur(e.getMessage().equals("Forbidden numeric value: NaN")
-                                  ? R.string.coordonnees_non_calculees
-                                  : R.string.erreur_inscription,
-                                  messageErreur);
+            SnackbarCustom.show(this,
+                                e.getMessage().equals("Forbidden numeric value: NaN")
+                                ? R.string.coordonnees_non_calculees
+                                : R.string.erreur_inscription,
+                                SnackbarCustom.STYLE_ERREUR);
             donnees = null;
         }
         return donnees;
     }
 
-    /**
-     * Affiche un message d'erreur global.
-     * @param message L'id du message d'erreur à afficher.
-     * @param entreeMessageErreur L'entrée de texte où afficher le message d'erreur.
-     */
-    private void afficherMessageErreur(int message, TextView entreeMessageErreur) {
-        entreeMessageErreur.setVisibility(View.VISIBLE);
-        entreeMessageErreur.setText(message);
-    }
-
-    /**
-     * Masque le message d'erreur global.
-     */
-    private void masquerMessageErreur() {
-        messageErreur.setVisibility(View.GONE);
-        messageErreur.setText("");
-    }
     private void retourMap(ActivityResult retourMap) {
         Intent retour = retourMap.getData();
 
@@ -166,6 +155,7 @@ public class ActiviteInscription extends AppCompatActivity {
             latitude = retour.getDoubleExtra("latitude", Double.NaN);
             longitude = retour.getDoubleExtra("longitude", Double.NaN);
             adresse.setText(retour.getStringExtra("adresse"));
+            boutonObtenirCoordonnees.setActivated(true);
             boutonSubmitInscription.setEnabled(true);
         }
     }
