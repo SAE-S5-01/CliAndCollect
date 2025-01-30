@@ -11,7 +11,11 @@
     <color name="dark_grey">#B1B1B1</color>
     <color name="dark_blue">#072C51</color>
 
+    <color name="bouton_principal">@color/colorPrimaryLight</color>
+    <color name="bouton_principal_desactive">#6786AC</color>
+
     <color name="bouton_secondaire">#DADADA</color>
+    <color name="bouton_secondaire_desactive">#BDBDBD</color>
 
     <color name="information">@color/colorPrimary</color>
     <color name="validation">#50B356</color>

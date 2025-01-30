@@ -13,10 +13,11 @@
         android:layout_gravity="center"
         android:orientation="vertical">
 
-        <TableLayout
+        <LinearLayout
             android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/labelMail"
@@ -36,12 +37,13 @@
                 android:imeOptions="actionNext"
                 android:inputType="textEmailAddress" />
 
-        </TableLayout>
+        </LinearLayout>
 
-        <TableLayout
+        <LinearLayout
             android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/labelMdp"
@@ -58,7 +60,7 @@
                 android:maxLines="1"
                 android:inputType="textPassword" />
 
-        </TableLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
