@@ -32,8 +32,6 @@
     <string name="menu_compte">Gérer mon compte</string>
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
-    <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
-
 
     <string name="ajouter_client">Ajouter un client / prospect</string>
     <string name="detail_client">Détails du client</string>
@@ -64,5 +62,7 @@
     <string name="marqueur_annulation">Non</string>
     <string name="marqueur_message">Voulez-vous vraiment supprimer ce marqueur ?</string>
     <string name="marqueur_titre">Supprimer le marqueur</string>
-    <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayer.</string>
+    <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayez</string>
+    <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
+    <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
 </resources>
