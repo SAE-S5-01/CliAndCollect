@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Activité de la page d'inscription.
@@ -99,6 +100,8 @@ public class ActiviteInscription extends AppCompatActivity {
                                            seRappelerDeMoi.isChecked());
 
                 Intent menuPrincipal = new Intent(ActiviteInscription.this, GestionFragment.class);
+                menuPrincipal.putExtra(GestionFragment.CLE_EXTRA_MSG_BIENVENUE, true);
+
                 startActivity(menuPrincipal);
                 finish();
             });

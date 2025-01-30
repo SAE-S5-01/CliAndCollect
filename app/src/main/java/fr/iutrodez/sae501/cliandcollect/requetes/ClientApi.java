@@ -42,6 +42,7 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Différentes méthodes de communication avec l'API.
@@ -219,9 +220,6 @@ public class ClientApi {
                         String token = jsonReponse.getString("token");
                         Preferences.sauvegarderTokenApi(contexte, token);
 
-                        Toast toast = Toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG);
-                        toast.show();
-
                         ((ActiviteInscription) contexte).runOnUiThread(connexionReussie);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -362,15 +360,15 @@ public class ClientApi {
                     String erreurToString = new String(erreur.networkResponse.data, "UTF-8");
                     JSONObject objetErreur = new JSONObject(erreurToString);
 
-                    Toast.makeText(contexte, objetErreur.getString("description"), Toast.LENGTH_LONG).show();
+                    SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ATTENTION);
                 } catch (Exception e) {
-                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                    SnackbarCustom.show(contexte, R.string.erreur_inconnue, SnackbarCustom.STYLE_ERREUR);
                     throw new RuntimeException(e);
                 }
             });
         } else {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
+                SnackbarCustom.show(contexte, R.string.api_injoignable, SnackbarCustom.STYLE_ERREUR);
             });
         }
     }
@@ -397,12 +395,12 @@ public class ClientApi {
                     });
                 });
             } catch (Exception e) {
-                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                SnackbarCustom.show(contexte, R.string.erreur_inconnue, SnackbarCustom.STYLE_ERREUR);
                 throw new RuntimeException(e);
             }
         } else {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
+                SnackbarCustom.show(contexte, R.string.api_injoignable, SnackbarCustom.STYLE_ERREUR);
             });
         }
     }

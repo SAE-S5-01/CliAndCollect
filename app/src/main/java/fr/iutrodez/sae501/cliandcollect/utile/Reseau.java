@@ -13,7 +13,8 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 
@@ -27,27 +28,27 @@ public class Reseau {
     /**
      * Vérifie qu'une connexion internet est disponible et affiche une erreur générique.
      * @param contexte Le contexte de l'application.
-     * @param afficherToastSiErreur true pour afficher un toast en cas de réseau
-     *                              indisponible, false sinon.
+     * @param afficherSnackbarSiErreur true pour afficher un snackbar en cas de réseau
+     *                                 indisponible, false sinon.
      * @return true si une connexion internet est disponible sinon false.
      */
-    public static boolean reseauDisponible(Context contexte, boolean afficherToastSiErreur) {
-        return reseauDisponible(contexte, afficherToastSiErreur, R.string.erreur_reseau);
+    public static boolean reseauDisponible(Context contexte, boolean afficherSnackbarSiErreur) {
+        return reseauDisponible(contexte, afficherSnackbarSiErreur, R.string.erreur_reseau);
     }
 
     /**
      * Vérifie qu'une connexion internet est disponible et affiche un toast d'erreur.
      * @param contexte Le contexte de l'application.
-     * @param afficherToastSiErreur true pour afficher un toast en cas de réseau
-     *                              indisponible, false sinon.
+     * @param afficherSnackbarSiErreur true pour afficher un snackbar en cas de réseau
+     *                                 indisponible, false sinon.
      * @param idMessageErreur L'identifiant du message d'erreur à afficher.
      * @return true si une connexion internet est disponible sinon false.
      */
-    public static boolean reseauDisponible(Context contexte, boolean afficherToastSiErreur,
+    public static boolean reseauDisponible(Context contexte, boolean afficherSnackbarSiErreur,
                                            int idMessageErreur) {
         if (!reseauDisponible(contexte)) {
-            if (afficherToastSiErreur) {
-                Toast.makeText(contexte, idMessageErreur, Toast.LENGTH_LONG).show();
+            if (afficherSnackbarSiErreur) {
+                SnackbarCustom.show(contexte, idMessageErreur, SnackbarCustom.STYLE_ATTENTION);
             }
             return false;
         }
