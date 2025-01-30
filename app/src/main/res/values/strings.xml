@@ -45,7 +45,7 @@
     <string name="coordonnees">Coordonnées entreprise :</string>
     <string name="tel_contact">Numéro de téléphone :</string>
     <string name="valider">Valider</string>
-    <string name="obtenircoordonnees">Calculer les coordonnées</string>
+    <string name="obtenir_coordonnees">Calculer les coordonnées</string>
     <string name="coordonnees_non_calculees">Veuillez d\'abord obtenir vos coordonnées</string>
     <string name="adresseClient">Adresse :</string>
     <string name="retour">Retour</string>

@@ -119,7 +119,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="obtenirCoordonnees"
-                android:text="@string/obtenircoordonnees" />
+                android:text="@string/obtenir_coordonnees" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

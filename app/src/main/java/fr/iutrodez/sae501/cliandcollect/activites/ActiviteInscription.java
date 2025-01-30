@@ -4,38 +4,21 @@ import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
-import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
-import fr.iutrodez.sae501.cliandcollect.utile.Distance;
-import fr.iutrodez.sae501.cliandcollect.utile.GestionBouton;
-import fr.iutrodez.sae501.cliandcollect.utile.LocalisationAdapter;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import org.json.JSONObject;
-import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
-import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
-import fr.iutrodez.sae501.cliandcollect.R;
-import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
@@ -60,9 +43,6 @@ public class ActiviteInscription extends AppCompatActivity {
     private static double longitude = Double.NaN;
 
     private CheckBox seRappelerDeMoi;
-
-    private Button boutonObtenirCoordonnees;
-    private Button boutonEditerAdresse;
     private Button boutonSubmitInscription;
 
     private ActivityResultLauncher<Intent> lanceurMap;
@@ -88,18 +68,12 @@ public class ActiviteInscription extends AppCompatActivity {
         messageErreur = findViewById(R.id.messageErreur);
         messageErreurAdresse = findViewById(R.id.messageErreurAdresse);
         seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
-        boutonObtenirCoordonnees = findViewById(R.id.boutonObtenirCoordonnees);
-        boutonEditerAdresse = findViewById(R.id.boutonEditerAdresse);
         boutonSubmitInscription = findViewById(R.id.boutonInscription);
 
         preferences = getDefaultSharedPreferences(getApplicationContext());
 
-        setAdresseEditable(true);
-
-        boutonEditerAdresse.setOnClickListener(v -> setAdresseEditable(true));
         boutonSubmitInscription.setOnClickListener(this::inscription);
 
-        GestionBouton.activerBoutonSiTexteEntre(adresse, boutonObtenirCoordonnees);
         lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                         this::retourMap);
     }
@@ -129,22 +103,6 @@ public class ActiviteInscription extends AppCompatActivity {
                 finish();
             });
         }
-    }
-
-    /**
-     * Active ou désactive le mode édition pour le champ d'adresse.
-     * @param editable True si le champ doit être éditable, false sinon.
-     */
-    private void setAdresseEditable(boolean editable) {
-        adresse.setEnabled(editable);
-
-        boutonEditerAdresse.setEnabled(!editable);
-        boutonSubmitInscription.setEnabled(!editable);
-
-        if (!adresse.getText().toString().isEmpty()) {
-            boutonObtenirCoordonnees.setEnabled(editable);
-        }
-        boutonEditerAdresse.setVisibility(editable ? View.GONE : View.VISIBLE);
     }
 
     /**
@@ -197,6 +155,7 @@ public class ActiviteInscription extends AppCompatActivity {
     private void masquerMessageErreur() {
         messageErreur.setVisibility(View.GONE);
         messageErreur.setText("");
+    }
     private void retourMap(ActivityResult retourMap) {
         Intent retour = retourMap.getData();
 
@@ -204,6 +163,7 @@ public class ActiviteInscription extends AppCompatActivity {
             latitude = retour.getDoubleExtra("latitude", Double.NaN);
             longitude = retour.getDoubleExtra("longitude", Double.NaN);
             adresse.setText(retour.getStringExtra("adresse"));
+            boutonSubmitInscription.setEnabled(true);
         }
     }
 }

@@ -8,143 +8,10 @@
         layout="@layout/entete_page_composant" />
 
     <LinearLayout
-        android:id="@+id/formulaireInsription"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/textViewInscription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/nom" />
-            <TextView
-                android:id="@+id/messageErreurNom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <EditText
-                android:id="@+id/saisieNom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_nom" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/mail" />
-            <TextView
-                android:id="@+id/messageErreurMail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <EditText
-                android:id="@+id/saisieMail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_email" />
-
-            <TextView
-                android:id="@+id/messageErreurAdresse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:text="@string/adresse" />
-
-            <EditText
-                android:id="@+id/saisieAdresse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_adresse" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/prenom" />
-            <TextView
-                android:id="@+id/messageErreurPrenom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-
-            <EditText
-                android:id="@+id/saisiePrenom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_prenom" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/mdp" />
-            <TextView
-                android:id="@+id/messageErreurMdp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-            <EditText
-                android:id="@+id/saisieMdp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_mdp" />
-
-            <Button
-                android:id="@+id/obtenirCoordonnees"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="obtenirCoordonnees"
-                android:layout_marginTop="30dp"
-                android:text="@string/obtenircoordonnees" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/messageErreur"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        app:layout_constraintTop_toBottomOf="@id/formulaireInsription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <LinearLayout
-
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/messageErreur"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
-
-        <CheckBox
-            android:id="@+id/seRappelerDeMoi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        style="@style/AppStyle"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/textViewInscription"
@@ -205,7 +72,16 @@
             android:id="@+id/saisieAdresse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/indication_adresse" />
+            android:hint="@string/indication_adresse"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/boutonObtenirCoordonnees"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+            android:onClick="obtenirCoordonnees"
+            android:text="@string/obtenir_coordonnees" />
 
         <TextView
             android:layout_width="match_parent"
@@ -267,6 +143,8 @@
                 android:text="@string/se_souvenir" />
         </LinearLayout>
 
+
+        <!-- TODO vue téléphone avec tailles dans dimens adaptées taille écran -->
         <Button
             android:id="@+id/boutonInscription"
             android:layout_width="wrap_content"

@@ -32,11 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activites.ActiviteConnexion"
-            android:screenOrientation="portrait" />
 
-        <activity android:name=".activites.ActiviteMap"></activity>
+        <activity android:name=".activites.ActiviteMap"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".activites.ActiviteInscription"
