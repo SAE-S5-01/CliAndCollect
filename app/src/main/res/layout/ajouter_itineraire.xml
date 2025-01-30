@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/textViewAjoutItineraire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ajouter_itineraire"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/formulaireAjoutItineraire"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/textViewAjoutItineraire"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/nom_itineraire"/>
+
+            <EditText
+                android:id="@+id/nomItineraire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/indication_nom_itineraire" />
+
+            <TextView
+                android:id="@+id/messageErreurNomItineraire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="" />
+
+            <TextView
+                android:id="@+id/indication_contact_a_ajouter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/indication_contaxt_a_ajouter" />
+
+            <EditText
+                android:id="@+id/contact_a_ajouter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/contact_a_ajouter" />
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/liste_clients_itineraire" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/erreurFormulaire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        app:layout_constraintTop_toBottomOf="@id/formulaireAjoutItineraire"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/erreurFormulaire"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/boutonValider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="valider"
+            android:layout_marginBottom="304dp"
+            android:text="@string/valider" />
+        <Button
+            android:id="@+id/boutonRetour"
+            android:layout_width="wrap_content"
+            android:onClick="retour"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="304dp"
+            android:text="@string/retour" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

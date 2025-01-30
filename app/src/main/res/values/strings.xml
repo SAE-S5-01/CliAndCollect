@@ -33,6 +33,7 @@
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
 
+
     <string name="valider">Valider</string>
     <string name="retour">Retour</string>
 
@@ -61,6 +62,11 @@
 
     <string name="nom_itineraire">Nom :</string>
     <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
-    <string name="ajouter_itineraire">Ajouter un itinéraire</string>
     <string name="pasModifier">Aucune information n\'a été modifiée</string>
+    <string name="ajouter_itineraire">Ajouter un itinéraire</string>*
+    <string name="contact_a_ajouter">Veuillez entrer le nom de l\'entreprise du contact</string>
+    <string name="indication_nom_itineraire">Veuillez entrer le nom de l\'itinéraire</string>
+    <string name="indication_clients_itineraire">Veuillez sélectionner les clients à visiter</string>
+    <string name="indication_contaxt_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
+
 </resources>
