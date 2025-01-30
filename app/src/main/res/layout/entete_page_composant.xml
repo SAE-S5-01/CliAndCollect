@@ -32,7 +32,7 @@
         android:id="@+id/boutonOptionMenu"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/account_circle"
+        android:src="@drawable/ic_compte"
         android:contentDescription="Menu options"
         android:clickable="true"
         android:focusable="true"

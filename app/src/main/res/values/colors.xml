@@ -3,11 +3,13 @@
     <color name="ic_launcher_background">#FFFFFF</color>
 
     <color name="colorPrimary">#1981FF</color>
+    <color name="colorPrimaryLight">#95C4FF</color>
     <color name="colorPrimaryDark">#1A6ED5</color>
-    <color name="colorAccent">@color/colorPrimary</color>
 
     <color name="black">#000000</color>
     <color name="dark_blue">#072C51</color>
+
+    <color name="bouton_secondaire">#DADADA</color>
 
     <color name="information">@color/colorPrimary</color>
     <color name="validation">#50B356</color>
