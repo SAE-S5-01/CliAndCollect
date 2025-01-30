@@ -398,8 +398,7 @@ public class ClientApi {
 
                     afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
                         R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
-                        R.id.messageErreurPrenom, R.id.messageErreurAdresse, R.id.messageErreurVille
-                    }, new String[] {
+                        R.id.messageErreurPrenom, R.id.messageErreurAdresse}, new String[] {
                         "mail", "motDePasse", "nom", "prenom", "adresse", "ville"
                     });
                 });

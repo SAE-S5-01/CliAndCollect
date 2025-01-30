@@ -1,31 +1,22 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
 import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Map;
-
 import fr.iutrodez.sae501.cliandcollect.R;
-import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
-import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
-import fr.iutrodez.sae501.cliandcollect.utile.Distance;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 public class ActiviteCreationClient extends AppCompatActivity {
@@ -38,23 +29,18 @@ public class ActiviteCreationClient extends AppCompatActivity {
 
     private static EditText prenomContact;
 
-
     private static EditText telephone;
 
     private static EditText nomContact;
 
     private static RadioGroup clientProspect;
 
-    private static EditText coordonnees;
-
     private  static TextView erreur;
-
-    private Client nouveauClient;
 
     private static double latitude = Double.NaN;
     private static double longitude = Double.NaN;
-    private Button boutonValider;
 
+    private ActivityResultLauncher<Intent> lanceurMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,16 +48,15 @@ public class ActiviteCreationClient extends AppCompatActivity {
         setContentView(R.layout.ajouter_client);
         nomEntreprise = findViewById(R.id.nomEntreprise);
         saisieAdresse = findViewById(R.id.adresseEntreprise);
+        saisieAdresse.setEnabled(false);
         telephone = findViewById(R.id.telephone);
         description = findViewById(R.id.description);
-        coordonnees = findViewById(R.id.coordonnees);
         prenomContact = findViewById(R.id.prenomContact);
         nomContact = findViewById(R.id.nomContact);
         clientProspect = findViewById(R.id.clientProspect);
         erreur = findViewById(R.id.erreurFormulaire);
-        boutonValider = findViewById(R.id.boutonValider);
-        boutonValider.setEnabled(false);
-
+        lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                this::retourMap);
     }
 
     public void retour(View view){
@@ -99,46 +84,8 @@ public class ActiviteCreationClient extends AppCompatActivity {
     }
 
     public void obtenirCoordonnees(View view) {
-        try {
-            // STUB (rodez) TODO remplacer par geoloc
-            double[] viewBox = Distance.creationViewBox(44.333333  , 2.566667);
-            ClientApi.verifierAddresse(saisieAdresse.getText().toString(),  viewBox,this, new VolleyCallback() {
-                @Override
-                public void onSuccess(List<Map<String , String>> results) {
-                    String[] options = new String[results.size()];
-
-                    for (int i = 0; i < results.size(); i++) {
-                        options[i] = results.get(i).get("display_name");
-                    }
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ActiviteCreationClient.this);
-
-                    if (options.length > 0) {
-                        builder.setTitle("Choisissez une option");
-                        builder.setItems(options, (dialog, which) -> {
-                            Map<String, String> selectedLocation = results.get(which);
-                            String lat = selectedLocation.get("lat");
-                            String lon = selectedLocation.get("lon");
-                            latitude = Double.parseDouble(lat);
-                            longitude = Double.parseDouble(lon);
-                            saisieAdresse.setText(selectedLocation.get("display_name"));
-                            boutonValider.setEnabled(true);
-                        });
-                    } else {
-                        builder.setTitle("Aucun résultat");
-                        builder.setMessage("Aucun résultat n'a été trouvé pour cette adresse");
-                    }
-
-                    builder.show();
-                }
-                @Override
-                public void onError(String error) {
-                    Log.e("erro", "------------------------------------" + error);
-                }
-            });
-        } catch (UnsupportedEncodingException e) {
-            Log.e("erreur", "------------------------------------" + e);
-        }
+        Intent map = new Intent(this, ActiviteMap.class);
+        lanceurMap.launch(map);
     }
 
     private static JSONObject formulaireEnJson() {
@@ -159,5 +106,15 @@ public class ActiviteCreationClient extends AppCompatActivity {
             Log.e("erreur", "Catch form json" + e);
         }
         return donnees;
+    }
+
+    private void retourMap(ActivityResult retourMap) {
+        Intent retour = retourMap.getData();
+
+        if (retourMap.getResultCode() == RESULT_OK) {
+            latitude = retour.getDoubleExtra("latitude", Double.NaN);
+            longitude = retour.getDoubleExtra("longitude", Double.NaN);
+            saisieAdresse.setText(retour.getStringExtra("adresse"));
+        }
     }
 }

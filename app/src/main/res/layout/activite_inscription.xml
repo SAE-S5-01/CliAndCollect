@@ -119,21 +119,13 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_mdp" />
 
-            <TextView
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/obtenirCoordonnees"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ville" />
-            <TextView
-                android:id="@+id/messageErreurVille"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-
-            <EditText
-                android:id="@+id/saisieVille"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_ville" />
+                android:onClick="obtenirCoordonnees"
+                android:layout_marginTop="30dp"
+                android:text="@string/obtenircoordonnees" />
         </LinearLayout>
     </LinearLayout>
 
@@ -178,13 +170,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="50dp">
 
-        <Button
-            android:id="@+id/obtenirCoordonnees"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="obtenirCoordonnees"
-            android:layout_marginBottom="304dp"
-            android:text="@string/obtenircoordonnees" />
         <Button
             android:id="@+id/boutonInscription"
             android:layout_width="wrap_content"

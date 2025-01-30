@@ -1,8 +1,6 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
-
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,20 +10,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Map;
-
 import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
 import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
-import fr.iutrodez.sae501.cliandcollect.requetes.VolleyCallback;
-import fr.iutrodez.sae501.cliandcollect.utile.Distance;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
@@ -39,7 +33,6 @@ public class ActiviteInscription extends AppCompatActivity {
     private EditText nom;
     private EditText prenom;
     private EditText adresse;
-    private EditText ville;
     private TextView messageErreur;
     public static SharedPreferences preferences;
 
@@ -47,6 +40,8 @@ public class ActiviteInscription extends AppCompatActivity {
     private static double longitude = Double.NaN;
     private CheckBox seRappelerdeMoi;
     private Button boutonSubmitInscription;
+
+    private ActivityResultLauncher<Intent> lanceurMap;
 
     /**
      * Méthode invoquée lors de la création de l'activité.
@@ -61,13 +56,16 @@ public class ActiviteInscription extends AppCompatActivity {
         nom = findViewById(R.id.saisieNom);
         prenom = findViewById(R.id.saisiePrenom);
         adresse = findViewById(R.id.saisieAdresse);
-        ville = findViewById(R.id.saisieVille);
+        adresse.setEnabled(false);
         messageErreur = findViewById(R.id.messageErreur);
         seRappelerdeMoi = findViewById(R.id.seRappelerDeMoi);
         preferences = getDefaultSharedPreferences(getApplicationContext());
         boutonSubmitInscription = findViewById(R.id.boutonInscription);
         boutonSubmitInscription.setOnClickListener(this::inscription);
+        lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                        this::retourMap);
     }
+
 
     /**
      * Méthode invoquée lors du clic sur le bouton d'inscription.
@@ -92,39 +90,9 @@ public class ActiviteInscription extends AppCompatActivity {
     }
 
     public void obtenirCoordonnees(View view) {
-        try {
-            // STUB (rodez) TODO remplacer par geoloc
-            double[] viewBox = Distance.creationViewBox(44.333333  , 2.566667);
-            ClientApi.verifierAddresse(adresse.getText().toString(),  viewBox,this, new VolleyCallback() {
-                @Override
-                public void onSuccess(List<Map<String , String>> results) {
-                    String[] options = new String[results.size()];
-                    for (int i = 0; i < results.size(); i++) {
-                        options[i] = results.get(i).get("display_name");
-                    }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ActiviteInscription.this);
-                    builder.setTitle("Choisissez une option");
-                    builder.setItems(options, (dialog, which) -> {
-                        Map<String, String> selectedLocation = results.get(which);
-                        String lat = selectedLocation.get("lat");
-                        String lon = selectedLocation.get("lon");
-                        latitude = Double.parseDouble(lat);
-                        longitude = Double.parseDouble(lon);
-                        adresse.setText(selectedLocation.get("display_name"));
-                        boutonSubmitInscription.setEnabled(true);
-                        messageErreur.setText("");
-                    });
-                    builder.show();
-                }
-                @Override
-                public void onError(String error) {
-                    Log.e("error", "------------------------------------" + error);
-                }
-            });
-        } catch (UnsupportedEncodingException e) {
-            Log.e("erreur", "------------------------------------" + e);
-        }
+        Intent map = new Intent(ActiviteInscription.this, ActiviteMap.class);
+        lanceurMap.launch(map);
     }
 
     /**
@@ -139,15 +107,25 @@ public class ActiviteInscription extends AppCompatActivity {
             donnees.put("nom", nom.getText().toString());
             donnees.put("prenom", prenom.getText().toString());
             donnees.put("adresse", adresse.getText().toString());
-            donnees.put("ville", ville.getText().toString());
             donnees.put("latitude", latitude);
             donnees.put("longitude", longitude);
         } catch (Exception e) {
+            Log.e("Inscription", "Erreur lors de la création de l'objet JSON", e);
             messageErreur.setText(e.getMessage().equals("Forbidden numeric value: NaN")
                                   ? R.string.coordonnees_non_calculees
                                   : R.string.erreur_inscription);
             donnees = null;
         }
         return donnees;
+    }
+
+    private void retourMap(ActivityResult retourMap) {
+        Intent retour = retourMap.getData();
+
+        if (retourMap.getResultCode() == RESULT_OK) {
+            latitude = retour.getDoubleExtra("latitude", Double.NaN);
+            longitude = retour.getDoubleExtra("longitude", Double.NaN);
+            adresse.setText(retour.getStringExtra("adresse"));
+        }
     }
 }
