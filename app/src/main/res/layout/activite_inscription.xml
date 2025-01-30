@@ -72,7 +72,16 @@
             android:id="@+id/saisieAdresse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/indication_adresse" />
+            android:hint="@string/indication_adresse"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/boutonObtenirCoordonnees"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+            android:onClick="obtenirCoordonnees"
+            android:text="@string/obtenir_coordonnees" />
 
         <TextView
             android:layout_width="match_parent"
@@ -134,21 +143,8 @@
                 android:text="@string/se_souvenir" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/boutonObtenirCoordonnees"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="50dp"
-            android:onClick="obtenirCoordonnees"
-            android:enabled="false"
-            android:text="@string/obtenir_coordonnees" />
+
         <!-- TODO vue téléphone avec tailles dans dimens adaptées taille écran -->
-        <Button
-            android:id="@+id/boutonEditerAdresse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="50dp"
-            android:text="@string/editer_adresse" />
         <Button
             android:id="@+id/boutonInscription"
             android:layout_width="wrap_content"

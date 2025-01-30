@@ -81,14 +81,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/coordonnees" />
+                android:text="@string/tel_contact" />
 
             <EditText
-                android:id="@+id/coordonnees"
+                android:id="@+id/telephone"
                 android:layout_width="match_parent"
-                android:inputType="textMultiLine"
                 android:layout_height="wrap_content"
-                android:hint="@string/indication_coordonnees" />
+                android:hint="@string/indication_telephone" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -114,6 +114,12 @@
                 android:layout_height="wrap_content"
                 android:text="" />
 
+            <Button
+                android:id="@+id/obtenirCoordonnees"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="obtenirCoordonnees"
+                android:text="@string/obtenir_coordonnees" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -131,16 +137,7 @@
                 android:layout_height="wrap_content"
                 android:text="" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/tel_contact" />
 
-            <EditText
-                android:id="@+id/telephone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/indication_telephone" />
 
             <RadioGroup
                 android:layout_width="match_parent"
@@ -187,21 +184,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="valider"
-            android:layout_marginBottom="304dp"
             android:text="@string/valider" />
-        <Button
-            android:id="@+id/obtenirCoordonnees"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="obtenirCoordonnees"
-            android:layout_marginBottom="304dp"
-            android:text="@string/obtenir_coordonnees" />
         <Button
             android:id="@+id/boutonRetour"
             android:layout_width="wrap_content"
             android:onClick="retour"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="304dp"
             android:text="@string/retour" />
     </LinearLayout>
 

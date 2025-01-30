@@ -32,6 +32,8 @@
     <string name="menu_compte">Gérer mon compte</string>
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
+    <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
+
 
 
     <string name="valider">Valider</string>
@@ -46,7 +48,8 @@
     <string name="prenom_contact">Prénom du contact :</string>
     <string name="coordonnees">Coordonnées entreprise :</string>
     <string name="tel_contact">Numéro de téléphone :</string>
-    <string name="obtenir_coordonnees">Obtenir mes coordonnées</string>
+    <string name="valider">Valider</string>
+    <string name="obtenir_coordonnees">Calculer les coordonnées</string>
     <string name="coordonnees_non_calculees">Veuillez d\'abord obtenir vos coordonnées</string>
     <string name="adresseClient">Adresse :</string>
 
@@ -70,4 +73,10 @@
     <string name="indication_contaxt_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
     <string name="ajout_contact_itineraire">Ajouter le contact</string>
 
+
+    <string name="marqueur_confirmation">Oui</string>
+    <string name="marqueur_annulation">Non</string>
+    <string name="marqueur_message">Voulez-vous vraiment supprimer ce marqueur ?</string>
+    <string name="marqueur_titre">Supprimer le marqueur</string>
+    <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayer.</string>
 </resources>
