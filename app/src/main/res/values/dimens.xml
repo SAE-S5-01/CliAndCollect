@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="app_marge_interieure">15dp</dimen>
+    <dimen name="texte_defaut">18sp</dimen>
+
+    <dimen name="connexion_largeur_champs">300dp</dimen>
+    <dimen name="connexion_taille_titres">25sp</dimen>
+    <dimen name="connexion_taille_texte_boutons">22sp</dimen>
+    <dimen name="connexion_largeur_boutons">145dp</dimen>
+    <dimen name="connexion_marge_verticale_champs_texte">14dp</dimen>
+    <dimen name="connexion_marge_verticale_autre">20dp</dimen>
 
     <dimen name="carte_marges">16dp</dimen>
 
