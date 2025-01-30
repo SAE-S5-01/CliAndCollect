@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 
 /**
@@ -29,6 +30,8 @@ import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
  * @author Loïc FAUGIERES
  */
 public class GestionFragment extends AppCompatActivity {
+
+    public static String CLE_EXTRA_MSG_BIENVENUE = "welcome_message";
 
     TabLayout gestionnaireOnglet;
 
@@ -108,6 +111,11 @@ public class GestionFragment extends AppCompatActivity {
                 }
             }
         });
+
+        Intent intent = getIntent();
+        if (intent != null && intent.getBooleanExtra(CLE_EXTRA_MSG_BIENVENUE, false)) {
+            SnackbarCustom.show(this, R.string.inscription_reussie, SnackbarCustom.STYLE_VALIDATION);
+        }
     }
 
     @Override
