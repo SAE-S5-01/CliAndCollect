@@ -1,8 +1,6 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
-
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -29,6 +27,15 @@ import fr.iutrodez.sae501.cliandcollect.utile.Distance;
 import fr.iutrodez.sae501.cliandcollect.utile.GestionBouton;
 import fr.iutrodez.sae501.cliandcollect.utile.LocalisationAdapter;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import org.json.JSONObject;
+import fr.iutrodez.sae501.cliandcollect.ActivitePrincipale;
+import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
+import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
 /**
@@ -58,6 +65,8 @@ public class ActiviteInscription extends AppCompatActivity {
     private Button boutonEditerAdresse;
     private Button boutonSubmitInscription;
 
+    private ActivityResultLauncher<Intent> lanceurMap;
+
     /**
      * Méthode invoquée lors de la création de l'activité.
      * @param savedInstanceState
@@ -75,6 +84,7 @@ public class ActiviteInscription extends AppCompatActivity {
         nom = findViewById(R.id.saisieNom);
         prenom = findViewById(R.id.saisiePrenom);
         adresse = findViewById(R.id.saisieAdresse);
+        adresse.setEnabled(false);
         messageErreur = findViewById(R.id.messageErreur);
         messageErreurAdresse = findViewById(R.id.messageErreurAdresse);
         seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
@@ -90,7 +100,10 @@ public class ActiviteInscription extends AppCompatActivity {
         boutonSubmitInscription.setOnClickListener(this::inscription);
 
         GestionBouton.activerBoutonSiTexteEntre(adresse, boutonObtenirCoordonnees);
+        lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                        this::retourMap);
     }
+
 
     /**
      * Méthode invoquée lors du clic sur le bouton d'inscription.
@@ -139,80 +152,9 @@ public class ActiviteInscription extends AppCompatActivity {
      * @param view Le bouton "Obtenir les coordonnées"
      */
     public void obtenirCoordonnees(View view) {
-        masquerMessageErreur();
 
-        String adresseEntree = adresse.getText().toString().trim();
-
-        boolean reseauDisponible = Reseau.reseauDisponible(this, R.id.messageErreur, R.string.erreur_reseau);
-
-        if (reseauDisponible && adresseEntree.isEmpty()) {
-            afficherMessageErreur(R.string.erreur_adresse_vide, messageErreurAdresse);
-        } else if (reseauDisponible) {
-            try {
-                // Création d'un "viewBox" (zone de recherche géographique) pour limiter la recherche à une zone spécifique
-                double[] viewBox = Distance.creationViewBox(44.333333,2.566667);  // Coordonnées de base (Rodez)
-
-                ClientApi.verifierAdresse(adresseEntree, viewBox, this, new VolleyCallback() {
-                    @Override
-                    public void onSuccess(List<Map<String, String>> resultats) {
-                        gererAdressesProposees(resultats);
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        Log.e("Erreur API", "Problème lors de la récupération des coordonnées : " + error);
-                        afficherMessageErreur(R.string.api_injoignable, messageErreur);
-                        boutonSubmitInscription.setEnabled(false);
-                    }
-                });
-            } catch (Exception e) {
-                Log.e("Exception", "Erreur lors de l'obtention des coordonnées : " + e);
-                afficherMessageErreur(R.string.erreur_inconnue, messageErreur);
-                boutonSubmitInscription.setEnabled(false);
-            }
-        }
-    }
-
-    /**
-     * Gère les adresses proposées par l'API.
-     * @param resultats Liste des adresses proposées par l'API
-     */
-    private void gererAdressesProposees(List<Map<String, String>> resultats) {
-        if (resultats == null || resultats.isEmpty()) {
-            boutonSubmitInscription.setEnabled(false);
-            afficherMessageErreur(R.string.adresse_non_trouvee, messageErreurAdresse);
-        } else {
-            ArrayList<String> options = new ArrayList<>();
-            for (int i = 0;
-                 i < resultats.size() && i < NB_MAX_ADRESSES_PROPOSEES;
-                 i++) {
-                options.add(resultats.get(i).get("display_name"));
-            }
-
-            AlertDialog.Builder builder
-            = new AlertDialog.Builder(ActiviteInscription.this);
-            builder.setTitle(R.string.titre_choix_adresse);
-
-            LocalisationAdapter adapter
-            = new LocalisationAdapter(ActiviteInscription.this,
-                                      options);
-
-            builder.setAdapter(adapter, (dialog, which) -> {
-                Map<String, String> selectedLocation = resultats.get(which);
-                String lat = selectedLocation.get("lat");
-                String lon = selectedLocation.get("lon");
-
-                latitude = Double.parseDouble(lat);
-                longitude = Double.parseDouble(lon);
-
-                adresse.setText(selectedLocation.get("display_name"));
-                setAdresseEditable(false);
-                messageErreurAdresse.setText("");
-                dialog.dismiss();
-            });
-
-            builder.show();
-        }
+        Intent map = new Intent(ActiviteInscription.this, ActiviteMap.class);
+        lanceurMap.launch(map);
     }
 
     /**
@@ -255,5 +197,13 @@ public class ActiviteInscription extends AppCompatActivity {
     private void masquerMessageErreur() {
         messageErreur.setVisibility(View.GONE);
         messageErreur.setText("");
+    private void retourMap(ActivityResult retourMap) {
+        Intent retour = retourMap.getData();
+
+        if (retourMap.getResultCode() == RESULT_OK) {
+            latitude = retour.getDoubleExtra("latitude", Double.NaN);
+            longitude = retour.getDoubleExtra("longitude", Double.NaN);
+            adresse.setText(retour.getStringExtra("adresse"));
+        }
     }
 }
