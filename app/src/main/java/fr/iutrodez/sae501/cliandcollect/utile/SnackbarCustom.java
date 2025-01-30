@@ -74,7 +74,8 @@ public class SnackbarCustom {
         snackbarView.setBackgroundColor(Color.TRANSPARENT);
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) snackbarView.getLayoutParams();
-        params.setMargins(0, 0, 0, 220);
+        int margeBasse = contexte.getResources().getDimensionPixelSize(R.dimen.pied_page_hauteur_min);
+        params.setMargins(0, 0, 0, margeBasse);
         snackbarView.setLayoutParams(params);
 
         // Ajouter une vue personnalisée à l'intérieur du Snackbar
@@ -84,7 +85,7 @@ public class SnackbarCustom {
         TextView snackbarTextView = customView.findViewById(R.id.texte_snackbar);
         snackbarTextView.setText(messageErreur);
 
-        CardView snackbarCustom = customView.findViewById(R.id.snackbar_custom);
+        CardView snackbarCustom = customView.findViewById(R.id.snackbar_id);
         ImageView snackbarIcon = customView.findViewById(R.id.snackbar_icon);
         switch (style) {
             default:
