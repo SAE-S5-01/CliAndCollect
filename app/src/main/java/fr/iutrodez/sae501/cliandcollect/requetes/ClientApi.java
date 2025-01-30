@@ -37,10 +37,13 @@ import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 
 /**
@@ -260,27 +263,77 @@ public class ClientApi {
         );
     }
 
+    public static void getListeItineraire(Context contexte , Runnable callback) {
+        requeteApi(contexte, Request.Method.GET, "/itineraire", null, null,
+                response -> {
+                    try {
+                        JSONArray jsonReponse = new JSONArray(response);
+
+                        for (int i = 0; i < jsonReponse.length(); i++) {
+                            JSONObject jsonItineraire = jsonReponse.getJSONObject(i);
+                            Itineraire itineraire = new Itineraire(jsonItineraire);
+                            SingletonListeItineraire.getInstance().ajouterItineraire(itineraire);
+                        }
+                        callback.run();
+                    } catch (Exception e) {
+                        Log.e("getListeItineraire", "Erreur lors du traitement de la réponse", e);
+                    }
+                },
+                error -> {
+                    Log.e("getListeItineraire", "Erreur reçue", error);
+                    gestionErreur(contexte, error);
+                }
+        );
+    }
+
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
             requeteApi(contexte, Request.Method.POST, "/contact", null , donnees,
-                response -> {
-                    try {
-                        // En cas de succès, on ajoute le client au singleton pour faire l'affichage
-                        JSONObject jsonReponse = new JSONObject(response);
-                        ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
-                        Client clientCree = new Client(jsonReponse);
-                        SingletonListeClient.getInstance().ajouterClient(clientCree);
-                    } catch (Exception e) {
-                        // TODO gestion erreur
-                        Log.e("erreur", e.toString());
-                        //throw new RuntimeException(e);
+                    response -> {
+                        try {
+                            // En cas de succès, on ajoute le client au singleton pour faire l'affichage
+                            JSONObject jsonReponse = new JSONObject(response);
+                            ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
+                            Client clientCree = new Client(jsonReponse);
+                            SingletonListeClient.getInstance().ajouterClient(clientCree);
+                        } catch (Exception e) {
+                            // TODO gestion erreur
+                            Log.e("erreur", e.toString());
+                            //throw new RuntimeException(e);
+                        }
+                    } ,
+                    error -> {
+                        // TODO gestion erreur api
+                        //gestionErreur(contexte, error);
+                        Log.e("erreur", error.toString());
                     }
-                } ,
-                error -> {
-                // TODO gestion erreur api
-                    //gestionErreur(contexte, error);
-                    Log.e("erreur", error.toString());
-                }
+            );
+        } catch (Exception e) {
+            Log.e("erreur", e.toString());
+        }
+    }
+
+    public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
+        try {
+            requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
+                    response -> {
+                        try {
+                            // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
+                            JSONObject jsonReponse = new JSONObject(response);
+                            ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
+                            Itineraire itineraireCree = new Itineraire(jsonReponse);
+                            SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
+                        } catch (Exception e) {
+                            // TODO gestion erreur
+                            Log.e("erreur", e.toString());
+                            //throw new RuntimeException(e);
+                        }
+                    } ,
+                    error -> {
+                        // TODO gestion erreur api
+                        //gestionErreur(contexte, error);
+                        Log.e("erreur", error.toString());
+                    }
             );
         } catch (Exception e) {
             Log.e("erreur", e.toString());

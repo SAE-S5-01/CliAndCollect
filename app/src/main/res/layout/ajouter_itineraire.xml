@@ -98,6 +98,12 @@
         android:layout_marginTop="16dp">
 
         <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="ajouterClient"
+            android:layout_marginBottom="304dp"
+            android:text="@string/ajout_contact_itineraire" />
+        <Button
             android:id="@+id/boutonValider"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

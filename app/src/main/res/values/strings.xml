@@ -68,5 +68,6 @@
     <string name="indication_nom_itineraire">Veuillez entrer le nom de l\'itinéraire</string>
     <string name="indication_clients_itineraire">Veuillez sélectionner les clients à visiter</string>
     <string name="indication_contaxt_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
+    <string name="ajout_contact_itineraire">Ajouter le contact</string>
 
 </resources>
