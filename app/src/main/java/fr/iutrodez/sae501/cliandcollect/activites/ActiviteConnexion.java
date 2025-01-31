@@ -35,34 +35,47 @@ public class ActiviteConnexion extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activite_connexion);
 
         boolean reseauDispo = Reseau.reseauDisponible(this);
 
         if (reseauDispo && Preferences.estConnecte(this)) {
             ClientApi.connexion(this,
-                    Preferences.getEmail(this),
-                    Preferences.getMotDePasse(this),
-                    () -> lancerMenuPrincipal()
+                Preferences.getEmail(this),
+                Preferences.getMotDePasse(this),
+                this::lancerMenuPrincipal,
+                () -> {
+                    runOnUiThread(() -> setupUI(reseauDispo));
+                }
             );
         } else {
-            if (!reseauDispo) {
-                SnackbarCustom.show(this, R.string.erreur_reseau, SnackbarCustom.STYLE_ATTENTION);
-            }
-
-            ImageView boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
-            Button boutonConnexion = findViewById(R.id.boutonConnexion);
-            Button boutonInscription = findViewById(R.id.boutonInscription);
-            mail = findViewById(R.id.saisieMail);
-            mdp = findViewById(R.id.saisieMdp);
-            seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
-
-            boutonOptionMenu.setVisibility(View.INVISIBLE);
-
-            boutonConnexion.setOnClickListener(this::clicConnexion);
-            boutonInscription.setOnClickListener(this::clicInscription);
+            setupUI(reseauDispo);
         }
     }
+
+    /**
+     * Initialise l'interface utilisateur.
+     * @param reseauDispo true si le réseau est disponible, false sinon
+     */
+    private void setupUI(boolean reseauDispo) {
+        setContentView(R.layout.activite_connexion);
+
+        if (!reseauDispo) {
+            SnackbarCustom.show(this, R.string.erreur_reseau, SnackbarCustom.STYLE_ATTENTION);
+        }
+
+        ImageView boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
+        Button boutonConnexion = findViewById(R.id.boutonConnexion);
+        Button boutonInscription = findViewById(R.id.boutonInscription);
+        mail = findViewById(R.id.saisieMail);
+        mdp = findViewById(R.id.saisieMdp);
+        seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
+
+        boutonOptionMenu.setVisibility(View.INVISIBLE);
+
+        boutonConnexion.setOnClickListener(this::clicConnexion);
+        boutonInscription.setOnClickListener(this::clicInscription);
+    }
+
 
     /**
      * Méthode invoquée lors du clic sur le bouton de connexion.
@@ -81,7 +94,7 @@ public class ActiviteConnexion extends AppCompatActivity {
             ClientApi.connexion(this, mail, mdp, () -> {
                 Preferences.sauvegarderInfosConnexion(this, mail, mdp, seRappelerDeMoi.isChecked());
                 lancerMenuPrincipal();
-            });
+            }, null);
         }
     }
 
