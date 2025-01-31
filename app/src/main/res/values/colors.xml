@@ -3,12 +3,26 @@
     <color name="ic_launcher_background">#FFFFFF</color>
 
     <color name="colorPrimary">#1981FF</color>
+    <color name="colorPrimaryLight">#95C4FF</color>
     <color name="colorPrimaryDark">#1A6ED5</color>
-    <color name="colorAccent">#FF6262</color>
 
     <color name="black">#000000</color>
+    <color name="light_grey">#ECECEC</color>
+    <color name="dark_grey">#B1B1B1</color>
+    <color name="dark_blue">#072C51</color>
 
-    <color name="pied_page_icone_active">#00aa44</color>
-    <color name="pied_page_icone_inactive">#2E2E2E</color>
-    <color name="pied_page_fond">#D9D9D9</color>
+    <color name="bouton_principal">@color/colorPrimaryLight</color>
+    <color name="bouton_principal_desactive">#6786AC</color>
+
+    <color name="bouton_secondaire">#DADADA</color>
+    <color name="bouton_secondaire_desactive">#BDBDBD</color>
+
+    <color name="information">@color/colorPrimary</color>
+    <color name="validation">#50B356</color>
+    <color name="attention">#E1B000</color>
+    <color name="erreur">#DDFF1500</color>
+
+    <color name="pied_page_icone_active">@color/colorPrimary</color>
+    <color name="pied_page_icone_inactive">@color/dark_blue</color>
+    <color name="pied_page_fond">#E4E4E4</color>
 </resources>

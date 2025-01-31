@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:background="?attr/colorPrimary"
     android:id="@+id/entete">
 
-    <ImageView
-        android:id="@+id/toolbar_logo"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/ic_launcher_foreground"
-        android:layout_alignParentStart="true"
-        android:contentDescription="Logo"
-        android:layout_marginEnd="16dp" />
+    <TableRow android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/toolbar_logo"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_launcher_foreground"
+            android:layout_alignParentStart="true"
+            android:contentDescription="Logo"
+            android:layout_marginEnd="16dp" />
 
-    <TextView
-        android:id="@+id/toolbar_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/app_nom"
-        android:textColor="@android:color/white"
-        android:textSize="30sp"
-        android:gravity="center" />
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/app_nom"
+            android:textColor="@android:color/white"
+            android:textSize="30sp"
+            android:gravity="center" />
 
-    <ImageButton
-        android:id="@+id/boutonOptionMenu"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/account_circle"
-        android:contentDescription="Menu options"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:attr/selectableItemBackground" />
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/boutonOptionMenu"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_compte"
+            android:contentDescription="Menu options"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+    </TableRow>
+
+</TableLayout>

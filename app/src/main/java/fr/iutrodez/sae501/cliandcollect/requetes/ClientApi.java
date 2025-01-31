@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Différentes méthodes de communication avec l'API.
@@ -222,9 +224,6 @@ public class ClientApi {
                         String token = jsonReponse.getString("token");
                         Preferences.sauvegarderTokenApi(contexte, token);
 
-                        Toast toast = Toast.makeText(contexte, R.string.inscription_reussie, Toast.LENGTH_LONG);
-                        toast.show();
-
                         ((ActiviteInscription) contexte).runOnUiThread(connexionReussie);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -342,65 +341,25 @@ public class ClientApi {
 
     public static void modificationClient(Context contexte, JSONObject donnees, String id) {
         HashMap<String,String> parametre = new HashMap<>();
-        parametre.put("id",id);
+        parametre.put("id", id);
+
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_chargement));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
             requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
-                    response -> {} ,
-                    error -> {}
+                response -> {
+                    spineurChargement.dismiss(); },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
             );
         } catch (Exception e) {
-            Log.e("erreur", e.toString());
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
-    }
-
-
-
-    public static void verifierAdresse(String adresse, double[] viewbox , Context contexte,
-                                       VolleyCallback callback) throws UnsupportedEncodingException {
-        String urlApi = "https://nominatim.openstreetmap.org/search?q="
-            + URLEncoder.encode(adresse, "UTF-8")
-            + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
-            + "&bounded=1&format=json&addressdetails=1";
-        JsonArrayRequest requete = new JsonArrayRequest(
-            Request.Method.GET,
-            urlApi,
-            null,
-            response -> {
-                try {
-                    // Liste pour stocker les résultats
-                    List<Map<String , String>> results = new ArrayList<>();
-
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject jsonObject = response.getJSONObject(i);
-
-                        Map<String, String> locationInfo = new HashMap<>();
-                        locationInfo.put("display_name", jsonObject.getString("display_name"));
-                        locationInfo.put("lat", jsonObject.getString("lat"));
-                        locationInfo.put("lon", jsonObject.getString("lon"));
-                        results.add(locationInfo);
-                    }
-                    // Retourner les résultats via le callback
-                    callback.onSuccess(results);
-                } catch (JSONException e) {
-                    // Gérer l'exception JSON
-                    callback.onError("error catch : " + e.toString());
-                }
-            },
-            error -> {
-                // Retourner l'erreur via le callback
-                callback.onError(error.toString());
-            }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("User-Agent", "cliAndCollect/1.0");
-                return headers;
-            }
-        };
-
-        // Ajouter la requête à la file d'attente
-        RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
     }
 
     /**
@@ -415,15 +374,15 @@ public class ClientApi {
                     String erreurToString = new String(erreur.networkResponse.data, "UTF-8");
                     JSONObject objetErreur = new JSONObject(erreurToString);
 
-                    Toast.makeText(contexte, objetErreur.getString("description"), Toast.LENGTH_LONG).show();
+                    SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ERREUR);
                 } catch (Exception e) {
-                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
                     throw new RuntimeException(e);
                 }
             });
         } else {
             ((Activity) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
+                SnackbarCustom.show(contexte, R.string.api_injoignable, SnackbarCustom.STYLE_ERREUR);
             });
         }
     }
@@ -443,19 +402,19 @@ public class ClientApi {
 
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
                     afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
-                        R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
-                        R.id.messageErreurPrenom, R.id.messageErreurAdresse
+                        R.id.saisieMail, R.id.saisieMdp, R.id.saisieNom,
+                        R.id.saisiePrenom, R.id.saisieAdresse
                     }, new String[] {
                         "mail", "motDePasse", "nom", "prenom", "adresse"
                     });
                 });
             } catch (Exception e) {
-                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG).show();
+                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
                 throw new RuntimeException(e);
             }
         } else {
             ((ActiviteInscription) contexte).runOnUiThread(() -> {
-                Toast.makeText(contexte, R.string.api_injoignable, Toast.LENGTH_LONG).show();
+                SnackbarCustom.show(contexte, R.string.api_injoignable, SnackbarCustom.STYLE_ERREUR);
             });
         }
     }
@@ -471,13 +430,9 @@ public class ClientApi {
                                                    int[] idChampsTextuels, String [] cleChampsTextuels) {
         for (int i = 0; i < idChampsTextuels.length; i++) {
             try {
-                TextView messageErreur = activite.findViewById(idChampsTextuels[i]);
+                EditText champ = activite.findViewById(idChampsTextuels[i]);
                 if (erreurs.has(cleChampsTextuels[i])) {
-                    messageErreur.setText(erreurs.getString(cleChampsTextuels[i]));
-                    messageErreur.setVisibility(View.VISIBLE);
-                } else {
-                    messageErreur.setText("");
-                    messageErreur.setVisibility(View.GONE);
+                    champ.setError(erreurs.getString(cleChampsTextuels[i]));
                 }
             } catch (JSONException e) {
             }

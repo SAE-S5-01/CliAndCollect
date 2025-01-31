@@ -1,19 +1,23 @@
+/*
+ * ActiviteDetailClient.java                                        31 jan. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import org.json.JSONObject;
 
 import fr.iutrodez.sae501.cliandcollect.R;
@@ -21,27 +25,28 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
+/**
+ * Activité de la page de détail d'un client.
+ *
+ * @author Loïc FAUGIERES
+ * @author Noah MIQUEL
+ */
 public class ActiviteDetailClient extends AppCompatActivity {
 
     private EditText nomEntreprise;
-
     private EditText saisieAdresse;
-
     private EditText description;
-
     private EditText prenomContact;
-
     private EditText telephone;
-
     private EditText nomContact;
+
+    private Button boutonValider;
 
     private RadioGroup clientProspect;
 
-    private TextView coordonnees;
-
     double latitude;
-
     double longitude;
 
     private int id;
@@ -66,77 +71,84 @@ public class ActiviteDetailClient extends AppCompatActivity {
         description = findViewById(R.id.Description);
         prenomContact = findViewById(R.id.prenomContact);
         nomContact = findViewById(R.id.nomContact);
-        clientProspect = findViewById(R.id.ClientProspect);
-        clientProspect.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                isClient = checkedId == R.id.client;
-            }
-        });
-        coordonnees = findViewById(R.id.coordonnees);
+        clientProspect = findViewById(R.id.clientProspect);
         telephone = findViewById(R.id.telephone);
-        Button retour = findViewById(R.id.boutonRetour);
-        Button valider = findViewById(R.id.boutonModifier);
 
-        retour.setOnClickListener(this::retour);
-        valider.setOnClickListener(this::valider);
+        Button obtenirCoordonnees = findViewById(R.id.obtenirCoordonnees);
+        Button boutonRetour = findViewById(R.id.boutonRetour);
+        boutonValider = findViewById(R.id.boutonModifier);
+
+        obtenirCoordonnees.setOnClickListener(this::obtenirCoordonnees);
+        boutonRetour.setOnClickListener(this::retour);
+        boutonValider.setOnClickListener(this::valider);
 
         id = intention.getIntExtra("ID", 0);
-        initialiser();
+        initialiserChamps();
 
         intentionRetour = new Intent();
 
-        lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                this::retourMap);
+        lanceurMap = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), this::retourMap);
+        TextWatcher champModifieListener = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boutonValider.setEnabled(true);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        EditText[] champs = {nomEntreprise, saisieAdresse, description, prenomContact, nomContact, telephone};
+
+        for (EditText champ : champs) {
+            champ.addTextChangedListener(champModifieListener);
+        }
+
+        clientProspect.setOnCheckedChangeListener((group, checkedId) -> {
+            isClient = checkedId == R.id.client;
+            boutonValider.setEnabled(true);
+        });
     }
 
-    public void retour(View view){
+    public void retour(View view) {
         setResult(AppCompatActivity.RESULT_CANCELED);
         finish();
     }
 
-    public void valider(View view){
-        intentionRetour.putExtra("ID",id);
-        if(isModifie()) {
-            if (!nomEntreprise.getText().toString().equals(client.getEntreprise())) {
-                client.setEntreprise(nomEntreprise.getText().toString());
-            }
-            if(!saisieAdresse.getText().toString().equals(client.getAdresse())){
-                client.setAdresse(saisieAdresse.getText().toString());
-                client.setX(longitude);
-                client.setY(latitude);
-            }
-            if(!description.getText().toString().equals(client.getDescription())){
-                client.setDescription(description.getText().toString());
-            }
-            if(!nomContact.getText().toString().equals(client.getNomContact())){
-                client.setNomContact(nomContact.getText().toString());
-            }
-            if(!prenomContact.getText().toString().equals(client.getPrenomContact())){
-                client.setPrenomContact(prenomContact.getText().toString());
-            }
-            if(!telephone.getText().toString().equals(client.getTelephone())){
-                client.setTelephone(telephone.getText().toString());
-            }
-            if(isClient != client.isClient()){
-                client.setClientPropspect(isClient);
-            }
+    public void valider(View view) {
+        intentionRetour.putExtra("ID", id);
+        if (isModifie()) {
+            client.setEntreprise(nomEntreprise.getText().toString());
+            client.setDescription(description.getText().toString());
+            client.setAdresse(saisieAdresse.getText().toString());
+            client.setX(longitude);
+            client.setY(latitude);
+            client.setNomContact(nomContact.getText().toString());
+            client.setPrenomContact(prenomContact.getText().toString());
+            client.setTelephone(telephone.getText().toString());
+            client.setClientPropspect(isClient);
 
             JSONObject donnees = formulaireEnJson();
 
             if (Reseau.reseauDisponible(this,true)) {
                 ClientApi.modificationClient(this, donnees, client.getID().toString());
-                setResult(AppCompatActivity.RESULT_OK,intentionRetour);
+                setResult(AppCompatActivity.RESULT_OK, intentionRetour);
                 finish();
             }
         } else {
-            Toast.makeText(this, R.string.pasModifier, Toast.LENGTH_LONG)
-                    .show();
+            SnackbarCustom.show(this, R.string.pasModifie, SnackbarCustom.STYLE_ATTENTION);
         }
     }
 
+
+
     private JSONObject formulaireEnJson() {
         JSONObject donnees = new JSONObject();
+
         try {
             donnees.put("adresse" , saisieAdresse.getText().toString());
             donnees.put("nomEntreprise", nomEntreprise.getText().toString());
@@ -149,36 +161,41 @@ public class ActiviteDetailClient extends AppCompatActivity {
             donnees.put("longitude", longitude);
 
         } catch (Exception e) {
-            // TODO
-            Log.e("erreur", "Catch form json" + e);
+            SnackbarCustom.show(this,
+                e.getMessage().equals("Forbidden numeric value: NaN")
+                ? R.string.coordonnees_non_calculees
+                : R.string.erreur_modification_client,
+                SnackbarCustom.STYLE_ERREUR);
+            donnees = null;
         }
         return donnees;
     }
 
-
-    public void initialiser(){
+    public void initialiserChamps() {
         client = SingletonListeClient.getClient(id);
         nomEntreprise.setText(client.getEntreprise());
         saisieAdresse.setText(client.getAdresse());
         description.setText(client.getDescription());
-        // On lit les co gps N/S puis O/E donc y puis x
-        coordonnees.setText(String.format("%s : %s",client.getY(), client.getX()));
-        clientProspect.check(client.isClient()?R.id.client : R.id.propspect);
+        clientProspect.check(client.isClient() ? R.id.client : R.id.prospect);
         prenomContact.setText(client.getPrenomContact());
         nomContact.setText(client.getNomContact());
         telephone.setText(client.getTelephone());
     }
 
-    private boolean isModifie(){
+    private boolean isModifie() {
         return !nomEntreprise.getText().toString().equals(client.getEntreprise())
                 || !saisieAdresse.getText().toString().equals(client.getAdresse())
                 || !description.getText().toString().equals(client.getDescription())
                 || !prenomContact.getText().toString().equals(client.getPrenomContact())
                 || !nomContact.getText().toString().equals(client.getNomContact())
                 || !telephone.getText().toString().equals(client.getTelephone())
-                || !(isClient == client.isClient());
+                || isClient != client.isClient();
     }
 
+    /**
+     * Clic sur le bouton "Obtenir les coordonnées".
+     * @param view Le bouton "Obtenir les coordonnées"
+     */
     public void obtenirCoordonnees(View view) {
         Intent map = new Intent(ActiviteDetailClient.this, ActiviteMap.class);
         lanceurMap.launch(map);
@@ -191,7 +208,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
             latitude = retour.getDoubleExtra("latitude", Double.NaN);
             longitude = retour.getDoubleExtra("longitude", Double.NaN);
             saisieAdresse.setText(retour.getStringExtra("adresse"));
-            coordonnees.setText(String.format("%s : %s", latitude, longitude));
+
         }
     }
 }

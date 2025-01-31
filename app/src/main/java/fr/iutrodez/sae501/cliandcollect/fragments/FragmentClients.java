@@ -32,6 +32,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Gestion du fragment Clients.
@@ -95,7 +96,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
         clients = new ArrayList<>();
 
-        if (Reseau.reseauDisponible(this.getContext(), false)) {
+        if (Reseau.reseauDisponible(this.getContext())) {
             ClientApi.getListeClient(this.getContext(), () -> {
                 for (Client client : SingletonListeClient.getListeClient()) {
                     clients.add(client);
@@ -115,7 +116,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
             lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getModifClient);
         // TODO : else : afficher un message d'erreur + personnalisé
         } else {
-            Toast.makeText(this.getContext(), R.string.erreur_reseau, Toast.LENGTH_LONG).show();
+            SnackbarCustom.show(this.getContext(), R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
         }
         return vueDuFragment;
     }

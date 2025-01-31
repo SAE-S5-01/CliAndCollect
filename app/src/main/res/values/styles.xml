@@ -6,4 +6,29 @@
         <!-- Utilise l'espace restant avec weight = 1 -->
         <item name="android:padding">@dimen/app_marge_interieure</item>
     </style>
+
+    <!-- Définition du style des boutons -->
+    <style name="ButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/boutons_custom</item>
+        <item name="android:textColor">@color/boutons_couleurs</item>
+        <item name="android:textSize">@dimen/texte_defaut</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="EditTextStyle">
+        <item name="android:background">@drawable/champ_textuel_custom</item>
+        <item name="android:textColor">@color/champs_textuels_couleurs</item>
+        <item name="android:textColorHint">@color/dark_grey</item>
+        <item name="android:textSize">@dimen/texte_defaut</item>
+        <item name="android:hint">Entrez votre texte</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:imeOptions">actionDone</item>
+    </style>
 </resources>
