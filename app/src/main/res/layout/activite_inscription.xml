@@ -50,7 +50,9 @@
                     android:layout_width="@dimen/inscription_largeur_champs"
                     android:layout_height="wrap_content"
                     android:hint="@string/indication_nom"
-                    android:maxLines="1" />
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:maxLength="50" />
             </LinearLayout>
 
             <LinearLayout
@@ -69,7 +71,9 @@
                     android:layout_width="@dimen/inscription_largeur_champs"
                     android:layout_height="wrap_content"
                     android:hint="@string/indication_prenom"
-                    android:maxLines="1" />
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:maxLength="50" />
             </LinearLayout>
         </TableRow>
 
@@ -91,7 +95,9 @@
                     android:layout_width="@dimen/inscription_largeur_champs"
                     android:layout_height="wrap_content"
                     android:hint="@string/indication_email"
-                    android:maxLines="1" />
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:maxLength="200" />
             </LinearLayout>
 
             <LinearLayout
@@ -110,8 +116,9 @@
                     android:layout_width="@dimen/inscription_largeur_champs"
                     android:layout_height="wrap_content"
                     android:hint="@string/indication_mdp"
+                    android:inputType="textPassword"
                     android:maxLines="1"
-                    android:inputType="textPassword" />
+                    android:maxLength="50" />
             </LinearLayout>
         </TableRow>
 
@@ -134,7 +141,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/indication_adresse"
                     android:enabled="false"
-                    android:maxLines="2" />
+                    android:maxLines="2"
+                    android:maxLength="300" />
             </LinearLayout>
 
             <LinearLayout
@@ -199,7 +207,7 @@
                     android:layout_gravity="center"
                     android:enabled="false"
                     android:text="@string/inscription"
-                    android:textSize="22sp"/>
+                    android:textSize="22sp" />
             </LinearLayout>
         </TableRow>
 

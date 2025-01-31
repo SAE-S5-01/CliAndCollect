@@ -31,11 +31,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_email"
-                android:maxLines="1"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:imeOptions="actionNext"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:maxLength="200" />
 
         </LinearLayout>
 
@@ -57,9 +58,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_mdp"
+                android:inputType="textPassword"
                 android:maxLines="1"
-                android:inputType="textPassword" />
-
+                android:maxLength="50" />
         </LinearLayout>
 
         <LinearLayout

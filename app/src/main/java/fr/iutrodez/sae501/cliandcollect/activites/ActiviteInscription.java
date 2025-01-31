@@ -115,15 +115,6 @@ public class ActiviteInscription extends AppCompatActivity {
     }
 
     /**
-     * Clic sur le bouton "Obtenir les coordonnées".
-     * @param view Le bouton "Obtenir les coordonnées"
-     */
-    public void obtenirCoordonnees(View view) {
-        Intent map = new Intent(ActiviteInscription.this, ActiviteMap.class);
-        lanceurMap.launch(map);
-    }
-
-    /**
      * Récupère les informations saisies par l'utilisateur et les transforme en objet JSON.
      * @return Les informations saisies par l'utilisateur sous forme d'objet JSON.
      */
@@ -146,6 +137,15 @@ public class ActiviteInscription extends AppCompatActivity {
             donnees = null;
         }
         return donnees;
+    }
+
+    /**
+     * Clic sur le bouton "Obtenir les coordonnées".
+     * @param view Le bouton "Obtenir les coordonnées"
+     */
+    public void obtenirCoordonnees(View view) {
+        Intent map = new Intent(ActiviteInscription.this, ActiviteMap.class);
+        lanceurMap.launch(map);
     }
 
     private void retourMap(ActivityResult retourMap) {

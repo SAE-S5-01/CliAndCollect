@@ -16,6 +16,14 @@
 
     <dimen name="carte_marges">16dp</dimen>
 
+    <dimen name="detail_client_largeur_champs">250dp</dimen>
+    <dimen name="detail_client_taille_titres">20sp</dimen>
+    <dimen name="detail_client_taille_texte_boutons">22sp</dimen>
+    <dimen name="detail_client_largeur_boutons">175dp</dimen>
+    <dimen name="detail_client_texte_radios">@dimen/detail_client_taille_titres</dimen>
+    <dimen name="detail_client_marge_radios">10dp</dimen>
+    <dimen name="detail_client_marge_verticale_champs_texte">20dp</dimen>
+
     <dimen name="pied_page_hauteur_min">70dp</dimen>
     <dimen name="pied_page_icone_padding_haut">15dp</dimen>
     <dimen name="pied_page_icone_espace_barre">12dp</dimen>

@@ -288,14 +288,24 @@ public class ClientApi {
 
     public static void modificationClient(Context contexte, JSONObject donnees, String id) {
         HashMap<String,String> parametre = new HashMap<>();
-        parametre.put("id",id);
+        parametre.put("id", id);
+
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_chargement));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
             requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
-                    response -> {} ,
-                    error -> {}
+                response -> {
+                    spineurChargement.dismiss(); },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
             );
         } catch (Exception e) {
-            Log.e("erreur", e.toString());
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
 
@@ -311,9 +321,9 @@ public class ClientApi {
                     String erreurToString = new String(erreur.networkResponse.data, "UTF-8");
                     JSONObject objetErreur = new JSONObject(erreurToString);
 
-                    SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ATTENTION);
+                    SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ERREUR);
                 } catch (Exception e) {
-                    SnackbarCustom.show(contexte, R.string.erreur_inconnue, SnackbarCustom.STYLE_ERREUR);
+                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
                     throw new RuntimeException(e);
                 }
             });
@@ -346,7 +356,7 @@ public class ClientApi {
                     });
                 });
             } catch (Exception e) {
-                SnackbarCustom.show(contexte, R.string.erreur_inconnue, SnackbarCustom.STYLE_ERREUR);
+                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
                 throw new RuntimeException(e);
             }
         } else {
