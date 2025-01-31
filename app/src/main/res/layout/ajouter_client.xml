@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/entreprise"/>
+                android:text="@string/nom_entreprise"/>
 
             <EditText
                 android:id="@+id/nomEntreprise"
@@ -52,13 +52,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/adresse_client" />
+                android:text="@string/adresse_entreprise" />
 
             <EditText
                 android:id="@+id/adresseEntreprise"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/indication_adresse_entreprise" />
+                android:hint="@string/indication_adresse" />
 
             <TextView
                 android:id="@+id/messageErreurAdresse"

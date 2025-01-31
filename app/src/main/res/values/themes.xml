@@ -1,7 +1,13 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Base.Theme.CliAndCollect" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/colorPrimaryDark</item> <!-- Couleur status réseau, app, heure android -->
         <item name="colorPrimary">@color/colorPrimary</item> <!-- Couleur principale de l'application -->
+
+        <!-- Style des boutons globalement -->
+        <item name="buttonStyle">@style/ButtonStyle</item>
+
+        <!-- Style des EditText globalement -->
+        <item name="editTextStyle">@style/EditTextStyle</item>
     </style>
 
     <style name="Theme.CliAndCollect" parent="Base.Theme.CliAndCollect" />

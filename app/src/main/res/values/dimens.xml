@@ -1,8 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="app_marge_interieure">15dp</dimen>
+    <dimen name="texte_defaut">18sp</dimen>
+
+    <dimen name="connexion_largeur_champs">300dp</dimen>
+    <dimen name="connexion_taille_titres">25sp</dimen>
+    <dimen name="connexion_taille_texte_boutons">22sp</dimen>
+    <dimen name="connexion_largeur_boutons">145dp</dimen>
+    <dimen name="connexion_marge_verticale_champs_texte">14dp</dimen>
+    <dimen name="connexion_marge_verticale_autre">20dp</dimen>
+
+    <dimen name="inscription_largeur_champs">160dp</dimen>
+    <dimen name="inscription_taille_titres">20sp</dimen>
+    <dimen name="inscription_marge_verticale_champs_texte">14dp</dimen>
 
     <dimen name="carte_marges">16dp</dimen>
+
+    <dimen name="detail_client_largeur_champs">160dp</dimen>
+    <dimen name="detail_client_taille_titres">20sp</dimen>
+    <dimen name="detail_client_taille_texte_boutons">22sp</dimen>
+    <dimen name="detail_client_largeur_boutons">145dp</dimen>
+    <dimen name="detail_client_texte_radios">14sp</dimen>
+    <dimen name="detail_client_marge_radios">0dp</dimen>
+    <dimen name="detail_client_marge_verticale_champs_texte">14dp</dimen>
 
     <dimen name="pied_page_hauteur_min">60dp</dimen>
     <dimen name="pied_page_icone_padding_haut">12dp</dimen>

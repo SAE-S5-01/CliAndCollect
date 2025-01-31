@@ -13,81 +13,107 @@
         android:layout_gravity="center"
         android:orientation="vertical">
 
-        <TableLayout
-            android:layout_width="350dp"
+        <LinearLayout
+            android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:paddingVertical="16dp">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/labelMail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/mail"
-                android:textSize="25sp" />
+                android:textSize="@dimen/connexion_taille_titres" />
 
             <EditText
                 android:id="@+id/saisieMail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_email"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailAddress"
                 android:maxLines="1"
-                android:inputType="textEmailAddress" />
+                android:maxLength="200" />
 
-        </TableLayout>
+        </LinearLayout>
 
-        <TableLayout
-            android:layout_width="350dp"
+        <LinearLayout
+            android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:paddingVertical="16dp">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/labelMdp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:text="@string/mdp"
-                android:textSize="25sp" />
+                android:textSize="@dimen/connexion_taille_titres" />
 
             <EditText
                 android:id="@+id/saisieMdp"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_mdp"
+                android:inputType="textPassword"
                 android:maxLines="1"
-                android:inputType="textPassword" />
-
-        </TableLayout>
+                android:maxLength="50" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingVertical="16dp">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_autre">
 
             <CheckBox
                 android:id="@+id/seRappelerDeMoi"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:scaleX="1.2"
+                android:scaleY="1.2"
+                android:layout_gravity="center" />
             <TextView
                 android:id="@+id/labelRememberMe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/se_souvenir" />
+                android:layout_gravity="center"
+                android:text="@string/se_souvenir"
+                android:textSize="20sp" />
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/boutonConnexion"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:text="@string/connexion"
-            android:textSize="25sp" />
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_autre"
+            android:gravity="center">
 
-        <Button
-            android:id="@+id/boutonInscription"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="@string/inscription"
-            android:textSize="25sp"
-            android:layout_marginTop="16dp" />
+            <Button
+                android:id="@+id/boutonConnexion"
+                android:layout_width="@dimen/connexion_largeur_boutons"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="@string/connexion"
+                android:textSize="@dimen/connexion_taille_texte_boutons" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/boutonInscription"
+                android:layout_width="@dimen/connexion_largeur_boutons"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:backgroundTint="@color/bouton_secondaire"
+                android:text="@string/inscription"
+                android:textSize="@dimen/connexion_taille_texte_boutons" />
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -287,65 +288,25 @@ public class ClientApi {
 
     public static void modificationClient(Context contexte, JSONObject donnees, String id) {
         HashMap<String,String> parametre = new HashMap<>();
-        parametre.put("id",id);
+        parametre.put("id", id);
+
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_chargement));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
             requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
-                    response -> {} ,
-                    error -> {}
+                response -> {
+                    spineurChargement.dismiss(); },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
             );
         } catch (Exception e) {
-            Log.e("erreur", e.toString());
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
-    }
-
-
-
-    public static void verifierAdresse(String adresse, double[] viewbox , Context contexte,
-                                       VolleyCallback callback) throws UnsupportedEncodingException {
-        String urlApi = "https://nominatim.openstreetmap.org/search?q="
-            + URLEncoder.encode(adresse, "UTF-8")
-            + "&countrycodes=fr&viewbox=" + viewbox[0] + "," + viewbox[1] + "," + viewbox[2] + "," + viewbox[3]
-            + "&bounded=1&format=json&addressdetails=1";
-        JsonArrayRequest requete = new JsonArrayRequest(
-            Request.Method.GET,
-            urlApi,
-            null,
-            response -> {
-                try {
-                    // Liste pour stocker les résultats
-                    List<Map<String , String>> results = new ArrayList<>();
-
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject jsonObject = response.getJSONObject(i);
-
-                        Map<String, String> locationInfo = new HashMap<>();
-                        locationInfo.put("display_name", jsonObject.getString("display_name"));
-                        locationInfo.put("lat", jsonObject.getString("lat"));
-                        locationInfo.put("lon", jsonObject.getString("lon"));
-                        results.add(locationInfo);
-                    }
-                    // Retourner les résultats via le callback
-                    callback.onSuccess(results);
-                } catch (JSONException e) {
-                    // Gérer l'exception JSON
-                    callback.onError("error catch : " + e.toString());
-                }
-            },
-            error -> {
-                // Retourner l'erreur via le callback
-                callback.onError(error.toString());
-            }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("User-Agent", "cliAndCollect/1.0");
-                return headers;
-            }
-        };
-
-        // Ajouter la requête à la file d'attente
-        RequeteVolley.getInstance(contexte).ajoutFileRequete(requete);
     }
 
     /**
@@ -360,9 +321,9 @@ public class ClientApi {
                     String erreurToString = new String(erreur.networkResponse.data, "UTF-8");
                     JSONObject objetErreur = new JSONObject(erreurToString);
 
-                    SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ATTENTION);
+                    SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ERREUR);
                 } catch (Exception e) {
-                    SnackbarCustom.show(contexte, R.string.erreur_inconnue, SnackbarCustom.STYLE_ERREUR);
+                    Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
                     throw new RuntimeException(e);
                 }
             });
@@ -388,14 +349,14 @@ public class ClientApi {
 
                 ((ActiviteInscription) contexte).runOnUiThread(() -> {
                     afficherErreursInscription((ActiviteInscription) contexte, erreurs, new int[] {
-                        R.id.messageErreurMail, R.id.messageErreurMdp, R.id.messageErreurNom,
-                        R.id.messageErreurPrenom, R.id.messageErreurAdresse
+                        R.id.saisieMail, R.id.saisieMdp, R.id.saisieNom,
+                        R.id.saisiePrenom, R.id.saisieAdresse
                     }, new String[] {
                         "mail", "motDePasse", "nom", "prenom", "adresse"
                     });
                 });
             } catch (Exception e) {
-                SnackbarCustom.show(contexte, R.string.erreur_inconnue, SnackbarCustom.STYLE_ERREUR);
+                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
                 throw new RuntimeException(e);
             }
         } else {
@@ -416,13 +377,9 @@ public class ClientApi {
                                                    int[] idChampsTextuels, String [] cleChampsTextuels) {
         for (int i = 0; i < idChampsTextuels.length; i++) {
             try {
-                TextView messageErreur = activite.findViewById(idChampsTextuels[i]);
+                EditText champ = activite.findViewById(idChampsTextuels[i]);
                 if (erreurs.has(cleChampsTextuels[i])) {
-                    messageErreur.setText(erreurs.getString(cleChampsTextuels[i]));
-                    messageErreur.setVisibility(View.VISIBLE);
-                } else {
-                    messageErreur.setText("");
-                    messageErreur.setVisibility(View.GONE);
+                    champ.setError(erreurs.getString(cleChampsTextuels[i]));
                 }
             } catch (JSONException e) {
             }
