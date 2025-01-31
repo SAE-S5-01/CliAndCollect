@@ -13,7 +13,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:background">@drawable/boutons_custom</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/boutons_couleurs</item>
         <item name="android:textSize">@dimen/texte_defaut</item>
         <item name="android:padding">10dp</item>
         <item name="android:gravity">center</item>
@@ -21,7 +21,7 @@
 
     <style name="EditTextStyle">
         <item name="android:background">@drawable/champ_textuel_custom</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/champs_textuels_couleurs</item>
         <item name="android:textColorHint">@color/dark_grey</item>
         <item name="android:textSize">@dimen/texte_defaut</item>
         <item name="android:hint">Entrez votre texte</item>

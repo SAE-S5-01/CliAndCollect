@@ -13,10 +13,11 @@
         android:layout_gravity="center"
         android:orientation="vertical">
 
-        <TableLayout
+        <LinearLayout
             android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/labelMail"
@@ -30,18 +31,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_email"
-                android:maxLines="1"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:imeOptions="actionNext"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:maxLength="200" />
 
-        </TableLayout>
+        </LinearLayout>
 
-        <TableLayout
+        <LinearLayout
             android:layout_width="@dimen/connexion_largeur_champs"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte">
+            android:layout_marginVertical="@dimen/connexion_marge_verticale_champs_texte"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/labelMdp"
@@ -55,10 +58,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_mdp"
+                android:inputType="textPassword"
                 android:maxLines="1"
-                android:inputType="textPassword" />
-
-        </TableLayout>
+                android:maxLength="50" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
