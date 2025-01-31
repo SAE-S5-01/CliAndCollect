@@ -7,6 +7,7 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,7 +69,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         setContentView(R.layout.detail_client);
         nomEntreprise = findViewById(R.id.saisieNom);
         saisieAdresse = findViewById(R.id.saisieAdresse);
-        description = findViewById(R.id.Description);
+        description = findViewById(R.id.description);
         prenomContact = findViewById(R.id.prenomContact);
         nomContact = findViewById(R.id.nomContact);
         clientProspect = findViewById(R.id.clientProspect);
@@ -122,29 +123,30 @@ public class ActiviteDetailClient extends AppCompatActivity {
     public void valider(View view) {
         intentionRetour.putExtra("ID", id);
         if (isModifie()) {
-            client.setEntreprise(nomEntreprise.getText().toString());
-            client.setDescription(description.getText().toString());
-            client.setAdresse(saisieAdresse.getText().toString());
-            client.setX(longitude);
-            client.setY(latitude);
-            client.setNomContact(nomContact.getText().toString());
-            client.setPrenomContact(prenomContact.getText().toString());
-            client.setTelephone(telephone.getText().toString());
-            client.setClientPropspect(isClient);
-
-            JSONObject donnees = formulaireEnJson();
-
-            if (Reseau.reseauDisponible(this,true)) {
-                ClientApi.modificationClient(this, donnees, client.getID().toString());
-                setResult(AppCompatActivity.RESULT_OK, intentionRetour);
-                finish();
+            if (nomEntreprise.getText().toString().isEmpty()) {
+                this.nomEntreprise.setError(getString(R.string.erreur_nom_entreprise_non_renseigne));
+            } else {
+                JSONObject donnees = formulaireEnJson();
+                if (Reseau.reseauDisponible(ActiviteDetailClient.this, true)
+                    && donnees != null) {
+                    ClientApi.modificationClient(this, donnees, client.getID().toString());
+                    client.setEntreprise(nomEntreprise.getText().toString());
+                    client.setDescription(description.getText().toString());
+                    client.setAdresse(saisieAdresse.getText().toString());
+                    client.setX(longitude);
+                    client.setY(latitude);
+                    client.setNomContact(nomContact.getText().toString());
+                    client.setPrenomContact(prenomContact.getText().toString());
+                    client.setTelephone(telephone.getText().toString());
+                    client.setClientPropspect(isClient);
+                    setResult(AppCompatActivity.RESULT_OK, intentionRetour);
+                    finish();
+                }
             }
         } else {
             SnackbarCustom.show(this, R.string.pasModifie, SnackbarCustom.STYLE_ATTENTION);
         }
     }
-
-
 
     private JSONObject formulaireEnJson() {
         JSONObject donnees = new JSONObject();
@@ -208,7 +210,6 @@ public class ActiviteDetailClient extends AppCompatActivity {
             latitude = retour.getDoubleExtra("latitude", Double.NaN);
             longitude = retour.getDoubleExtra("longitude", Double.NaN);
             saisieAdresse.setText(retour.getStringExtra("adresse"));
-
         }
     }
 }

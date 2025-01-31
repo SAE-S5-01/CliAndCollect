@@ -19,7 +19,7 @@
                 android:orientation="vertical"
                 android:gravity="center">
                 <TextView
-                    android:id="@+id/textViewDetailClient"
+                    android:id="@+id/titreDetailClient"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_span="2"
@@ -63,7 +63,7 @@
                     android:text="@string/description"
                     android:textSize="@dimen/detail_client_taille_titres" />
                 <EditText
-                    android:id="@+id/Description"
+                    android:id="@+id/description"
                     android:layout_width="@dimen/detail_client_largeur_champs"
                     android:hint="@string/indication_description"
                     android:inputType="textMultiLine"

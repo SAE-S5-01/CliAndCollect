@@ -238,51 +238,54 @@ public class ClientApi {
 
     public static void getListeClient(Context contexte , Runnable callback) {
         requeteApi(contexte, Request.Method.GET, "/contact", null, null,
-                response -> {
-                    try {
-                        JSONArray jsonReponse = new JSONArray(response);
+            response -> {
+                try {
+                    JSONArray jsonReponse = new JSONArray(response);
 
-                        for (int i = 0; i < jsonReponse.length(); i++) {
-                            JSONObject jsonClient = jsonReponse.getJSONObject(i);
-                            Client client = new Client(jsonClient);
-                            SingletonListeClient.getInstance().ajouterClient(client);
-                        }
-                        callback.run();
-                    } catch (Exception e) {
-                        Log.e("getListeClient", "Erreur lors du traitement de la réponse", e);
+                    for (int i = 0; i < jsonReponse.length(); i++) {
+                        JSONObject jsonClient = jsonReponse.getJSONObject(i);
+                        Client client = new Client(jsonClient);
+                        SingletonListeClient.getInstance().ajouterClient(client);
                     }
-                },
-                error -> {
-                    Log.e("getListeClient", "Erreur reçue", error);
-                    gestionErreur(contexte, error);
+                    callback.run();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
+            },
+            error -> {
+                gestionErreur(contexte, error);
+            }
         );
     }
 
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.attente_inscription));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
-            requeteApi(contexte, Request.Method.POST, "/contact", null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/contact", null, donnees,
                 response -> {
                     try {
+                        spineurChargement.dismiss();
+
                         // En cas de succès, on ajoute le client au singleton pour faire l'affichage
                         JSONObject jsonReponse = new JSONObject(response);
                         ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
                         Client clientCree = new Client(jsonReponse);
                         SingletonListeClient.getInstance().ajouterClient(clientCree);
                     } catch (Exception e) {
-                        // TODO gestion erreur
-                        Log.e("erreur", e.toString());
-                        //throw new RuntimeException(e);
+                        throw new RuntimeException(e);
                     }
                 } ,
                 error -> {
-                // TODO gestion erreur api
-                    //gestionErreur(contexte, error);
-                    Log.e("erreur", error.toString());
+                    spineurChargement.dismiss();
+                    gestionErreurClient(contexte, error);
                 }
             );
         } catch (Exception e) {
-            Log.e("erreur", e.toString());
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
 
@@ -375,6 +378,58 @@ public class ClientApi {
      */
     private static void afficherErreursInscription(ActiviteInscription activite, JSONObject erreurs,
                                                    int[] idChampsTextuels, String [] cleChampsTextuels) {
+        for (int i = 0; i < idChampsTextuels.length; i++) {
+            try {
+                EditText champ = activite.findViewById(idChampsTextuels[i]);
+                if (erreurs.has(cleChampsTextuels[i])) {
+                    champ.setError(erreurs.getString(cleChampsTextuels[i]));
+                }
+            } catch (JSONException e) {
+            }
+        }
+    }
+
+    /**
+     * Méthode permettant de gérer les erreurs lors de la création d'un client.
+     * @param contexte Le contexte de l'application
+     * @param erreur L'erreur retournée par l'API
+     */
+    private static void gestionErreurClient(Context contexte, VolleyError erreur) {
+        if (erreur.networkResponse != null && erreur.networkResponse.data != null) {
+            try {
+                String responseBody = new String(erreur.networkResponse.data, "UTF-8");
+
+                JSONObject jsonResponse = new JSONObject(responseBody);
+                JSONObject erreurs = jsonResponse.getJSONObject("erreur");
+
+                ((ActiviteCreationClient) contexte).runOnUiThread(() -> {
+                    afficherErreursClient((ActiviteCreationClient) contexte, erreurs, new int[] {
+                        R.id.saisieNom, R.id.description, R.id.saisieAdresse,
+                        R.id.prenomContact, R.id.nomContact, R.id.telephone
+                    }, new String[] {
+                        "entreprise", "description", "adresse", "prenom", "nom", "telephone"
+                    });
+                });
+            } catch (Exception e) {
+                Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
+                throw new RuntimeException(e);
+            }
+        } else {
+            ((ActiviteCreationClient) contexte).runOnUiThread(() -> {
+                SnackbarCustom.show(contexte, R.string.api_injoignable, SnackbarCustom.STYLE_ERREUR);
+            });
+        }
+    }
+
+    /**
+     * Afficher les erreurs lors de la création d'un client.
+     * @param activite L'activité de création d'un client
+     * @param erreurs Les erreurs retournées par l'API
+     * @param idChampsTextuels Les identifiants des inputs des champs textuels
+     * @param cleChampsTextuels Les clés de réponse de l'API des champs textuels
+     */
+    private static void afficherErreursClient(ActiviteCreationClient activite, JSONObject erreurs,
+                                              int[] idChampsTextuels, String [] cleChampsTextuels) {
         for (int i = 0; i < idChampsTextuels.length; i++) {
             try {
                 EditText champ = activite.findViewById(idChampsTextuels[i]);
