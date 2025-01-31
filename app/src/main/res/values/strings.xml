@@ -25,7 +25,8 @@
     <string name="attente_reseau">Vérification en cours du réseau ...</string>
     <string name="attente_connexion">Connexion en cours ...</string>
     <string name="attente_inscription">Inscription en cours ...</string>
-    <string name="attente_chargement">Modification(s) en cours ...</string>
+    <string name="chargement_modification">Modification(s) en cours ...</string>
+    <string name="chargement_suppression">Suppression en cours ...</string>
     <string name="inscription_reussie">Inscription réussie, bienvenue !</string>
     <string name="menu_deconnecter">Se déconnecter</string>
     <string name="menu_compte">Gérer mon compte</string>
@@ -55,6 +56,7 @@
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
     <string name="pasModifie">Aucune information n\'a été modifiée</string>
+    <string name="erreur_aucun_client">Aucun client ou prospect n\'a été ajouté</string>
     <string name="erreur_creation_client">Erreur lors de la création d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_modification_client">Erreur lors de l\'édition d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_recuperation_clients">Aucune connexion internet, impossible de récupérer les clients</string>

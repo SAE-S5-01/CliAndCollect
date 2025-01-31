@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +34,7 @@ import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Gestion du fragment Clients.
+ *
  * @author Loïc FAUGIERES
  */
 public class FragmentClients extends Fragment implements View.OnClickListener {
@@ -103,13 +104,16 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
         listeClients.setLayoutManager(gestionnaireLineaire);
 
-        adapter = new ClientAdapter(clients,this::onDetailClientClick);
+        adapter = new ClientAdapter(clients,this::onDetailClientClick, this::supprimerClient);
         listeClients.setHasFixedSize(true);
         listeClients.setAdapter(adapter);
 
         return vueDuFragment;
     }
 
+    /**
+     * Lorsque le fragment est affiché, récupérer les clients si la liste est vide.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -141,24 +145,37 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         for (Client client : SingletonListeClient.getListeClient()) {
             clients.add(client);
         }
+        mettreAJourTexteErreur();
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Met à jour le texte d'erreur si aucun client n'est présent.
+     */
+    private void mettreAJourTexteErreur() {
+        this.getView().findViewById(R.id.erreurPasDeClient)
+                      .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Méthode invoquée lors du clic sur le bouton d'ajout de client.
+     * @param v La vue du bouton d'ajout de client
+     */
     @Override
     public void onClick(View v) {
-        if (Reseau.reseauDisponible(this.getContext())) {
+        if (Reseau.reseauDisponible(this.getContext(), true)) {
             lanceurCreation.launch(creationClient);
-        } else {
-            SnackbarCustom.show(this.getContext(), R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
         }
     }
 
+    /**
+     * Méthode invoquée lors du clic sur la carte d'un client / prospect
+     * @param i L'identifiant du client / prospect
+     */
     public void onDetailClientClick(int i) {
-        if (Reseau.reseauDisponible(this.getContext())) {
+        if (Reseau.reseauDisponible(this.getContext(), true)) {
             detailClient.putExtra("ID", i);
             lanceurDetails.launch(detailClient);
-        } else {
-            SnackbarCustom.show(this.getContext(), R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
         }
     }
 
@@ -171,6 +188,35 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
             clients.add(id,client);
             listeClients.setAdapter(adapter);
         }
+    }
+
+    /**
+     * Supprime un client de la liste des clients
+     * @param position La position du client à supprimer
+     */
+    private void supprimerClient(int position) {
+        new AlertDialog.Builder(getContext())
+            .setTitle("Supprimer ce client ?")
+            .setMessage("Êtes-vous sûr de vouloir supprimer ce client ?")
+            .setPositiveButton("Oui", (dialog, which) -> {
+                if (Reseau.reseauDisponible(this.getContext(), true)) {
+                    ClientApi.supprimerClient(this.getContext(),
+                        clients.get(position).getID().toString(),
+                        () -> {
+                            Client clientASupprimer = clients.get(position);
+                            SingletonListeClient.supprimerClient(clientASupprimer);
+                            clients.remove(position);
+
+                            adapter.notifyItemRemoved(position);
+                            adapter.notifyItemRangeChanged(position, clients.size());
+
+                            mettreAJourTexteErreur();
+                        });
+
+                }
+            })
+            .setNegativeButton("Non", null)
+            .show();
     }
 
 }

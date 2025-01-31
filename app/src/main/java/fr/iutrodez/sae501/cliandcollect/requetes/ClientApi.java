@@ -5,9 +5,12 @@
 
 package fr.iutrodez.sae501.cliandcollect.requetes;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -37,6 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
@@ -86,7 +90,7 @@ public class ClientApi {
         headers.put("Content-Type", "application/json");
         String token = Preferences.getTokenApi(contexte);
         if (!token.isEmpty() && !(route.equals("/utilisateur/connexion")
-            || route.equals("/utilisateur/inscription"))) {
+                || route.equals("/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
         }
         return headers;
@@ -158,7 +162,7 @@ public class ClientApi {
      * @param mdp Le mot de passe de l'utilisateur
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
-    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie) {
+    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie, Runnable connexionEchouee) {
         Map<String, String> parametre = new HashMap<>();
 
         parametre.put("mail", mail);
@@ -191,6 +195,9 @@ public class ClientApi {
                 },
                 error -> {
                     spineurChargement.dismiss();
+                    if (connexionEchouee != null) {
+                        connexionEchouee.run();
+                    }
                     gestionErreur(contexte, error);
                 }
             );
@@ -247,6 +254,7 @@ public class ClientApi {
                         Client client = new Client(jsonClient);
                         SingletonListeClient.getInstance().ajouterClient(client);
                     }
+
                     callback.run();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -294,14 +302,37 @@ public class ClientApi {
         parametre.put("id", id);
 
         spineurChargement = new ProgressDialog(contexte);
-        spineurChargement.setMessage(contexte.getString(R.string.attente_chargement));
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_modification));
         spineurChargement.setCancelable(false);
         spineurChargement.show();
 
         try {
-            requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
+            requeteApi(contexte, Request.Method.PUT, "/contact", parametre, donnees,
                 response -> {
-                    spineurChargement.dismiss(); },
+                    spineurChargement.dismiss();
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    public static void supprimerClient(Context contexte, String id, Runnable suppressionReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_suppression));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.DELETE, "/contact/" + id, null, null,
+                response -> {
+                    spineurChargement.dismiss();
+                    ((Activity) contexte).runOnUiThread(suppressionReussie);
+                },
                 error -> {
                     spineurChargement.dismiss();
                     gestionErreur(contexte, error);
