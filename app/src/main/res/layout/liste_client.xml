@@ -4,50 +4,27 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
     <LinearLayout
-        android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/bouton_secondaire"
         android:padding="10dp">
 
-        <TableRow
+        <TextView
+            android:id="@+id/entreprise"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:text="@string/nom_entreprise_liste"
-                android:textSize="@dimen/texte_defaut"
-                android:textColor="@color/dark_blue" />
-            <TextView
-                android:id="@+id/entreprise"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/texte_defaut"
-                android:textColor="@color/black" />
-        </TableRow>
-
-        <TableRow
+            android:layout_margin="@dimen/liste_client_marge_texte"
+            android:textSize="@dimen/texte_defaut"
+            android:textColor="@color/dark_blue"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/adresse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:text="@string/adresse_entreprise_liste"
-                android:textSize="@dimen/texte_defaut"
-                android:textColor="@color/dark_blue" />
-            <TextView
-                android:id="@+id/adresse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/texte_defaut"
-                android:textColor="@color/black" />
-        </TableRow>
+            android:layout_margin="@dimen/liste_client_marge_texte"
+            android:textSize="@dimen/texte_defaut"
+            android:textColor="@color/black" />
 
     </LinearLayout>
 
