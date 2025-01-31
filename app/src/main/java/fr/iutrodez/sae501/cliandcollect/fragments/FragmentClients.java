@@ -12,8 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -40,7 +38,7 @@ import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
  */
 public class FragmentClients extends Fragment implements View.OnClickListener {
 
-    private Intent intent;
+    private Intent creationClient;
 
     private Intent detailClient;
 
@@ -53,6 +51,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     private ArrayList<Client> clients;
 
     private ClientAdapter adapter;
+
     /**
      * @return Une nouvelle instance de FragmentClients.
      */
@@ -91,74 +90,86 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_clients, container, false);
         vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
+
         detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
 
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
         clients = new ArrayList<>();
 
-        if (Reseau.reseauDisponible(this.getContext())) {
-            ClientApi.getListeClient(this.getContext(), () -> {
-                for (Client client : SingletonListeClient.getListeClient()) {
-                    clients.add(client);
-                }
-                adapter.notifyDataSetChanged();
-            });
+        creationClient = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
+        lanceurCreation = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::mettreAJourListeClients);
+        lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getModifClient);
 
-            LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
-            listeClients.setLayoutManager(gestionnaireLineaire);
+        LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
+        listeClients.setLayoutManager(gestionnaireLineaire);
 
-            adapter = new ClientAdapter(clients,this::onDetailClientClick);
-            listeClients.setHasFixedSize(true);
-            listeClients.setAdapter(adapter);
+        adapter = new ClientAdapter(clients,this::onDetailClientClick);
+        listeClients.setHasFixedSize(true);
+        listeClients.setAdapter(adapter);
 
-            intent = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
-            lanceurCreation = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
-            lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getModifClient);
-        // TODO : else : afficher un message d'erreur + personnalisé
-        } else {
-            SnackbarCustom.show(this.getContext(), R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
-        }
         return vueDuFragment;
-    }
-
-    public void onDetailClientClick(int i){
-        detailClient.putExtra("ID", i);
-        lanceurDetails.launch(detailClient);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // TODO : Appeler l'API pour récupérer la liste des clients
-        if (Reseau.reseauDisponible(this.getContext(), true) && clients.isEmpty()) {
-            Log.i("client fragment" , "reseau dispo et liste client vide call api requis");
+
+        if (clients.isEmpty()) {
+            recupererClients();
         }
+    }
+
+    /**
+     * Récupère la liste des clients depuis l'API et la met à jour localement.
+     */
+    private void recupererClients() {
+        if (Reseau.reseauDisponible(this.getContext())) {
+            ClientApi.getListeClient(this.getContext(), () -> {
+                mettreAJourListeClients(null);
+            });
+        } else {
+            SnackbarCustom.show(this.getContext(), R.string.erreur_recuperation_clients, SnackbarCustom.STYLE_ERREUR);
+        }
+    }
+
+    /**
+     * Met à jour la liste des clients de la vue.
+     * @param resultat Le résultat de l'activité de création de client
+     */
+    private void mettreAJourListeClients(ActivityResult resultat) {
+        clients.clear();
+        for (Client client : SingletonListeClient.getListeClient()) {
+            clients.add(client);
+        }
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClick(View v) {
-        lanceurCreation.launch(intent);
+        if (Reseau.reseauDisponible(this.getContext())) {
+            lanceurCreation.launch(creationClient);
+        } else {
+            SnackbarCustom.show(this.getContext(), R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
+        }
     }
 
-    private void getNouveauClient(ActivityResult resultat) {
-        if(resultat.getResultCode() == Activity.RESULT_OK){
-            clients.clear();
-            for ( Client client : SingletonListeClient.getListeClient()) {
-                clients.add(client);
-            }
-
-            adapter.notifyDataSetChanged();
+    public void onDetailClientClick(int i) {
+        if (Reseau.reseauDisponible(this.getContext())) {
+            detailClient.putExtra("ID", i);
+            lanceurDetails.launch(detailClient);
+        } else {
+            SnackbarCustom.show(this.getContext(), R.string.erreur_reseau, SnackbarCustom.STYLE_ERREUR);
         }
     }
 
     private void getModifClient(ActivityResult resultat) {
         Intent retourFille = resultat.getData();
-        if(resultat.getResultCode() == Activity.RESULT_OK){
+        if (resultat.getResultCode() == Activity.RESULT_OK) {
             int id = retourFille.getIntExtra("ID",0);
-           Client client = SingletonListeClient.getClient(id);
-           clients.remove(id);
-           clients.add(id,client);
-           listeClients.setAdapter(adapter);
+            Client client = SingletonListeClient.getClient(id);
+            clients.remove(id);
+            clients.add(id,client);
+            listeClients.setAdapter(adapter);
         }
     }
 

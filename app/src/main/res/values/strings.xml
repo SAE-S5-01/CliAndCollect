@@ -36,6 +36,7 @@
     <string name="detail_client">Détails du client / prospect</string>
     <string name="nom_entreprise">Nom de l\'entreprise</string>
     <string name="nom_entreprise_liste">Nom de l\'entreprise :</string>
+    <string name="erreur_nom_entreprise_non_renseigne">Nom de l\'entreprise non renseigné</string>
     <string name="adresse_entreprise">Adresse de l\'entreprise</string>
     <string name="adresse_entreprise_liste">Adresse de l\'entreprise :</string>
     <string name="description">Description</string>
@@ -54,7 +55,9 @@
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
     <string name="pasModifie">Aucune information n\'a été modifiée</string>
+    <string name="erreur_creation_client">Erreur lors de la création d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_modification_client">Erreur lors de l\'édition d\'un client \/ prospect, veuillez réessayer plus tard</string>
+    <string name="erreur_recuperation_clients">Aucune connexion internet, impossible de récupérer les clients</string>
 
     <string name="marqueur_confirmation">Oui</string>
     <string name="marqueur_annulation">Non</string>
