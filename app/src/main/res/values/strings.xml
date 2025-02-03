@@ -34,8 +34,6 @@
 
 
     <string name="valider">Valider</string>
-    <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
-
     <string name="retour">Retour</string>
 
     <string name="ajouter_client">Ajouter un client / prospect</string>

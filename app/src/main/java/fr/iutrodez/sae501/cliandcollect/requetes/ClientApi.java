@@ -313,6 +313,21 @@ public class ClientApi {
         }
     }
 
+    public static void calculerItineraire(JSONObject donnees, Context contexte, Runnable callback) {
+        try {
+            requeteApi(contexte , Request.Method.POST , "/itineraire/calculer" , null , donnees,
+                    response -> { Log.i("itineraire calculé : ", response); callback.run(); } ,
+                    error -> {
+                        // TODO gestion erreur api
+                        //gestionErreur(contexte, error);
+                        Log.e("erreur", error.toString());
+                    }
+            );
+        } catch (Exception e) {
+            Log.e("erreur", e.toString());
+        }
+    }
+
     //public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
     //    try {
     //        requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,

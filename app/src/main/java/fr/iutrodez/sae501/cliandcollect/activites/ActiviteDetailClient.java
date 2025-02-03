@@ -84,7 +84,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         boutonValider.setOnClickListener(this::valider);
 
         id = intention.getIntExtra("ID", 0);
-        initialiserChamps();
+        initialiser();
 
         intentionRetour = new Intent();
 

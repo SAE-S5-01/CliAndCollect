@@ -139,7 +139,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void mettreAJourListeClients(ActivityResult resultat) {
         clients.clear();
-        for (Client client : SingletonListeClient.getListeClient()) {
+        for (Client client : SingletonListeClient.getInstance().getListeClient()) {
             clients.add(client);
         }
         adapter.notifyDataSetChanged();
