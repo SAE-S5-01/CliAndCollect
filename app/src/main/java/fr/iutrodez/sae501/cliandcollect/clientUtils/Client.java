@@ -1,6 +1,5 @@
 package fr.iutrodez.sae501.cliandcollect.clientUtils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Client {
@@ -11,8 +10,10 @@ public class Client {
 
     private String description;
 
+    /** Longitude */
     private double x;
 
+    /** Latitude */
     private double y;
 
     private String nomContact;
@@ -23,7 +24,7 @@ public class Client {
 
     private Long ID;
 
-    private boolean clientPropspect;
+    private boolean estProspect;
 
     /**
      * Constructeur permettant d'instancier un ob
@@ -40,7 +41,7 @@ public class Client {
         this.adresse = clientFromApi.optString("adresse");
         this.x = clientFromApi.optDouble("longitude");
         this.y = clientFromApi.optDouble("latitude");
-        this.clientPropspect = clientFromApi.optBoolean("prospect");
+        this.estProspect = clientFromApi.optBoolean("prospect");
         this.ID = clientFromApi.optLong("id");
 
         // Valeur optionnelles
@@ -74,20 +75,16 @@ public class Client {
         return telephone;
     }
 
-    public boolean isClient() {
-        return clientPropspect;
-    }
-
-    public double getX() {
-        return x;
+    public boolean isProspect() {
+        return estProspect;
     }
 
     public Long getID(){
         return ID;
     }
 
-    public void setClientPropspect(boolean clientPropspect) {
-        this.clientPropspect = clientPropspect;
+    public void setEstProspect(boolean estProspect) {
+        this.estProspect = estProspect;
     }
 
     public void setTelephone(String telephone) {
@@ -100,10 +97,6 @@ public class Client {
 
     public void setNomContact(String nomContact) {
         this.nomContact = nomContact;
-    }
-
-    public void setX(double x) {
-        this.x = x;
     }
 
     public void setEntreprise(String entreprise) {
@@ -130,4 +123,12 @@ public class Client {
     public String toString() {
         return adresse + " - " + entreprise;
     }
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
 }

@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -87,7 +87,13 @@ public class ActiviteMap extends AppCompatActivity {
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
     }
 
+    /**
+     * Recherche une adresse et la positionne sur la carte.
+     * @param v La vue qui a déclenché l'événement
+     */
     private void rechercherAdresse(View v) {
+        masquerClavier(v);
+
         String adresseRecherchee = vueRecherche.getQuery().toString();
 
         // Crée un objet Geocoder pour convertir l'adresse en coordonnées GPS
@@ -153,4 +159,16 @@ public class ActiviteMap extends AppCompatActivity {
         setResult(RESULT_OK, retourInscription);
         finish();
     }
+
+    /**
+     * Masque le clavier virtuel
+     * @param view La vue qui a déclenché l'événement
+     */
+    private void masquerClavier(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
 }
