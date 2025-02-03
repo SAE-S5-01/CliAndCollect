@@ -29,7 +29,7 @@ public class SingletonListeItineraire {
     }
 
     /**
-     * Ajoute un client à la liste des clients.
+     * Ajoute un itinéraire à la liste des itinéraires.
      * @param itineraire L'itinéraire à ajouter.
      */
     public static void ajouterItineraire(Itineraire itineraire){
@@ -37,9 +37,13 @@ public class SingletonListeItineraire {
     }
 
     /**
-     * Retourne la liste des clients.
+     * Retourne la liste des itinéraires.
      */
     public static List<Itineraire> getListeItineraire(){
         return instance.listeItineraires;
+    }
+
+    public static Itineraire getItineraire(int id){
+        return instance.listeItineraires.get(id);
     }
 }
