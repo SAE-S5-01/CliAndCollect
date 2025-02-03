@@ -22,7 +22,7 @@ public class ItineraireAdapter extends RecyclerView.Adapter<ItineraireHolder>{
     @Override
     public ItineraireHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).
-                inflate(R.layout.liste_client,viewGroup,false);
+                inflate(R.layout.liste_itineraire,viewGroup,false);
         return new ItineraireHolder(view);
     }
 

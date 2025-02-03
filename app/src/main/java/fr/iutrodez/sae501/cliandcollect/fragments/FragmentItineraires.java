@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailItineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
@@ -36,6 +37,7 @@ import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 /**
  * Gestion du fragment Itinéraires.
  * @author Loïc FAUGIERES
+ * @author Simon GUIRAUD
  */
 public class FragmentItineraires extends Fragment implements View.OnClickListener {
 
@@ -87,10 +89,12 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_itineraires, container, false);
-        vueDuFragment.findViewById(R.id.boutonAjoutItineraire).setOnClickListener(this);
+        //vueDuFragment.findViewById(R.id.boutonAjoutItineraire).setOnClickListener(this);
+        detailItineraire = new Intent(FragmentItineraires.this.getContext(), ActiviteDetailItineraire.class);
 
         listeItineraires = vueDuFragment.findViewById(R.id.recycler_view_itineraires);
         itineraires = new ArrayList<>();
+        System.out.println("3");
 
         if (Reseau.reseauDisponible(this.getContext(), false)) {
             ClientApi.getListeItineraire(this.getContext(), () -> {
@@ -108,7 +112,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
             listeItineraires.setAdapter(adapter);
 
             intent = new Intent(FragmentItineraires.this.getContext(), ActiviteCreationItineraire.class);
-            lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
+            lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouvelItineraire);
             // TODO : else : afficher un message d'erreur + personnalisé
         } else {
             Toast.makeText(this.getContext(), R.string.erreur_reseau, Toast.LENGTH_LONG).show();
@@ -124,7 +128,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-        // TODO : Appeler l'API pour récupérer la liste des clients
+        // TODO : Appeler l'API pour récupérer la liste des itinéraires
         if (Reseau.reseauDisponible(this.getContext(), true) && itineraires.isEmpty()) {
             Log.i("itineraire fragment" , "reseau dispo et liste client vide call api requis");
         }
@@ -140,7 +144,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
     }
 
 
-    private void getNouveauClient(ActivityResult resultat) {
+    private void getNouvelItineraire(ActivityResult resultat) {
         if(resultat.getResultCode() == Activity.RESULT_OK){
             itineraires.clear();
             for ( Itineraire itineraire : SingletonListeItineraire.getListeItineraire()) {
