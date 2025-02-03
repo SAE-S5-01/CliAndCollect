@@ -7,7 +7,6 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,7 +51,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
 
     private int id;
 
-    private boolean isClient;
+    private boolean isProspect;
 
     private Client client;
 
@@ -110,7 +109,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         }
 
         clientProspect.setOnCheckedChangeListener((group, checkedId) -> {
-            isClient = checkedId == R.id.client;
+            isProspect = checkedId == R.id.prospect;
             boutonValider.setEnabled(true);
         });
     }
@@ -129,18 +128,20 @@ public class ActiviteDetailClient extends AppCompatActivity {
                 JSONObject donnees = formulaireEnJson();
                 if (Reseau.reseauDisponible(ActiviteDetailClient.this, true)
                     && donnees != null) {
-                    ClientApi.modificationClient(this, donnees, client.getID().toString());
-                    client.setEntreprise(nomEntreprise.getText().toString());
-                    client.setDescription(description.getText().toString());
-                    client.setAdresse(saisieAdresse.getText().toString());
-                    client.setX(longitude);
-                    client.setY(latitude);
-                    client.setNomContact(nomContact.getText().toString());
-                    client.setPrenomContact(prenomContact.getText().toString());
-                    client.setTelephone(telephone.getText().toString());
-                    client.setClientPropspect(isClient);
-                    setResult(AppCompatActivity.RESULT_OK, intentionRetour);
-                    finish();
+                    ClientApi.modificationClient(this, donnees, client.getID().toString(),
+                        () -> {
+                            client.setEntreprise(nomEntreprise.getText().toString());
+                            client.setDescription(description.getText().toString());
+                            client.setAdresse(saisieAdresse.getText().toString());
+                            client.setX(longitude);
+                            client.setY(latitude);
+                            client.setNomContact(nomContact.getText().toString());
+                            client.setPrenomContact(prenomContact.getText().toString());
+                            client.setTelephone(telephone.getText().toString());
+                            client.setEstProspect(isProspect);
+                            setResult(AppCompatActivity.RESULT_OK, intentionRetour);
+                            finish();
+                        });
                 }
             }
         } else {
@@ -159,9 +160,10 @@ public class ActiviteDetailClient extends AppCompatActivity {
             donnees.put("prenomContact", prenomContact.getText().toString());
             donnees.put("nomContact", nomContact.getText().toString());
             donnees.put("prospect", clientProspect.getCheckedRadioButtonId() == R.id.prospect);
+            latitude = latitude != 0.0 ? latitude : client.getY();
             donnees.put("latitude", latitude);
+            longitude = longitude != 0.0 ? longitude : client.getX();
             donnees.put("longitude", longitude);
-
         } catch (Exception e) {
             SnackbarCustom.show(this,
                 e.getMessage().equals("Forbidden numeric value: NaN")
@@ -178,7 +180,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         nomEntreprise.setText(client.getEntreprise());
         saisieAdresse.setText(client.getAdresse());
         description.setText(client.getDescription());
-        clientProspect.check(client.isClient() ? R.id.client : R.id.prospect);
+        clientProspect.check(client.isProspect() ? R.id.prospect : R.id.client);
         prenomContact.setText(client.getPrenomContact());
         nomContact.setText(client.getNomContact());
         telephone.setText(client.getTelephone());
@@ -191,7 +193,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
                 || !prenomContact.getText().toString().equals(client.getPrenomContact())
                 || !nomContact.getText().toString().equals(client.getNomContact())
                 || !telephone.getText().toString().equals(client.getTelephone())
-                || isClient != client.isClient();
+                || isProspect != client.isProspect();
     }
 
     /**

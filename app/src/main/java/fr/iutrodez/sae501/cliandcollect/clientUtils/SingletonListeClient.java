@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class SingletonListeClient {
 
-    private List<Client> listeClient;
+    private static List<Client> listeClients;
 
     private static SingletonListeClient instance;
 
@@ -24,7 +24,7 @@ public class SingletonListeClient {
      * Constructeur privé du singleton
      */
     private SingletonListeClient() {
-        listeClient = new ArrayList<>();
+        this.listeClients = new ArrayList<>();
     }
 
     /**
@@ -42,7 +42,7 @@ public class SingletonListeClient {
      * @param client Le client à ajouter
      */
     public static void ajouterClient(Client client) {
-        getInstance().listeClient.add(client);
+        getInstance().listeClients.add(client);
     }
 
     /**
@@ -50,14 +50,14 @@ public class SingletonListeClient {
      * @param client Le client à supprimer
      */
     public static void supprimerClient(Client client) {
-        getInstance().listeClient.remove(client);
+        getInstance().listeClients.remove(client);
     }
 
     /**
      * @return La liste des clients
      */
     public static List<Client> getListeClient() {
-        return getInstance().listeClient;
+        return getInstance().listeClients;
     }
 
     /**
@@ -66,6 +66,13 @@ public class SingletonListeClient {
      * @return Le client correspondant à l'identifiant
      */
     public static Client getClient(int id) {
-        return getInstance().listeClient.get(id);
+        return getInstance().listeClients.get(id);
+    }
+
+    /**
+     * Vide la liste des clients
+     */
+    public static void viderListeClient() {
+        getInstance().listeClients.clear();
     }
 }

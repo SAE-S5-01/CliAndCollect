@@ -99,12 +99,12 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
         creationClient = new Intent(FragmentClients.this.getContext(), ActiviteCreationClient.class);
         lanceurCreation = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::mettreAJourListeClients);
-        lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getModifClient);
+        lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::gestionModificationClient);
 
         LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
         listeClients.setLayoutManager(gestionnaireLineaire);
 
-        adapter = new ClientAdapter(clients,this::onDetailClientClick, this::supprimerClient);
+        adapter = new ClientAdapter(clients, this::onDetailClientClick, this::supprimerClient);
         listeClients.setHasFixedSize(true);
         listeClients.setAdapter(adapter);
 
@@ -128,33 +128,13 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void recupererClients() {
         if (Reseau.reseauDisponible(this.getContext())) {
-            ClientApi.getListeClient(this.getContext(), () -> {
-                mettreAJourListeClients(null);
-            });
+            ClientApi.getListeClient(this.getContext(),
+                () -> mettreAJourListeClients(null));
         } else {
-            SnackbarCustom.show(this.getContext(), R.string.erreur_recuperation_clients, SnackbarCustom.STYLE_ERREUR);
+            SnackbarCustom.show(this.getContext(),
+                                R.string.erreur_recuperation_clients,
+                                SnackbarCustom.STYLE_ERREUR);
         }
-    }
-
-    /**
-     * Met à jour la liste des clients de la vue.
-     * @param resultat Le résultat de l'activité de création de client
-     */
-    private void mettreAJourListeClients(ActivityResult resultat) {
-        clients.clear();
-        for (Client client : SingletonListeClient.getListeClient()) {
-            clients.add(client);
-        }
-        mettreAJourTexteErreur();
-        adapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Met à jour le texte d'erreur si aucun client n'est présent.
-     */
-    private void mettreAJourTexteErreur() {
-        this.getView().findViewById(R.id.erreurPasDeClient)
-                      .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -179,15 +159,36 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void getModifClient(ActivityResult resultat) {
+    private void gestionModificationClient(ActivityResult resultat) {
         Intent retourFille = resultat.getData();
         if (resultat.getResultCode() == Activity.RESULT_OK) {
             int id = retourFille.getIntExtra("ID",0);
             Client client = SingletonListeClient.getClient(id);
             clients.remove(id);
-            clients.add(id,client);
-            listeClients.setAdapter(adapter);
+            clients.add(id, client);
+            adapter.notifyItemChanged(id);
         }
+    }
+
+    /**
+     * Met à jour la liste des clients de la vue.
+     * @param resultat Le résultat de l'activité de création de client
+     */
+    private void mettreAJourListeClients(ActivityResult resultat) {
+        clients.clear();
+        for (Client client : SingletonListeClient.getListeClient()) {
+            clients.add(client);
+        }
+        mettreAJourTexteErreur();
+        adapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Met à jour le texte d'erreur si aucun client n'est présent.
+     */
+    private void mettreAJourTexteErreur() {
+        this.getView().findViewById(R.id.erreurPasDeClient)
+                .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -196,8 +197,8 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void supprimerClient(int position) {
         new AlertDialog.Builder(getContext())
-            .setTitle("Supprimer ce client ?")
-            .setMessage("Êtes-vous sûr de vouloir supprimer ce client ?")
+            .setTitle(R.string.supprimer_client)
+            .setMessage(R.string.confirmation_suppression_client)
             .setPositiveButton("Oui", (dialog, which) -> {
                 if (Reseau.reseauDisponible(this.getContext(), true)) {
                     ClientApi.supprimerClient(this.getContext(),

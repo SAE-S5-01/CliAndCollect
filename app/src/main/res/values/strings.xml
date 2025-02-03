@@ -68,4 +68,7 @@
     <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayez</string>
     <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
+
+    <string name="supprimer_client">Supprimer un client / prospect</string>
+    <string name="confirmation_suppression_client">"Êtes-vous sûr de vouloir supprimer ce client / prospect ?"</string>
 </resources>

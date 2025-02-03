@@ -79,8 +79,4 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientHolder> {
     public int getItemCount() {
         return clients.size();
     }
-
-    public void add(Client client) {
-        clients.add(client);
-    }
 }
