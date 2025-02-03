@@ -1,6 +1,5 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,6 +15,7 @@ import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Activité de la page de connexion.
@@ -37,14 +37,19 @@ public class ActiviteConnexion extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_connexion);
 
-        if (Reseau.reseauDisponible(this, true)
-            && Preferences.estConnecte(this)) {
+        boolean reseauDispo = Reseau.reseauDisponible(this);
+
+        if (reseauDispo && Preferences.estConnecte(this)) {
             ClientApi.connexion(this,
-                Preferences.getEmail(this),
-                Preferences.getMotDePasse(this),
-                () -> lancerMenuPrincipal()
+                    Preferences.getEmail(this),
+                    Preferences.getMotDePasse(this),
+                    () -> lancerMenuPrincipal()
             );
         } else {
+            if (!reseauDispo) {
+                SnackbarCustom.show(this, R.string.erreur_reseau, SnackbarCustom.STYLE_ATTENTION);
+            }
+
             ImageView boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
             Button boutonConnexion = findViewById(R.id.boutonConnexion);
             Button boutonInscription = findViewById(R.id.boutonInscription);

@@ -14,8 +14,6 @@ import android.net.NetworkCapabilities;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import fr.iutrodez.sae501.cliandcollect.R;
 
 /**
@@ -48,7 +46,7 @@ public class Reseau {
                                            int idMessageErreur) {
         if (!reseauDisponible(contexte)) {
             if (afficherSnackbarSiErreur) {
-                SnackbarCustom.show(contexte, idMessageErreur, SnackbarCustom.STYLE_ATTENTION);
+                SnackbarCustom.show(contexte, idMessageErreur, SnackbarCustom.STYLE_ERREUR);
             }
             return false;
         }
