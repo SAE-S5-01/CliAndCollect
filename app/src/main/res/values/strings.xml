@@ -64,6 +64,7 @@
     <string name="adresseClient">Adresse :</string>
     <string name="nom_itineraire">Nom :</string>
     <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
+    <string name="depart_itinéraire">Départ et arrivé de l\itinéraire : domicile</string>
     <string name="pasModifier">Aucune information n\'a été modifiée</string>
     <string name="ajouter_itineraire">Ajouter un itinéraire</string>*
     <string name="contact_a_ajouter">Veuillez entrer le nom de l\'entreprise du contact</string>
@@ -79,4 +80,5 @@
     <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayez</string>
     <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
+    <string name="erreur_creation_itineraire">Erreur lors de la création de l\'itinéraire</string>
 </resources>

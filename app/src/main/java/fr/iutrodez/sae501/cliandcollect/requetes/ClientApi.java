@@ -9,32 +9,30 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
+import org.osmdroid.util.GeoPoint;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
@@ -313,10 +311,19 @@ public class ClientApi {
         }
     }
 
-    public static void calculerItineraire(JSONObject donnees, Context contexte, Runnable callback) {
+    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<String, GeoPoint>> callback) {
         try {
             requeteApi(contexte , Request.Method.POST , "/itineraire/calculer" , null , donnees,
-                    response -> { Log.i("itineraire calculé : ", response); callback.run(); } ,
+                    response -> {
+                        try {
+                            JSONObject jsonReponse = new JSONObject(response);
+                            LinkedHashMap<String, GeoPoint> point = parseItineraire(jsonReponse);
+                            ((Activity) contexte).runOnUiThread(() -> callback.accept(point));
+
+                        } catch (Exception e) {
+                            Log.e("erreur", e.toString());
+                        }
+ } ,
                     error -> {
                         // TODO gestion erreur api
                         //gestionErreur(contexte, error);
@@ -327,33 +334,57 @@ public class ClientApi {
             Log.e("erreur", e.toString());
         }
     }
+    public static LinkedHashMap<String, GeoPoint> parseItineraire(JSONObject jsonResponse) {
+        LinkedHashMap<String, GeoPoint> waypoints = new LinkedHashMap<>();
 
-    //public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
-    //    try {
-    //        requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
-    //                response -> {
-    //                    try {
-    //                        // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
-    //                        JSONObject jsonReponse = new JSONObject(response);
-    //                        ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
-    //                        Itineraire itineraireCree = new Itineraire(jsonReponse);
-    //                        SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
-    //                    } catch (Exception e) {
-    //                        // TODO gestion erreur
-    //                        Log.e("erreur", e.toString());
-    //                        //throw new RuntimeException(e);
-    //                    }
-    //                } ,
-    //                error -> {
-    //                    // TODO gestion erreur api
-    //                    //gestionErreur(contexte, error);
-    //                    Log.e("erreur", error.toString());
-    //                }
-    //        );
-    //    } catch (Exception e) {
-    //        Log.e("erreur", e.toString());
-    //    }
-    //}
+        try {
+            Iterator<String> keys = jsonResponse.keys();
+
+            while (keys.hasNext()) {
+                String key = keys.next(); // La clé (ex: "33", "69", ...)
+                JSONObject point = jsonResponse.getJSONObject(key);
+
+                double longitude = point.getDouble("x");
+                double latitude = point.getDouble("y");
+
+                waypoints.put(key, new GeoPoint(latitude, longitude));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return waypoints;
+    }
+
+
+    public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
+        try {
+            requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
+                    response -> {
+                        try {
+                            // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
+                            //JSONObject jsonReponse = new JSONObject(response);
+                            //((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
+                            //Itineraire itineraireCree = new Itineraire(jsonReponse);
+                            //SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
+                            Log.i("itineraire", response.toString());
+                        } catch (Exception e) {
+                            // TODO gestion erreur
+                            Log.e("erreur creat client", e.toString());
+                            //throw new RuntimeException(e);
+                        }
+                    } ,
+                    error -> {
+                        // TODO gestion erreur api
+                        //gestionErreur(contexte, error);
+                        Log.e("erreur", error.toString());
+                    }
+            );
+        } catch (Exception e) {
+            Log.e("erreur", e.toString());
+        }
+    }
 
     public static void modificationClient(Context contexte, JSONObject donnees, String id) {
         HashMap<String,String> parametre = new HashMap<>();

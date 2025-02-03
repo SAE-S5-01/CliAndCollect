@@ -67,6 +67,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="@string/depart_itinéraire" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/liste_clients_itineraire" />
 
             <androidx.recyclerview.widget.RecyclerView
