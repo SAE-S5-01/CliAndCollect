@@ -37,6 +37,13 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientHolder> {
         void onLongClick(int festivalId);
     }
 
+
+    public ClientAdapter(List<Client> donnees, OnViewClickListener onViewClickListener) {
+        this.clients = donnees;
+        this.onViewClickListener = onViewClickListener;
+    }
+
+
     /**
      * Constructeur de l'adapter
      * @param donnees La liste des clients
