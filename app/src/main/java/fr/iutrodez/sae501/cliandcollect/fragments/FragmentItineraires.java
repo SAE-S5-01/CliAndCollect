@@ -89,7 +89,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_itineraires, container, false);
-        //vueDuFragment.findViewById(R.id.boutonAjoutItineraire).setOnClickListener(this);
+        vueDuFragment.findViewById(R.id.boutonAjoutItineraire).setOnClickListener(this);
         detailItineraire = new Intent(FragmentItineraires.this.getContext(), ActiviteDetailItineraire.class);
 
         listeItineraires = vueDuFragment.findViewById(R.id.recycler_view_itineraires);
