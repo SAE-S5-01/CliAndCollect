@@ -76,7 +76,7 @@ public class ActiviteCreationClient extends AppCompatActivity {
         boutonValider.setOnClickListener(this::valider);
 
         lanceurMap = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), this::retourMap);
+            new ActivityResultContracts.StartActivityForResult(), this::retourMap);
     }
 
     /**
@@ -97,7 +97,8 @@ public class ActiviteCreationClient extends AppCompatActivity {
             this.nomEntreprise.setError(getString(R.string.erreur_nom_entreprise_non_renseigne));
         } else {
             JSONObject donnees = formulaireEnJson();
-            if (Reseau.reseauDisponible(this, true) && donnees != null) {
+            if (Reseau.reseauDisponible(this, true)
+                && donnees != null) {
                 ClientApi.creationClient(this, donnees, () -> {
                     setResult(AppCompatActivity.RESULT_OK);
                     finish();

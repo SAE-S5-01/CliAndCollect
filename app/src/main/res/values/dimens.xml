@@ -15,6 +15,8 @@
     <dimen name="inscription_marge_verticale_champs_texte">14dp</dimen>
 
     <dimen name="carte_marges">16dp</dimen>
+    <dimen name="liste_client_marge_texte">5dp</dimen>
+    <dimen name="liste_client_marge_haute">16dp</dimen>
 
     <dimen name="detail_client_largeur_champs">160dp</dimen>
     <dimen name="detail_client_taille_titres">20sp</dimen>

@@ -9,30 +9,26 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -86,7 +82,7 @@ public class ClientApi {
         headers.put("Content-Type", "application/json");
         String token = Preferences.getTokenApi(contexte);
         if (!token.isEmpty() && !(route.equals("/utilisateur/connexion")
-            || route.equals("/utilisateur/inscription"))) {
+                || route.equals("/utilisateur/inscription"))) {
             headers.put("Authorization", "Bearer " + token);
         }
         return headers;
@@ -116,9 +112,9 @@ public class ClientApi {
                 try {
                     // Encodage des clés et valeurs des paramètres pour les rendre compatibles avec l'URL
                     urlACompleter.append(URLEncoder.encode(parametre.getKey(), "UTF-8")) // Encode la clé
-                            .append("=")
-                            .append(URLEncoder.encode(parametre.getValue(), "UTF-8")) // Encode la valeur
-                            .append("&"); // Ajoute un '&' pour séparer les paramètres
+                        .append("=")
+                        .append(URLEncoder.encode(parametre.getValue(), "UTF-8")) // Encode la valeur
+                        .append("&"); // Ajoute un '&' pour séparer les paramètres
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -131,7 +127,9 @@ public class ClientApi {
         Request request;
         if (donnees != null) {
             // Utiliser JsonObjectRequest si un body JSON est présent
-            request = new JsonObjectRequest(methode, url, donnees, response -> reussite.onResponse(response.toString()), erreur) {
+            request = new JsonObjectRequest(methode, url, donnees,
+                                            response -> reussite.onResponse(response.toString()),
+                                            erreur) {
                 @Override
                 public Map<String, String> getHeaders() {
                     return genererHeaders(route, contexte);
@@ -150,7 +148,6 @@ public class ClientApi {
         RequeteVolley.getInstance(contexte).ajoutFileRequete(request);
     }
 
-
     /**
      * Méthode permettant de se connecter à l'API.
      * @param contexte Le contexte de l'application
@@ -158,7 +155,7 @@ public class ClientApi {
      * @param mdp Le mot de passe de l'utilisateur
      * @param connexionReussie La méthode à appeler en cas de connexion réussie
      */
-    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie) {
+    public static void connexion(Context contexte, String mail, String mdp, Runnable connexionReussie, Runnable connexionEchouee) {
         Map<String, String> parametre = new HashMap<>();
 
         parametre.put("mail", mail);
@@ -191,6 +188,9 @@ public class ClientApi {
                 },
                 error -> {
                     spineurChargement.dismiss();
+                    if (connexionEchouee != null) {
+                        connexionEchouee.run();
+                    }
                     gestionErreur(contexte, error);
                 }
             );
@@ -236,17 +236,24 @@ public class ClientApi {
         }
     }
 
+    /**
+     * Méthode permettant de récupérer la liste des clients depuis l'API.
+     * @param contexte Le contexte de l'application
+     * @param callback La méthode à appeler en cas de succès
+     */
     public static void getListeClient(Context contexte , Runnable callback) {
         requeteApi(contexte, Request.Method.GET, "/contact", null, null,
             response -> {
                 try {
                     JSONArray jsonReponse = new JSONArray(response);
 
+                    SingletonListeClient.getInstance().viderListeClient();
                     for (int i = 0; i < jsonReponse.length(); i++) {
                         JSONObject jsonClient = jsonReponse.getJSONObject(i);
                         Client client = new Client(jsonClient);
                         SingletonListeClient.getInstance().ajouterClient(client);
                     }
+
                     callback.run();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -269,7 +276,6 @@ public class ClientApi {
                 response -> {
                     try {
                         spineurChargement.dismiss();
-
                         // En cas de succès, on ajoute le client au singleton pour faire l'affichage
                         JSONObject jsonReponse = new JSONObject(response);
                         ((ActiviteCreationClient) contexte).runOnUiThread(creationReussie);
@@ -278,7 +284,7 @@ public class ClientApi {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                } ,
+                },
                 error -> {
                     spineurChargement.dismiss();
                     gestionErreurClient(contexte, error);
@@ -289,19 +295,43 @@ public class ClientApi {
         }
     }
 
-    public static void modificationClient(Context contexte, JSONObject donnees, String id) {
+    public static void modificationClient(Context contexte, JSONObject donnees, String id, Runnable modificationReussie) {
         HashMap<String,String> parametre = new HashMap<>();
         parametre.put("id", id);
 
         spineurChargement = new ProgressDialog(contexte);
-        spineurChargement.setMessage(contexte.getString(R.string.attente_chargement));
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_modification));
         spineurChargement.setCancelable(false);
         spineurChargement.show();
 
         try {
-            requeteApi(contexte, Request.Method.PUT, "/contact", parametre , donnees,
+            requeteApi(contexte, Request.Method.PUT, "/contact", parametre, donnees,
                 response -> {
-                    spineurChargement.dismiss(); },
+                    spineurChargement.dismiss();
+                    ((ActiviteDetailClient) contexte).runOnUiThread(modificationReussie);
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreurClient(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    public static void supprimerClient(Context contexte, String id, Runnable suppressionReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_suppression));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.DELETE, "/contact/" + id, null, null,
+                response -> {
+                    spineurChargement.dismiss();
+                    ((Activity) contexte).runOnUiThread(suppressionReussie);
+                },
                 error -> {
                     spineurChargement.dismiss();
                     gestionErreur(contexte, error);
@@ -327,7 +357,7 @@ public class ClientApi {
                     SnackbarCustom.show(contexte, objetErreur.getString("description"), SnackbarCustom.STYLE_ERREUR);
                 } catch (Exception e) {
                     Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
-                    throw new RuntimeException(e);
+                    erreur.printStackTrace();
                 }
             });
         } else {
@@ -395,6 +425,16 @@ public class ClientApi {
      * @param erreur L'erreur retournée par l'API
      */
     private static void gestionErreurClient(Context contexte, VolleyError erreur) {
+        AppCompatActivity activite = null;
+
+        if (contexte instanceof ActiviteCreationClient) {
+            activite = (ActiviteCreationClient) contexte;
+        } else if (contexte instanceof ActiviteDetailClient) {
+            activite = (ActiviteDetailClient) contexte;
+        }
+
+        final AppCompatActivity finalActivite = activite;
+
         if (erreur.networkResponse != null && erreur.networkResponse.data != null) {
             try {
                 String responseBody = new String(erreur.networkResponse.data, "UTF-8");
@@ -402,8 +442,8 @@ public class ClientApi {
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 JSONObject erreurs = jsonResponse.getJSONObject("erreur");
 
-                ((ActiviteCreationClient) contexte).runOnUiThread(() -> {
-                    afficherErreursClient((ActiviteCreationClient) contexte, erreurs, new int[] {
+                activite.runOnUiThread(() -> {
+                    afficherErreursClient(finalActivite, erreurs, new int[] {
                         R.id.saisieNom, R.id.description, R.id.saisieAdresse,
                         R.id.prenomContact, R.id.nomContact, R.id.telephone
                     }, new String[] {
@@ -412,23 +452,24 @@ public class ClientApi {
                 });
             } catch (Exception e) {
                 Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         } else {
-            ((ActiviteCreationClient) contexte).runOnUiThread(() -> {
+            activite.runOnUiThread(() -> {
                 SnackbarCustom.show(contexte, R.string.api_injoignable, SnackbarCustom.STYLE_ERREUR);
             });
+            erreur.printStackTrace();
         }
     }
 
     /**
-     * Afficher les erreurs lors de la création d'un client.
-     * @param activite L'activité de création d'un client
+     * Afficher les erreurs lors de la création ou modification d'un client.
+     * @param activite L'activité de création ou modification d'un client
      * @param erreurs Les erreurs retournées par l'API
      * @param idChampsTextuels Les identifiants des inputs des champs textuels
      * @param cleChampsTextuels Les clés de réponse de l'API des champs textuels
      */
-    private static void afficherErreursClient(ActiviteCreationClient activite, JSONObject erreurs,
+    private static void afficherErreursClient(AppCompatActivity activite, JSONObject erreurs,
                                               int[] idChampsTextuels, String [] cleChampsTextuels) {
         for (int i = 0; i < idChampsTextuels.length; i++) {
             try {
