@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailItineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
@@ -92,7 +93,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
         itineraires = new ArrayList<>();
 
         if (Reseau.reseauDisponible(this.getContext(), false)) {
-            ClientApi.getListeClient(this.getContext(), () -> {
+            ClientApi.getListeItineraire(this.getContext(), () -> {
                 for (Itineraire itineraire : SingletonListeItineraire.getListeItineraire()) {
                     itineraires.add(itineraire);
                 }
@@ -106,7 +107,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
             listeItineraires.setHasFixedSize(true);
             listeItineraires.setAdapter(adapter);
 
-            intent = new Intent(FragmentItineraires.this.getContext(), ActiviteCreationClient.class);
+            intent = new Intent(FragmentItineraires.this.getContext(), ActiviteCreationItineraire.class);
             lanceurFille = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::getNouveauClient);
             // TODO : else : afficher un message d'erreur + personnalisé
         } else {

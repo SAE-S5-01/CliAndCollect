@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
@@ -98,7 +99,8 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
 
         if (Reseau.reseauDisponible(this.getContext())) {
             ClientApi.getListeClient(this.getContext(), () -> {
-                for (Client client : SingletonListeClient.getListeClient()) {
+                List<Client> liste =  SingletonListeClient.getInstance().getListeClient();
+                for (Client client : liste) {
                     clients.add(client);
                 }
                 adapter.notifyDataSetChanged();
@@ -143,7 +145,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     private void getNouveauClient(ActivityResult resultat) {
         if(resultat.getResultCode() == Activity.RESULT_OK){
             clients.clear();
-            for ( Client client : SingletonListeClient.getListeClient()) {
+            for ( Client client : SingletonListeClient.getInstance().getListeClient()) {
                 clients.add(client);
             }
 
@@ -155,7 +157,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
         Intent retourFille = resultat.getData();
         if(resultat.getResultCode() == Activity.RESULT_OK){
             int id = retourFille.getIntExtra("ID",0);
-           Client client = SingletonListeClient.getClient(id);
+           Client client = SingletonListeClient.getInstance().getClient(id);
            clients.remove(id);
            clients.add(id,client);
            listeClients.setAdapter(adapter);

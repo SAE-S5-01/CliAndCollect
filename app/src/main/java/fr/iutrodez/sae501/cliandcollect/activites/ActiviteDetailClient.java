@@ -171,8 +171,9 @@ public class ActiviteDetailClient extends AppCompatActivity {
         return donnees;
     }
 
-    public void initialiserChamps() {
-        client = SingletonListeClient.getClient(id);
+
+    public void initialiser(){
+        client = SingletonListeClient.getInstance().getClient(id);
         nomEntreprise.setText(client.getEntreprise());
         saisieAdresse.setText(client.getAdresse());
         description.setText(client.getDescription());

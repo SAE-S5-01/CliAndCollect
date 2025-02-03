@@ -32,16 +32,12 @@ public class SingletonListeClient {
      * Ajoute un client à la liste des clients.
      * @param client Le client à ajouter.
      */
-    public static void ajouterClient(Client client){
-        instance.listeClient.add(client);
-    }
+    public void ajouterClient(Client client){ listeClient.add(client);}
 
     /**
      * Retourne la liste des clients.
      */
-    public static List<Client> getListeClient(){ return instance.listeClient; }
+    public List<Client> getListeClient(){ return listeClient; }
 
-    public static Client getClient(int id){
-        return instance.listeClient.get(id);
-    }
+    public Client getClient(int id){ return listeClient.get(id); }
 }

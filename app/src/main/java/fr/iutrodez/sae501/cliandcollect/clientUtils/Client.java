@@ -25,6 +25,14 @@ public class Client {
 
     private boolean clientPropspect;
 
+    /**
+     * Constructeur permettant d'instancier un ob
+     * @param nom
+     */
+    public Client(String nom){
+        this.entreprise = nom;
+    }
+
     public Client(JSONObject clientFromApi){
 
         // Valeur obligatoirement retourné par l'api
@@ -118,4 +126,8 @@ public class Client {
         this.y = y;
     }
 
+    @Override
+    public String toString() {
+        return adresse + " - " + entreprise;
+    }
 }

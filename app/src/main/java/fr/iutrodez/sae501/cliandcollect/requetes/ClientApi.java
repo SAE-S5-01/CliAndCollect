@@ -38,8 +38,6 @@ import java.util.Properties;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
-import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
-import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
@@ -312,32 +310,32 @@ public class ClientApi {
         }
     }
 
-    public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
-        try {
-            requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
-                    response -> {
-                        try {
-                            // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
-                            JSONObject jsonReponse = new JSONObject(response);
-                            ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
-                            Itineraire itineraireCree = new Itineraire(jsonReponse);
-                            SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
-                        } catch (Exception e) {
-                            // TODO gestion erreur
-                            Log.e("erreur", e.toString());
-                            //throw new RuntimeException(e);
-                        }
-                    } ,
-                    error -> {
-                        // TODO gestion erreur api
-                        //gestionErreur(contexte, error);
-                        Log.e("erreur", error.toString());
-                    }
-            );
-        } catch (Exception e) {
-            Log.e("erreur", e.toString());
-        }
-    }
+    //public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
+    //    try {
+    //        requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
+    //                response -> {
+    //                    try {
+    //                        // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
+    //                        JSONObject jsonReponse = new JSONObject(response);
+    //                        ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
+    //                        Itineraire itineraireCree = new Itineraire(jsonReponse);
+    //                        SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
+    //                    } catch (Exception e) {
+    //                        // TODO gestion erreur
+    //                        Log.e("erreur", e.toString());
+    //                        //throw new RuntimeException(e);
+    //                    }
+    //                } ,
+    //                error -> {
+    //                    // TODO gestion erreur api
+    //                    //gestionErreur(contexte, error);
+    //                    Log.e("erreur", error.toString());
+    //                }
+    //        );
+    //    } catch (Exception e) {
+    //        Log.e("erreur", e.toString());
+    //    }
+    //}
 
     public static void modificationClient(Context contexte, JSONObject donnees, String id) {
         HashMap<String,String> parametre = new HashMap<>();

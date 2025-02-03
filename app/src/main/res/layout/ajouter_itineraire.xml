@@ -31,6 +31,7 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -42,26 +43,20 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/indication_nom_itineraire" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/listeClient"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp" />
+
+
             <TextView
                 android:id="@+id/messageErreurNomItineraire"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="" />
 
-            <TextView
-                android:id="@+id/indication_contact_a_ajouter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/indication_contaxt_a_ajouter" />
-
-            <EditText
-                android:id="@+id/contact_a_ajouter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/contact_a_ajouter" />
         </LinearLayout>
-
-
 
         <LinearLayout
             android:layout_width="0dp"
@@ -74,7 +69,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/liste_clients_itineraire" />
 
-
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/clientSelectionne"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -97,12 +95,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="ajouterClient"
-            android:layout_marginBottom="304dp"
-            android:text="@string/ajout_contact_itineraire" />
         <Button
             android:id="@+id/boutonValider"
             android:layout_width="wrap_content"
