@@ -64,8 +64,10 @@ public class ActiviteDetailClient extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intention = getIntent();
         setContentView(R.layout.detail_client);
+
+        intention = getIntent();
+
         nomEntreprise = findViewById(R.id.saisieNom);
         saisieAdresse = findViewById(R.id.saisieAdresse);
         description = findViewById(R.id.description);

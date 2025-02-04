@@ -188,7 +188,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void mettreAJourTexteErreur() {
         this.getView().findViewById(R.id.erreurPasDeClient)
-                .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
+            .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /**

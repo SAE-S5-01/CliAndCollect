@@ -1,9 +1,5 @@
 package fr.iutrodez.sae501.cliandcollect.itineraireUtils;
 
-import android.util.ArrayMap;
-
-import com.android.volley.toolbox.JsonArrayRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,16 +7,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
-
-import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
-import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 
 public class Itineraire {
 
     private String nom;
 
-    private Long ID;
+    private String ID;
 
     private JSONObject ordreClientsJson;
 
@@ -31,7 +23,7 @@ public class Itineraire {
     private JSONObject point;
 
     // Liste des couples x et y issues de JSONObject point
-private ArrayList<Double[]> listeCoordonnees;
+    private ArrayList<Double[]> listeCoordonnees;
 
 
     // TODO parse le geojsonlinestring pour avoir la liste des coordonnées des clients
@@ -48,7 +40,7 @@ private ArrayList<Double[]> listeCoordonnees;
 
         // Valeur obligatoirement retourné par l'api
         this.nom = itineraireFromApi.optString("nomItineraire");
-        this.ID = itineraireFromApi.optLong("idItineraire");
+        this.ID = itineraireFromApi.optString("idItineraire");
         this.ordreClientsJson = itineraireFromApi.getJSONObject("ordreClients");
         String key = "";
         String valeur = "";
@@ -57,7 +49,6 @@ private ArrayList<Double[]> listeCoordonnees;
             key = it.next();
             valeur = ordreClientsJson.getString(key);
             this.ordreClients.put(Long.parseLong(key), valeur);
-
         }
 
         coordonnees = itineraireFromApi.getJSONObject("geoJsonLineString").getJSONArray("coordinates");
@@ -80,7 +71,7 @@ private ArrayList<Double[]> listeCoordonnees;
         return this.ordreClients = ordreClients;
     }
 
-    public Long getID(){
+    public String getID(){
         return ID;
     }
 

@@ -1,20 +1,23 @@
+/*
+ * ActiviteDetailItineraire.java                                    04 fev. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.text.Editable;
+import android.text.TextWatcher;
 import org.json.JSONObject;
 
 import fr.iutrodez.sae501.cliandcollect.R;
@@ -24,16 +27,23 @@ import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
+/**
+ * Activité de la page de détail d'un itinéraire.
+ *
+ * @author Loïc FAUGIERES
+ * @author Simon GUIRAUD
+ */
 public class ActiviteDetailItineraire extends AppCompatActivity {
-    //TODO classe
+
     private EditText nomItineraire;
 
-    private EditText listeContacts;
-
-    private Itineraire itineraire;
+    private Button boutonValider;
 
     private int id;
+
+    private Itineraire itineraire;
 
     private Intent intentionRetour;
 
@@ -42,20 +52,45 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intention = getIntent();
         setContentView(R.layout.detail_itineraire);
-        nomItineraire = findViewById(R.id.saisieNom);
-        // TODO listeContacts = findViewById(R.id.saisie_liste_contacts);
-        Button retour = findViewById(R.id.boutonRetour);
-        Button valider = findViewById(R.id.boutonModifier);
 
-        retour.setOnClickListener(this::retour);
-        valider.setOnClickListener(this::valider);
+        intention = getIntent();
+
+        nomItineraire = findViewById(R.id.saisieNom);
+
+        Button boutonRetour = findViewById(R.id.boutonRetour);
+        boutonValider = findViewById(R.id.boutonModifier);
+
+        boutonRetour.setOnClickListener(this::retour);
+        boutonValider.setOnClickListener(this::valider);
 
         id = intention.getIntExtra("ID", 0);
         initialiser();
 
         intentionRetour = new Intent();
+        TextWatcher champModifieListener = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boutonValider.setEnabled(true);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        EditText[] champs = {nomItineraire};
+
+        for (EditText champ : champs) {
+            champ.addTextChangedListener(champModifieListener);
+        }
+    }
+
+    public void initialiser() {
+        itineraire = SingletonListeItineraire.getInstance().getItineraire(id);
+        nomItineraire.setText(itineraire.getNom());
     }
 
     public void retour(View view) {
@@ -66,52 +101,39 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
     public void valider(View view) {
         intentionRetour.putExtra("ID", id);
         if (isModifie()) {
-            if (!nomItineraire.getText().toString().equals(itineraire.getNom())) {
-                itineraire.setNom(nomItineraire.getText().toString());
-            }
-            /*if (!saisieAdresse.getText().toString().equals(client.getAdresse())) {
-                client.setAdresse(saisieAdresse.getText().toString());
-                client.setX(longitude);
-                client.setY(latitude);
-            }*/
-
-            JSONObject donnees = formulaireEnJson();
-
-            if (Reseau.reseauDisponible(this, true)) {
-                ClientApi.modificationItineraire(this, donnees, itineraire.getID().toString());
-                setResult(AppCompatActivity.RESULT_OK, intentionRetour);
-                finish();
+            if (nomItineraire.getText().toString().isEmpty()) {
+                this.nomItineraire.setError(getString(R.string.erreur_nom_entreprise_non_renseigne));
+            } else {
+                JSONObject donnees = formulaireEnJson();
+                if (Reseau.reseauDisponible(ActiviteDetailItineraire.this, true)
+                    && donnees != null) {
+                    ClientApi.modifierItineraire(this, donnees, itineraire.getID().toString(),
+                        () -> {
+                            setResult(AppCompatActivity.RESULT_OK, intentionRetour);
+                            finish();
+                        });
+                }
             }
         } else {
-            Toast.makeText(this, R.string.pasModifier, Toast.LENGTH_LONG)
-                    .show();
+            SnackbarCustom.show(this, R.string.pasModifie, SnackbarCustom.STYLE_ATTENTION);
         }
     }
 
     private JSONObject formulaireEnJson() {
         JSONObject donnees = new JSONObject();
-        try {
-            donnees.put("nomItineraire", nomItineraire.getText().toString());
-            //donnees.put("ordreClients", listeContacts.getText().toString());
 
+        try {
+            donnees.put("nomItineraire" , nomItineraire.getText().toString());
         } catch (Exception e) {
-            // TODO
-            Log.e("erreur", "Catch form json" + e);
+            SnackbarCustom.show(this,
+                                R.string.erreur_modification_itineraire,
+                                SnackbarCustom.STYLE_ERREUR);
+            donnees = null;
         }
         return donnees;
     }
 
-
-    public void initialiser() {
-        itineraire = SingletonListeItineraire.getItineraire(id);
-        nomItineraire.setText(itineraire.getNom());
-        //listeContacts.setText(itineraire.getOrdreClients().get(id));
-    }
-
     private boolean isModifie() {
-        return !nomItineraire.getText().toString().equals(itineraire.getNom())
-                //|| !listeContacts.getText().toString().equals(itineraire.getOrdreClients())
-                  ;
+        return false; // TODO
     }
-
 }
