@@ -67,7 +67,6 @@
     <string name="nom_itineraire">Nom :</string>
     <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
     <string name="depart_itinéraire">Départ et arrivé de l\itinéraire : domicile</string>
-    <string name="nombre_etapes_liste_itineraire">Nombre d\'étapes :</string>
     <string name="pasModifier">Aucune information n\'a été modifiée</string>
     <string name="ajouter_itineraire">Ajouter un itinéraire</string>*
     <string name="contact_a_ajouter">Veuillez entrer le nom de l\'entreprise du contact</string>
@@ -75,6 +74,10 @@
     <string name="indication_clients_itineraire">Veuillez sélectionner les clients à visiter</string>
     <string name="indication_contaxt_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
     <string name="ajout_contact_itineraire">Ajouter le contact</string>
+    <string name="erreur_aucun_itineraire">Aucun itinéraire n\'a été ajouté</string>
+    <string name="erreur_creation_itineraire">Erreur lors de la création d\'un itinéraire, veuillez réessayer plus tard</string>
+    <string name="erreur_modification_itineraire">Erreur lors de l\'édition d\'un itinéraire, veuillez réessayer plus tard</string>
+    <string name="erreur_recuperation_itineraires">Aucune connexion internet, impossible de récupérer les itinéraires</string>
 
     <string name="marqueur_confirmation">Oui</string>
     <string name="marqueur_annulation">Non</string>
@@ -83,10 +86,13 @@
     <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayez</string>
     <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
-    <string name="erreur_creation_itineraire">Erreur lors de la création de l\'itinéraire</string>
     <string name="detail_itineraire">Détails de l\'itinéraire</string>
+    <string name="erreur_nom_itineraire_non_renseigne">Nom de l\'itinéraire non renseigné</string>
     <string name="liste_contacts">Liste des contacts</string>
 
     <string name="supprimer_client">Supprimer un client / prospect</string>
     <string name="confirmation_suppression_client">"Êtes-vous sûr de vouloir supprimer ce client / prospect ?"</string>
+
+    <string name="supprimer_itineraire">Supprimer un itinéraire</string>
+    <string name="confirmation_suppression_itineraire">"Êtes-vous sûr de vouloir supprimer cet itinéraire ?"</string>
 </resources>

@@ -17,12 +17,12 @@ public class ItineraireHolder extends RecyclerView.ViewHolder{
     public ItineraireHolder(@NonNull View itemView) {
         super(itemView);
         nom = itemView.findViewById(R.id.nomItineraire);
-        nombreEtapes = (TextView) itemView.findViewById(R.id.nombreEtapes);
+        nombreEtapes = itemView.findViewById(R.id.nombreEtapes);
     }
 
-    public void bind(Itineraire itineraire){
+    public void bind(Itineraire itineraire) {
         nom.setText(itineraire.getNom());
-        nombreEtapes.setText("" + itineraire.getOrdreClients().size());
+        nombreEtapes.setText(itineraire.getOrdreClients().size() + " étapes");
     }
 }
 
