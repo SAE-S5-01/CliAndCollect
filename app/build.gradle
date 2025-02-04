@@ -19,6 +19,7 @@ android {
     signingConfigs {
         release {
             storeFile file("./CliAndCollect-Key.jks")
+            // Utilisation des variables d'environnement pour configurer la signature
             storePassword System.getenv("KEYSTORE_PASSWORD") ?: ""
             keyAlias System.getenv("KEY_ALIAS") ?: ""
             keyPassword System.getenv("KEYSTORE_PASSWORD") ?: ""
@@ -26,7 +27,19 @@ android {
     }
 
     buildTypes {
-        // ... reste inchangé ...
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            applicationVariants.all { variant ->
+                if (variant.buildType.name == "release") {
+                    variant.outputs.all { output ->
+                        outputFileName = "CliAndCollect.apk"
+                    }
+                }
+            }
+        }
     }
 
     compileOptions {

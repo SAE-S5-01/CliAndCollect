@@ -30,11 +30,11 @@ public class Client {
      * Constructeur permettant d'instancier un ob
      * @param nom
      */
-    public Client(String nom){
+    public Client(String nom) {
         this.entreprise = nom;
     }
 
-    public Client(JSONObject clientFromApi){
+    public Client(JSONObject clientFromApi) {
 
         // Valeur obligatoirement retourné par l'api
         this.entreprise = clientFromApi.optString("nomEntreprise");
@@ -53,7 +53,6 @@ public class Client {
     public String getDescription() {
         return description;
     }
-
 
     public String getAdresse() {
         return adresse;
@@ -119,16 +118,17 @@ public class Client {
         this.y = y;
     }
 
-    @Override
-    public String toString() {
-        return adresse + " - " + entreprise;
-    }
     public double getX() {
         return x;
     }
 
     public void setX(double x) {
         this.x = x;
+    }
+
+    @Override
+    public String toString() {
+        return adresse + " - " + entreprise;
     }
 
 }

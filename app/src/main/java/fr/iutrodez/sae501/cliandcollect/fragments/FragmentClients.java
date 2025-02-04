@@ -91,7 +91,8 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_clients, container, false);
-         vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
+
+        vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
         detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
 
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
