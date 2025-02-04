@@ -56,7 +56,6 @@ private ArrayList<Double[]> listeCoordonnees;
         for (Iterator<String> it = ordreClientsJson.keys(); it.hasNext(); ) {
             key = it.next();
             valeur = ordreClientsJson.getString(key);
-            System.out.println(valeur);
             this.ordreClients.put(Long.parseLong(key), valeur);
 
         }

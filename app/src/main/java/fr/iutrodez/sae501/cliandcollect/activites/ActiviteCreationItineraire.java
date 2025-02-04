@@ -1,19 +1,16 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -26,16 +23,15 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 
@@ -128,8 +124,6 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
             }
             jsonFinal.put("nom", inputNomItineraire.getText().toString());
             jsonFinal.put("listePoint", listePoint);
-
-            Log.i("Itineraire", "JSON généré : " + jsonFinal.toString());
         } catch (Exception e) {
             Log.e("Itineraire", "Erreur lors de la génération du JSON : " + e);
         }
@@ -139,7 +133,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         }
     }
 
-    private void afficherCarteAvecItineraire(LinkedHashMap<String , GeoPoint> points) {
+    private void afficherCarteAvecItineraire(LinkedHashMap<Long , PointGPS> points) {
         runOnUiThread(() -> {
             try {
                 // Créer un conteneur pour la MapView
@@ -169,7 +163,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
                 // Créer la liste des points
                 ArrayList<GeoPoint> waypoints = new ArrayList<>(points.values());
-                ArrayList<String> nomMarkeur = new ArrayList<>(points.keySet());
+                ArrayList<Long> nomMarkeur = new ArrayList<>(points.keySet());
 
                 // Centrer la carte sur le premier point
                 if (!waypoints.isEmpty()) {
@@ -178,13 +172,16 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
                 // Créer et afficher l'AlertDialog
                 AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setTitle("Itinéraire : Voici l'itinéraire calculé pour votre tournée , voulez vous le créer ? ")
+                        .setTitle(inputNomItineraire.getText().toString().isEmpty()
+                                ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
+                                : String.format("%s : Voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?",
+                                inputNomItineraire.getText().toString()))
                         .setView(mapContainer)
                         .setPositiveButton("Valider", (dialogInterface, which) -> {
                             if (mapView != null) {
                                 mapView.onDetach();
                             }
-                            creationClient(points);
+                            creationItineraire(points);
                         })
                         .setNegativeButton("Annuler", null)
                         .create();
@@ -241,8 +238,6 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
                                 // Ajouter la ligne à vol d'oiseau aux overlays de la carte
                                 mapView.getOverlays().add(birdFlightLine);
-
-                                // Affichage d'un message indiquant que la ligne à vol d'oiseau a été ajoutée
                             }
                         }
 
@@ -297,17 +292,21 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         return Math.round(dp * density);
     }
 
-    private void creationClient(LinkedHashMap<String , GeoPoint> listeEtape) {
-        listeEtape.remove("-1");
-        listeEtape.remove("-2");
+    private void creationItineraire(LinkedHashMap<Long , PointGPS> listeEtape) {
+        PointGPS domicile = listeEtape.get(-1L);
+        listeEtape.remove(-1L); // Supprimer le point de départ
+        listeEtape.remove(-2L); // Supprimer le point d'arrivée
         JSONObject jsonFinal = new JSONObject();
         try {
             jsonFinal.put("nomItineraire", inputNomItineraire.getText().toString());
             JSONObject ordreClients = new JSONObject();
 
+            jsonFinal.put("domicile", new JSONObject()
+                    .put("x", domicile.getLongitude())
+                    .put("y", domicile.getLatitude()));
             // Parcourir la LinkedHashMap pour ajouter chaque point
-            for (Map.Entry<String, GeoPoint> entry : listeEtape.entrySet()) {
-                String clientKey = entry.getKey();
+            for (Map.Entry<Long, PointGPS> entry : listeEtape.entrySet()) {
+                Long clientKey = entry.getKey();
                 GeoPoint point = entry.getValue();
 
                 // Créer un objet JSON pour chaque point avec ses coordonnées
@@ -316,24 +315,22 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                 clientPoint.put("y", point.getLatitude());  // Latitude
 
                 // Ajouter ce point dans "ordreClients" avec la clé client
-                ordreClients.put(clientKey, clientPoint);
+                ordreClients.put(String.valueOf(clientKey), clientPoint);
             }
 
             // Ajouter "ordreClients" à l'objet final
-            jsonFinal.put("ordreClients", ordreClients);
+            jsonFinal.put("listePoint", ordreClients);
 
-            ClientApi.creationItineraire(this, jsonFinal, this::retour);
+            ClientApi.creationItineraire(this, jsonFinal, this::creationOk);
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(this, R.string.erreur_creation_itineraire,
                     Toast.LENGTH_SHORT).show();
         }
-        ClientApi.creationItineraire(this, jsonFinal, this::retour);
     }
 
-    private void retour() {
-        //setResult(AppCompatActivity.RESULT_OK);
-        //finish();
-        Log.i("Itineraire", "Itinéraire créé avec succès !");
+    private void creationOk() {
+        setResult(AppCompatActivity.RESULT_OK);
+        finish();
     }
 }

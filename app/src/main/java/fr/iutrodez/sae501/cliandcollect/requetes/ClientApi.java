@@ -38,11 +38,13 @@ import java.util.function.Consumer;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -324,45 +326,55 @@ public class ClientApi {
         }
     }
 
-    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<String, GeoPoint>> callback) {
+    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<Long, PointGPS>> callback) {
         try {
             requeteApi(contexte , Request.Method.POST , "/itineraire/calculer" , null , donnees,
                     response -> {
                         try {
-                            JSONObject jsonReponse = new JSONObject(response);
-                            LinkedHashMap<String, GeoPoint> point = parseItineraire(jsonReponse);
+                           JSONObject jsonReponse = new JSONObject(response);
+                            LinkedHashMap<Long, PointGPS> point = parseItineraire(jsonReponse);
                             ((Activity) contexte).runOnUiThread(() -> callback.accept(point));
 
                         } catch (Exception e) {
-                            Log.e("erreur", e.toString());
+                            Log.e("Parsing json ", e.toString());
                         }
- } ,
+                    } ,
                     error -> {
                         // TODO gestion erreur api
                         //gestionErreur(contexte, error);
+                        error.printStackTrace();
                         Log.e("erreur", error.toString());
                     }
             );
         } catch (Exception e) {
-            Log.e("erreur", e.toString());
+            Log.e("erreur ", e.toString());
         }
     }
-    public static LinkedHashMap<String, GeoPoint> parseItineraire(JSONObject jsonResponse) {
-        LinkedHashMap<String, GeoPoint> waypoints = new LinkedHashMap<>();
+    public static LinkedHashMap<Long, PointGPS> parseItineraire(JSONObject jsonResponse) {
+        LinkedHashMap<Long, PointGPS> waypoints = new LinkedHashMap<>();
 
         try {
-            Iterator<String> keys = jsonResponse.keys();
+            // Extraire le tableau "itineraire" de l'objet JSON
+            JSONArray itineraireArray = jsonResponse.getJSONArray("itineraire");
+            JSONObject depart = itineraireArray.getJSONObject(0);
+            itineraireArray.remove(0);
+            waypoints.put(-1L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Départ"));
 
-            while (keys.hasNext()) {
-                String key = keys.next(); // La clé (ex: "33", "69", ...)
-                JSONObject point = jsonResponse.getJSONObject(key);
+            // Parcourir le tableau pour récupérer les points
+            for (int i = 0; i < itineraireArray.length(); i++) {
+                JSONObject point = itineraireArray.getJSONObject(i);
 
-                double longitude = point.getDouble("x");
-                double latitude = point.getDouble("y");
+                // Extraire les données du point
+                Long id = point.getLong("id");
+                String nom = point.getString("nom");
+                double latitude = point.getDouble("latitude");
+                double longitude = point.getDouble("longitude");
 
-                waypoints.put(key, new GeoPoint(latitude, longitude));
+                // Ajouter le point dans la map avec le nom comme clé
+                waypoints.put(id, new PointGPS(latitude, longitude, nom));
+
             }
-
+            waypoints.put(-2L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Arrivé"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -371,17 +383,19 @@ public class ClientApi {
     }
 
 
+
     public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
             requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
                     response -> {
                         try {
                             // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
-                            //JSONObject jsonReponse = new JSONObject(response);
+                            JSONObject jsonReponse = new JSONObject(response);
                             //((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
-                            //Itineraire itineraireCree = new Itineraire(jsonReponse);
-                            //SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
-                            Log.i("itineraire", response.toString());
+                            Itineraire itineraireCree = new Itineraire(jsonReponse);
+                            SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
+                            ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
+
                         } catch (Exception e) {
                             // TODO gestion erreur
                             Log.e("erreur creat client", e.toString());

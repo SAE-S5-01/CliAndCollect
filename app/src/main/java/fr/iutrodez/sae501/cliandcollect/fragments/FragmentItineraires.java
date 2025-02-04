@@ -94,7 +94,6 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
 
         listeItineraires = vueDuFragment.findViewById(R.id.recycler_view_itineraires);
         itineraires = new ArrayList<>();
-        System.out.println("3");
 
         if (Reseau.reseauDisponible(this.getContext(), false)) {
             ClientApi.getListeItineraire(this.getContext(), () -> {
