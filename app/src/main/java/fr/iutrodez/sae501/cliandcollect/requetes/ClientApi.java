@@ -23,14 +23,12 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.util.GeoPoint;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -379,7 +377,7 @@ public class ClientApi {
         }
     }
 
-    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<String, GeoPoint>> callback) {
+    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<Long, PointGPS>> callback) {
         try {
             requeteApi(contexte , Request.Method.POST , "/itineraire/calculer" , null , donnees,
                     response -> {
@@ -440,31 +438,25 @@ public class ClientApi {
     public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
             requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
-                    response -> {
-                        try {
-                            // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
-                            JSONObject jsonReponse = new JSONObject(response);
-                            //((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
-                            Itineraire itineraireCree = new Itineraire(jsonReponse);
-                            SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
-                            ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
+                response -> {
+                    try {
+                        // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
+                        JSONObject jsonReponse = new JSONObject(response);
+                        //((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
+                        Itineraire itineraireCree = new Itineraire(jsonReponse);
+                        SingletonListeItineraire.getInstance().ajouterItineraire(itineraireCree);
+                        ((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
 
-                        } catch (Exception e) {
-                            // TODO gestion erreur
-                            Log.e("erreur creat client", e.toString());
-                            //throw new RuntimeException(e);
-                        }
-                    } ,
-                    error -> {
+                    } catch (Exception e) {
+                        // TODO gestion erreur
+                        Log.e("erreur creat client", e.toString());
+                        //throw new RuntimeException(e);
+                    }
+                },
+                error -> {
                         // TODO gestion erreur api
                         //gestionErreur(contexte, error);
                         Log.e("erreur", error.toString());
-                    }
-                } ,
-                error -> {
-                    // TODO gestion erreur api
-                    //gestionErreur(contexte, error);
-                    Log.e("erreur", error.toString());
                 }
             );
         } catch (Exception e) {
