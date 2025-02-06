@@ -1,3 +1,8 @@
+/*
+ * ActiviteConnexion.java                                           06 fev. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +24,9 @@ import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
  * Activité de la page de connexion.
- * @author Descriaud Lucas
+ * 
+ * @author Lucas DESCRIAUD
+ * @author Loïc FAUGIERES
  */
 public class ActiviteConnexion extends AppCompatActivity {
 
