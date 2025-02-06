@@ -85,7 +85,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         boutonValider.setOnClickListener(this::valider);
 
         id = intention.getIntExtra("ID", 0);
-        initialiser();
+        initialiserChamps();
 
         intentionRetour = new Intent();
 
@@ -114,6 +114,20 @@ public class ActiviteDetailClient extends AppCompatActivity {
             isProspect = checkedId == R.id.prospect;
             boutonValider.setEnabled(true);
         });
+    }
+
+    /**
+     * Initialise les champs de la page avec les valeurs du client.
+     */
+    public void initialiserChamps() {
+        client = SingletonListeClient.getInstance().getClient(id);
+        nomEntreprise.setText(client.getEntreprise());
+        saisieAdresse.setText(client.getAdresse());
+        description.setText(client.getDescription());
+        clientProspect.check(client.isProspect() ? R.id.prospect : R.id.client);
+        prenomContact.setText(client.getPrenomContact());
+        nomContact.setText(client.getNomContact());
+        telephone.setText(client.getTelephone());
     }
 
     public void retour(View view) {
@@ -175,18 +189,6 @@ public class ActiviteDetailClient extends AppCompatActivity {
             donnees = null;
         }
         return donnees;
-    }
-
-
-    public void initialiser(){
-        client = SingletonListeClient.getInstance().getClient(id);
-        nomEntreprise.setText(client.getEntreprise());
-        saisieAdresse.setText(client.getAdresse());
-        description.setText(client.getDescription());
-        clientProspect.check(client.isProspect() ? R.id.prospect : R.id.client);
-        prenomContact.setText(client.getPrenomContact());
-        nomContact.setText(client.getNomContact());
-        telephone.setText(client.getTelephone());
     }
 
     private boolean isModifie() {
