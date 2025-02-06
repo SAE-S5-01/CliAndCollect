@@ -76,7 +76,6 @@ public class ActiviteConnexion extends AppCompatActivity {
         boutonInscription.setOnClickListener(this::clicInscription);
     }
 
-
     /**
      * Méthode invoquée lors du clic sur le bouton de connexion.
      * @param bouton Le bouton de connexion
