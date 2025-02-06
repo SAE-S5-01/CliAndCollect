@@ -71,9 +71,13 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
     }
 
     private void ajouterClient(int position) {
-        Client client = clientsDisponibles.remove(position);
-        clientsAjoutes.add(client);
-        mettreAJourListes();
+        if(clientsAjoutes.size() >= 8) {
+            Toast.makeText(this, R.string.nombre_etape_depasse, Toast.LENGTH_SHORT).show();
+        } else {
+            Client client = clientsDisponibles.remove(position);
+            clientsAjoutes.add(client);
+            mettreAJourListes();
+        }
     }
 
     private void retirerClient(int position) {
@@ -162,8 +166,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                 mapController.setZoom(14.0);
 
                 // Créer la liste des points
-                ArrayList<GeoPoint> waypoints = new ArrayList<>(points.values());
-                ArrayList<Long> nomMarkeur = new ArrayList<>(points.keySet());
+                ArrayList<PointGPS> waypoints = new ArrayList<>(points.values());
 
                 // Centrer la carte sur le premier point
                 if (!waypoints.isEmpty()) {
@@ -254,7 +257,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                                 // Ajouter les marqueurs pour chaque point
                                 for (GeoPoint point : waypoints) {
                                     Marker marker = new Marker(mapView);
-                                    marker.setTitle(waypoints.indexOf(point) + 1 + " - " + nomMarkeur.get(waypoints.indexOf(point)));
+                                    marker.setTitle(waypoints.indexOf(point) + 1 + " - " + waypoints.get(waypoints.indexOf(point)).getNom());
                                     marker.setPosition(point);
                                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                                     mapView.getOverlays().add(marker);

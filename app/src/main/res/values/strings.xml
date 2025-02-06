@@ -88,6 +88,7 @@
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
     <string name="detail_itineraire">Détails de l\'itinéraire</string>
     <string name="erreur_nom_itineraire_non_renseigne">Nom de l\'itinéraire non renseigné</string>
+    <string name="nombre_etape_depasse">Vous ne pouvez pas ajouter plus de 8 clients à votre itinéraire</string>
     <string name="liste_contacts">Liste des contacts</string>
 
     <string name="supprimer_client">Supprimer un client / prospect</string>
