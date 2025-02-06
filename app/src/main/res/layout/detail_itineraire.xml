@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        style="@style/AppStyle"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TableRow
+            android:layout_marginVertical="24dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/titreDetailClient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="2"
+                    android:text="@string/detail_itineraire"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_marginVertical="@dimen/detail_client_marge_verticale_champs_texte">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="@dimen/detail_client_largeur_champs"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nom_itineraire"
+                    android:textSize="@dimen/detail_client_taille_titres" />
+                <EditText
+                    android:id="@+id/saisieNom"
+                    android:layout_width="@dimen/detail_client_largeur_champs"
+                    android:layout_height="wrap_content"
+                    android:hint="TODO hint"
+                    android:maxLines="1"
+                    android:maxLength="50" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="@dimen/detail_client_largeur_champs"
+                    android:layout_height="wrap_content"
+                    android:text="@string/liste_contacts"
+                    android:textSize="@dimen/detail_client_taille_titres" />
+                <EditText
+                    android:id="@+id/saisieContacts"
+                    android:layout_width="@dimen/detail_client_largeur_champs"
+                    android:hint="TODO hint"
+                    android:inputType="textMultiLine"
+                    android:layout_height="wrap_content"
+                    android:maxLength="500" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_marginVertical="28dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/boutonRetour"
+                    android:layout_width="@dimen/detail_client_largeur_boutons"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/bouton_secondaire"
+                    android:text="@string/retour"
+                    android:textSize="@dimen/detail_client_taille_texte_boutons" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/boutonModifier"
+                    android:layout_width="@dimen/detail_client_largeur_boutons"
+                    android:layout_height="wrap_content"
+                    android:text="@string/valider"
+                    android:textSize="@dimen/detail_client_taille_texte_boutons"
+                    android:enabled="false" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

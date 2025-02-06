@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <!-- Permet l'accès au local host (network security config)-->
     <application
         android:networkSecurityConfig="@xml/configuration_securite_reseau"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_nom"
+        android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CliAndCollect"
-        tools:targetApi="31">
+        android:theme="@style/Theme.CliAndCollect">
         <activity
-            android:name=".ActivitePrincipale"
+            android:name=".activites.ActiviteConnexion"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,25 +28,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".fragments.GestionFragment"/>
-        <activity android:name=".activites.ActiviteConnexion"/>
-        <activity android:name=".activites.ActiviteInscription"/>
         <activity
-            android:name=".fragments.FragmentAccueil"
-            android:exported="true">
-        </activity>
+            android:name=".activites.ActiviteMap"
+            android:screenOrientation="portrait"/>
         <activity
-            android:name=".fragments.FragmentClients"
-            android:exported="true">
-        </activity>
+            android:name=".activites.ActiviteInscription"
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".fragments.FragmentParcours"
-            android:exported="true">
-        </activity>
+            android:name=".activites.ActiviteDetailClient"
+            android:screenOrientation="portrait" />
+        <activity 
+            android:name=".activites.ActiviteCreationClient"
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".fragments.FragmentItineraires"
-            android:exported="true">
-        </activity>
+            android:name=".fragments.GestionFragment"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activites.ActiviteDetailItineraire"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activites.ActiviteCreationItineraire"
+            android:screenOrientation="portrait" />
+        <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
     </application>
 
 </manifest>

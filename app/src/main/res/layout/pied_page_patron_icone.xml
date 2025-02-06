@@ -8,7 +8,13 @@
 
     <ImageView
         android:id="@+id/footer_icon"
-        style="@style/FooterImage"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/pied_page_icone_dimensions"
+        android:layout_gravity="center"
+        android:paddingTop="@dimen/pied_page_icone_padding_haut"
+        android:paddingBottom="@dimen/pied_page_icone_espace_barre"
+        android:layout_marginHorizontal="@dimen/pied_page_icone_marge_exterieure_horizontale"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
         android:src="@drawable/client" />
-
 </LinearLayout>

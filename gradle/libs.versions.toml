@@ -1,0 +1,28 @@
+[versions]
+volley = "1.2.1"
+appcompat = "1.6.1"
+material = "1.8.0"
+constraintlayout = "2.1.4"
+viewpager2 = "1.1.0"
+junit = "4.13.2"
+androidxTestExt = "1.1.5"
+androidxTestEspresso = "3.5.1"
+preference = "1.2.0"
+osmdroid = "6.1.11"
+osmbonuspack = "6.9.0"
+
+[libraries]
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-ext = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExt" }
+androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxTestEspresso" }
+androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
+osmbonuspack = { module = "com.github.MKergall:osmbonuspack", version.ref = "osmbonuspack" }
+osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
+
+[plugins]
+android-application = { id = "com.android.application", version = "8.1.4" }
