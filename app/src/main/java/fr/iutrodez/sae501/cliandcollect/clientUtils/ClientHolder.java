@@ -1,6 +1,10 @@
+/*
+ * ClientHolder.java                                                06 fev. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.clientUtils;
 
-import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 
+/**
+ * Holder pour un client.
+ *
+ * @author Loïc FAUGIERES
+ * @author Lucas DESCRIAUD
+ */
 public class ClientHolder extends RecyclerView.ViewHolder {
 
     private TextView entreprise;
@@ -17,8 +27,8 @@ public class ClientHolder extends RecyclerView.ViewHolder {
 
     public ClientHolder(@NonNull View itemView) {
         super(itemView);
-        entreprise = (TextView) itemView.findViewById(R.id.entreprise);
-        adresse = (TextView) itemView.findViewById(R.id.adresse);
+        entreprise = itemView.findViewById(R.id.entreprise);
+        adresse = itemView.findViewById(R.id.adresse);
     }
 
     public void bind(Client client){

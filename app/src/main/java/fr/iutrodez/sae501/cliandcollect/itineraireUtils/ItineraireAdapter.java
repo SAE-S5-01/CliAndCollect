@@ -1,5 +1,5 @@
 /*
- * ItineraireAdapter.java                                               31 jan. 2025
+ * ItineraireAdapter.java                                           31 jan. 2025
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 

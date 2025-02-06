@@ -1,5 +1,9 @@
-package fr.iutrodez.sae501.cliandcollect.requetes;
+/*
+ * RequeteVolley.java                                               06 fev. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
 
+package fr.iutrodez.sae501.cliandcollect.requetes;
 
 import android.content.Context;
 import com.android.volley.Request;
@@ -8,7 +12,9 @@ import com.android.volley.toolbox.Volley;
 
 /**
  * Classe Singleton permettant de gérer les requêtes Volley.
- * @author Descriaud Lucas
+ *
+ * @author Lucas DESCRIAUD
+ * @author Loïc FAUGIERES
  */
 public class RequeteVolley {
 

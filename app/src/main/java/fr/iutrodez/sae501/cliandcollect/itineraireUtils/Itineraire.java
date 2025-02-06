@@ -1,3 +1,8 @@
+/*
+ * Itineraire.java                                                  06 fev. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.itineraireUtils;
 
 import org.json.JSONArray;
@@ -8,6 +13,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+/**
+ * Représentation d'un itinéraire.
+ *
+ * @author Lucas DESCRIAUD
+ * @author Loïc FAUGIERES
+ */
 public class Itineraire {
 
     private String nom;
@@ -27,7 +38,6 @@ public class Itineraire {
 
 
     // TODO parse le geojsonlinestring pour avoir la liste des coordonnées des clients
-
     /**public GeoJsonLineString getGeoJsonLineString(){
         GeoJsonLineString geoJsonLineString = new GeoJsonLineString();
         for (Client client : listeClients){
@@ -63,10 +73,6 @@ public class Itineraire {
         }
     }
 
-    public String setNom(String nom){
-        return this.nom = nom;
-    }
-
     public LinkedHashMap<Long, String> setItineraire(LinkedHashMap<Long, String> ordreClients){
         return this.ordreClients = ordreClients;
     }
@@ -79,6 +85,10 @@ public class Itineraire {
         return nom;
     }
 
+    public String setNom(String nom){
+        return this.nom = nom;
+    }
+
     public LinkedHashMap<Long, String> getOrdreClients() {
         return ordreClients;
     }
@@ -86,8 +96,5 @@ public class Itineraire {
     public ArrayList<Double[]> getListeCoordonnees() {
         return listeCoordonnees;
     }
-
-
-
 
 }
