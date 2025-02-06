@@ -33,6 +33,10 @@
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
 
+
+    <string name="valider">Valider</string>
+    <string name="retour">Retour</string>
+
     <string name="ajouter_client">Ajouter un client / prospect</string>
     <string name="detail_client">Détails du client / prospect</string>
     <string name="nom_entreprise">Nom de l\'entreprise</string>
@@ -44,10 +48,8 @@
     <string name="nom_contact">Nom du contact</string>
     <string name="prenom_contact">Prénom du contact</string>
     <string name="tel_contact">Numéro de téléphone</string>
-    <string name="valider">Valider</string>
     <string name="obtenir_coordonnees">Obtenir votre adresse</string>
     <string name="coordonnees_non_calculees">Veuillez d\'abord obtenir vos coordonnées</string>
-    <string name="retour">Retour</string>
     <string name="indication_entreprise">Entrez le nom de l\'entreprise</string>
     <string name="indication_prenom_contact">Entrez le prénom de votre contact</string>
     <string name="indication_nom_contact">Entrez le nom de votre contact</string>
@@ -61,6 +63,22 @@
     <string name="erreur_modification_client">Erreur lors de l\'édition d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_recuperation_clients">Aucune connexion internet, impossible de récupérer les clients</string>
 
+    <string name="adresseClient">Adresse :</string>
+    <string name="nom_itineraire">Nom :</string>
+    <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
+    <string name="depart_itinéraire">Départ et arrivé de l\itinéraire : domicile</string>
+    <string name="pasModifier">Aucune information n\'a été modifiée</string>
+    <string name="ajouter_itineraire">Ajouter un itinéraire</string>*
+    <string name="contact_a_ajouter">Veuillez entrer le nom de l\'entreprise du contact</string>
+    <string name="indication_nom_itineraire">Veuillez entrer le nom de l\'itinéraire</string>
+    <string name="indication_clients_itineraire">Veuillez sélectionner les clients à visiter</string>
+    <string name="indication_contaxt_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
+    <string name="ajout_contact_itineraire">Ajouter le contact</string>
+    <string name="erreur_aucun_itineraire">Aucun itinéraire n\'a été ajouté</string>
+    <string name="erreur_creation_itineraire">Erreur lors de la création d\'un itinéraire, veuillez réessayer plus tard</string>
+    <string name="erreur_modification_itineraire">Erreur lors de l\'édition d\'un itinéraire, veuillez réessayer plus tard</string>
+    <string name="erreur_recuperation_itineraires">Aucune connexion internet, impossible de récupérer les itinéraires</string>
+
     <string name="marqueur_confirmation">Oui</string>
     <string name="marqueur_annulation">Non</string>
     <string name="marqueur_message">Voulez-vous vraiment supprimer ce marqueur ?</string>
@@ -68,7 +86,14 @@
     <string name="recherche_adresse_aucun_resultat">Aucun résultat trouvé, vérifiez la saisie et réessayez</string>
     <string name="recherche_adresse_erreur">Erreur lors de la recherche de l\'adresse</string>
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
+    <string name="detail_itineraire">Détails de l\'itinéraire</string>
+    <string name="erreur_nom_itineraire_non_renseigne">Nom de l\'itinéraire non renseigné</string>
+    <string name="nombre_etape_depasse">Vous ne pouvez pas ajouter plus de 8 clients à votre itinéraire</string>
+    <string name="liste_contacts">Liste des contacts</string>
 
     <string name="supprimer_client">Supprimer un client / prospect</string>
     <string name="confirmation_suppression_client">"Êtes-vous sûr de vouloir supprimer ce client / prospect ?"</string>
+
+    <string name="supprimer_itineraire">Supprimer un itinéraire</string>
+    <string name="confirmation_suppression_itineraire">"Êtes-vous sûr de vouloir supprimer cet itinéraire ?"</string>
 </resources>

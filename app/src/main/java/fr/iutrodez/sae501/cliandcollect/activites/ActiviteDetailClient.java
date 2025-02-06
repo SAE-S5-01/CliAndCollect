@@ -64,8 +64,10 @@ public class ActiviteDetailClient extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intention = getIntent();
         setContentView(R.layout.detail_client);
+
+        intention = getIntent();
+
         nomEntreprise = findViewById(R.id.saisieNom);
         saisieAdresse = findViewById(R.id.saisieAdresse);
         description = findViewById(R.id.description);
@@ -112,6 +114,20 @@ public class ActiviteDetailClient extends AppCompatActivity {
             isProspect = checkedId == R.id.prospect;
             boutonValider.setEnabled(true);
         });
+    }
+
+    /**
+     * Initialise les champs de la page avec les valeurs du client.
+     */
+    public void initialiserChamps() {
+        client = SingletonListeClient.getInstance().getClient(id);
+        nomEntreprise.setText(client.getEntreprise());
+        saisieAdresse.setText(client.getAdresse());
+        description.setText(client.getDescription());
+        clientProspect.check(client.isProspect() ? R.id.prospect : R.id.client);
+        prenomContact.setText(client.getPrenomContact());
+        nomContact.setText(client.getNomContact());
+        telephone.setText(client.getTelephone());
     }
 
     public void retour(View view) {
@@ -173,17 +189,6 @@ public class ActiviteDetailClient extends AppCompatActivity {
             donnees = null;
         }
         return donnees;
-    }
-
-    public void initialiserChamps() {
-        client = SingletonListeClient.getClient(id);
-        nomEntreprise.setText(client.getEntreprise());
-        saisieAdresse.setText(client.getAdresse());
-        description.setText(client.getDescription());
-        clientProspect.check(client.isProspect() ? R.id.prospect : R.id.client);
-        prenomContact.setText(client.getPrenomContact());
-        nomContact.setText(client.getNomContact());
-        telephone.setText(client.getTelephone());
     }
 
     private boolean isModifie() {

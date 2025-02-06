@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
@@ -90,8 +91,8 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_clients, container, false);
-        vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
 
+        vueDuFragment.findViewById(R.id.boutonAjoutClient).setOnClickListener(this);
         detailClient = new Intent(FragmentClients.this.getContext(), ActiviteDetailClient.class);
 
         listeClients = vueDuFragment.findViewById(R.id.recycler_view_clients);
@@ -176,7 +177,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void mettreAJourListeClients(ActivityResult resultat) {
         clients.clear();
-        for (Client client : SingletonListeClient.getListeClient()) {
+        for (Client client : SingletonListeClient.getInstance().getListeClient()) {
             clients.add(client);
         }
         mettreAJourTexteErreur();
@@ -188,7 +189,7 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void mettreAJourTexteErreur() {
         this.getView().findViewById(R.id.erreurPasDeClient)
-                .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
+            .setVisibility(clients.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /**
