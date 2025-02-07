@@ -1,5 +1,5 @@
 /*
- * ActivitePrincipale.java                                                27 nov. 2024
+ * GestionFragment.java                                             07 fev. 2025
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 package fr.iutrodez.sae501.cliandcollect.fragments;
@@ -21,12 +21,14 @@ import android.widget.ImageView;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 
 /**
- * Activité principale et point d'entrée de l'application.
+ * Gestion des fragments de l'application.
+ *
  * @author Loïc FAUGIERES
  */
 public class GestionFragment extends AppCompatActivity {
@@ -161,7 +163,9 @@ public class GestionFragment extends AppCompatActivity {
             finish();
             resultat = true;
         } else if (item.getItemId() == R.id.menu_compte) {
-            // TODO vue mon compte
+            Intent pageCompte = new Intent(this, ActiviteGestionCompte.class);
+            startActivity(pageCompte);
+            finish();
             resultat = true;
         }
 

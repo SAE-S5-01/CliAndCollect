@@ -66,8 +66,6 @@ public class ActiviteDetailClient extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_client);
 
-        intention = getIntent();
-
         nomEntreprise = findViewById(R.id.saisieNom);
         saisieAdresse = findViewById(R.id.saisieAdresse);
         description = findViewById(R.id.description);
@@ -84,6 +82,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
         boutonRetour.setOnClickListener(this::retour);
         boutonValider.setOnClickListener(this::valider);
 
+        intention = getIntent();
         id = intention.getIntExtra("ID", 0);
         initialiserChamps();
 

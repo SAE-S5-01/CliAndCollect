@@ -32,7 +32,8 @@
     <string name="menu_compte">Gérer mon compte</string>
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
-
+    <string name="modifier_compte">Modifier ses données personnelles</string>
+    <string name="erreur_modification_compte">Erreur lors de la modification de vos données, veuillez réessayer plus tard</string>
 
     <string name="valider">Valider</string>
     <string name="retour">Retour</string>
@@ -62,6 +63,7 @@
     <string name="erreur_creation_client">Erreur lors de la création d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_modification_client">Erreur lors de l\'édition d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_recuperation_clients">Aucune connexion internet, impossible de récupérer les clients</string>
+    <string name="erreur_recuperation_compte">Impossible de récupérer vos informations, réessayez plus tard</string>
 
     <string name="adresseClient">Adresse :</string>
     <string name="nom_itineraire">Nom :</string>

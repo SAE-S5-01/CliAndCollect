@@ -22,7 +22,7 @@
                 android:orientation="vertical"
                 android:gravity="center">
                 <TextView
-                    android:id="@+id/textViewInscription"
+                    android:id="@+id/titrePageCompte"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_span="2"
@@ -193,6 +193,7 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/actionInscription"
             android:layout_marginVertical="@dimen/inscription_marge_verticale_champs_texte">
             <LinearLayout
                 android:layout_width="0dp"
@@ -208,6 +209,40 @@
                     android:enabled="false"
                     android:text="@string/inscription"
                     android:textSize="22sp" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/actionsGestionCompte"
+            android:layout_marginVertical="28dp"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/boutonRetour"
+                    android:layout_width="@dimen/detail_client_largeur_boutons"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/bouton_secondaire"
+                    android:text="@string/retour"
+                    android:textSize="@dimen/detail_client_taille_texte_boutons" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/boutonModifier"
+                    android:layout_width="@dimen/detail_client_largeur_boutons"
+                    android:layout_height="wrap_content"
+                    android:text="@string/valider"
+                    android:textSize="@dimen/detail_client_taille_texte_boutons" />
             </LinearLayout>
         </TableRow>
 
