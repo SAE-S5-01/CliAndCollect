@@ -57,8 +57,6 @@ public class ActiviteDetailClient extends AppCompatActivity {
 
     private Intent intentionRetour;
 
-    private Intent intention;
-
     private ActivityResultLauncher<Intent> lanceurMap;
 
     @Override
@@ -76,13 +74,13 @@ public class ActiviteDetailClient extends AppCompatActivity {
 
         Button obtenirCoordonnees = findViewById(R.id.obtenirCoordonnees);
         Button boutonRetour = findViewById(R.id.boutonRetour);
-        boutonValider = findViewById(R.id.boutonModifier);
+        boutonValider = findViewById(R.id.boutonValider);
 
         obtenirCoordonnees.setOnClickListener(this::obtenirCoordonnees);
         boutonRetour.setOnClickListener(this::retour);
         boutonValider.setOnClickListener(this::valider);
 
-        intention = getIntent();
+        Intent intention = getIntent();
         id = intention.getIntExtra("ID", 0);
         initialiserChamps();
 

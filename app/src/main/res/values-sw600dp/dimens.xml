@@ -2,6 +2,7 @@
 <resources>
     <dimen name="app_marge_interieure">30dp</dimen>
     <dimen name="texte_defaut">18sp</dimen>
+    <dimen name="pages_taille_entete">30sp</dimen>
 
     <dimen name="connexion_largeur_champs">400dp</dimen>
     <dimen name="connexion_taille_titres">25sp</dimen>
@@ -25,6 +26,11 @@
     <dimen name="detail_client_texte_radios">@dimen/detail_client_taille_titres</dimen>
     <dimen name="detail_client_marge_radios">10dp</dimen>
     <dimen name="detail_client_marge_verticale_champs_texte">20dp</dimen>
+
+    <dimen name="detail_itineraire_largeur_champs">250dp</dimen>
+    <dimen name="detail_itineraire_taille_titres">20sp</dimen>
+    <dimen name="detail_itineraire_hauteur_liste">370dp</dimen>
+    <dimen name="detail_itineraire_marge_verticale_champs_texte">16dp</dimen>
 
     <dimen name="pied_page_hauteur_min">70dp</dimen>
     <dimen name="pied_page_icone_padding_haut">15dp</dimen>

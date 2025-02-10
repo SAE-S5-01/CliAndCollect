@@ -66,11 +66,12 @@
     <string name="erreur_recuperation_compte">Impossible de récupérer vos informations, réessayez plus tard</string>
 
     <string name="adresseClient">Adresse :</string>
-    <string name="nom_itineraire">Nom :</string>
-    <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
-    <string name="depart_itinéraire">Départ et arrivé de l\itinéraire : domicile</string>
+    <string name="nom_itineraire">Nom de l\'itinéraire :</string>
+    <string name="liste_clients_itineraire">Client(s) / prospect(s) à ajouter :</string>
+    <string name="etapes_itineraire">Étapes de l\'itinéraire :</string>
+    <string name="depart_itineraire">Départ et arrivée de l\'itinéraire : domicile</string>
     <string name="pasModifier">Aucune information n\'a été modifiée</string>
-    <string name="ajouter_itineraire">Ajouter un itinéraire</string>*
+    <string name="ajouter_itineraire">Ajouter un itinéraire</string>
     <string name="contact_a_ajouter">Veuillez entrer le nom de l\'entreprise du contact</string>
     <string name="indication_nom_itineraire">Veuillez entrer le nom de l\'itinéraire</string>
     <string name="indication_clients_itineraire">Veuillez sélectionner les clients à visiter</string>
@@ -91,7 +92,6 @@
     <string name="detail_itineraire">Détails de l\'itinéraire</string>
     <string name="erreur_nom_itineraire_non_renseigne">Nom de l\'itinéraire non renseigné</string>
     <string name="nombre_etape_depasse">Vous ne pouvez pas ajouter plus de 8 clients à votre itinéraire</string>
-    <string name="liste_contacts">Liste des contacts</string>
 
     <string name="supprimer_client">Supprimer un client / prospect</string>
     <string name="confirmation_suppression_client">"Êtes-vous sûr de vouloir supprimer ce client / prospect ?"</string>

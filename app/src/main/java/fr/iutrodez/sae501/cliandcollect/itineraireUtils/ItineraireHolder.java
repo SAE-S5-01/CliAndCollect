@@ -19,7 +19,7 @@ import fr.iutrodez.sae501.cliandcollect.R;
  * @author Lucas DESCRIAUD
  * @author Loïc FAUGIERES
  */
-public class ItineraireHolder extends RecyclerView.ViewHolder{
+public class ItineraireHolder extends RecyclerView.ViewHolder {
 
     private TextView nom;
 
