@@ -498,8 +498,6 @@ public class ClientApi {
         return waypoints;
     }
 
-
-
     public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
         try {
             requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,

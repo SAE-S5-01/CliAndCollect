@@ -27,7 +27,7 @@
                     android:layout_height="wrap_content"
                     android:layout_span="2"
                     android:text="@string/inscription"
-                    android:textSize="30sp"
+                    android:textSize="@dimen/pages_taille_entete"
                     android:textStyle="bold" />
             </LinearLayout>
         </TableRow>
