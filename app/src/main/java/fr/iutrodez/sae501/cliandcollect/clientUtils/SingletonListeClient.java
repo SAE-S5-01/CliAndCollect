@@ -61,12 +61,33 @@ public class SingletonListeClient {
     }
 
     /**
+     * Récupère un client par sa position dans la liste
+     * @param position La position du client dans la liste
+     * @return
+     */
+    public static Client getClient(int position) {
+        return getInstance().listeClients.get(position);
+    }
+
+    /**
      * Récupère un client par son identifiant
      * @param id L'identifiant du client
      * @return Le client correspondant à l'identifiant
      */
-    public static Client getClient(int id) {
-        return getInstance().listeClients.get(id);
+    public static Client getClient(Long id) {
+        Client clientTrouve = null;
+
+        for (int i = 0;
+             i < getInstance().listeClients.size()
+             && clientTrouve == null;
+             i++) {
+            Client client = getInstance().listeClients.get(i);
+            if (client.getID().equals(id)) {
+                clientTrouve = client;
+            }
+        }
+
+        return clientTrouve;
     }
 
     /**
