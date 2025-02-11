@@ -25,7 +25,7 @@
     <dimen name="detail_client_largeur_boutons">145dp</dimen>
     <dimen name="detail_client_texte_radios">14sp</dimen>
     <dimen name="detail_client_marge_radios">0dp</dimen>
-    <dimen name="detail_client_marge_verticale_champs_texte">14dp</dimen>
+    <dimen name="detail_client_marge_verticale_champs_texte">10dp</dimen>
 
     <dimen name="detail_itineraire_largeur_champs">150dp</dimen>
     <dimen name="detail_itineraire_taille_titres">20sp</dimen>

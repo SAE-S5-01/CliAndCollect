@@ -78,7 +78,6 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
 
         Intent intention = getIntent();
         id = intention.getIntExtra("ID", 0);
-        initialiserChamps();
 
         recyclerClientsDispo.setLayoutManager(new LinearLayoutManager(this));
         recyclerClientsSelectionnes.setLayoutManager(new LinearLayoutManager(this));
@@ -86,6 +85,8 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
         // Récupération des listes
         clientsDisponibles = new ArrayList<>(SingletonListeClient.getInstance().getListeClient());
         clientsAjoutes = new ArrayList<>();
+
+        initialiserChamps();
 
         // Initialisation des adaptateurs
         adapterClientsDispo = new ClientAdapter(clientsDisponibles, this::ajouterClient);
@@ -105,6 +106,15 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
     public void initialiserChamps() {
         itineraire = SingletonListeItineraire.getInstance().getItineraire(id);
         inputNomItineraire.setText(itineraire.getNom());
+        clientsAjoutes = new ArrayList<>();
+        for (Map.Entry<Long, String> entry : itineraire.getOrdreClients().entrySet()) {
+            clientsAjoutes.add(SingletonListeClient.getInstance().getClient(entry.getKey()));
+        }
+        for (Client c : clientsAjoutes) {
+            if (clientsDisponibles.contains(c)) {
+                clientsDisponibles.remove(c);
+            }
+        }
     }
 
     private void ajouterClient(int position) {
@@ -114,7 +124,6 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
             Client client = clientsDisponibles.remove(position);
             clientsAjoutes.add(client);
             mettreAJourListes();
-            boutonValider.setEnabled(true);
         }
     }
 
@@ -127,6 +136,7 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
     private void mettreAJourListes() {
         adapterClientsDispo.notifyDataSetChanged();
         adapterClientsSelectionnes.notifyDataSetChanged();
+        boutonValider.setEnabled(true);
     }
 
     @Override
@@ -166,9 +176,9 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
             JSONObject listePoint = new JSONObject();
             try {
                 jsonFinal.put("domicile",
-                        new JSONObject()
-                                .put("y", 42.7720709)
-                                .put("x", 2.98383)
+                    new JSONObject()
+                        .put("y", 42.7720709)
+                        .put("x", 2.98383)
                 );
                 for (Client c : clientsAjoutes) {
                     JSONObject point = new JSONObject();
@@ -186,14 +196,14 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
         }
     }
 
-    private void afficherCarteAvecItineraire(LinkedHashMap<Long , PointGPS> points) {
+    private void afficherCarteAvecItineraire(LinkedHashMap<Long, PointGPS> points) {
         runOnUiThread(() -> {
             try {
                 // Créer un conteneur pour la MapView
                 LinearLayout mapContainer = new LinearLayout(this);
                 mapContainer.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        dpToPx(400)
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dpToPx(400)
                 ));
 
                 // Initialiser la MapView
@@ -227,7 +237,7 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
                     .setTitle(inputNomItineraire.getText().toString().isEmpty()
                               ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
                               : String.format("%s : Voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?",
-                                      inputNomItineraire.getText().toString()))
+                                              inputNomItineraire.getText().toString()))
                     .setView(mapContainer)
                     .setPositiveButton("Valider", (dialogInterface, which) -> {
                         if (mapView != null) {
@@ -377,11 +387,19 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(this, R.string.erreur_creation_itineraire,
-                    Toast.LENGTH_SHORT).show();
+                           Toast.LENGTH_SHORT).show();
         }
     }
 
     private void modificationValide() {
+        itineraire.setNom(inputNomItineraire.getText().toString());
+
+        LinkedHashMap<Long, String> ordreClients = new LinkedHashMap<>();
+        for (Client c : clientsAjoutes) {
+            ordreClients.put(c.getID(), c.getEntreprise());
+        }
+        itineraire.setOrdreClients(ordreClients);
+
         setResult(AppCompatActivity.RESULT_OK);
         finish();
     }
