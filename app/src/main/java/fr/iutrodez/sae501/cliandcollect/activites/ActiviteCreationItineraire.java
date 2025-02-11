@@ -43,6 +43,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
@@ -156,11 +157,10 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
             JSONObject jsonFinal = new JSONObject();
             JSONObject listePoint = new JSONObject();
             try {
-                jsonFinal.put("domicile",
-                        new JSONObject()
-                                .put("y", 42.7720709)
-                                .put("x", 2.98383)
-                );
+                jsonFinal.put("domicile", new JSONObject()
+                    .put("y", Preferences.getLatitude(this))
+                    .put("x", Preferences.getLongitude(this))
+            );
                 for (Client c : clientsAjoutes) {
                     JSONObject point = new JSONObject();
                     point.put("x", c.getX());
