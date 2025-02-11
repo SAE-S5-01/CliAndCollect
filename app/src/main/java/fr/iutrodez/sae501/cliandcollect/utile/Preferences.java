@@ -67,7 +67,6 @@ public class Preferences {
      */
     public static String getLatitude(Context context) {
         init(context);
-        Log.e("lat" , preferencesApplication.getString("latitude", ""));;
         return preferencesApplication.getString("latitude", "");
     }
 
@@ -78,7 +77,6 @@ public class Preferences {
      */
     public static String getLongitude(Context context) {
         init(context);
-        Log.e("long" , preferencesApplication.getString("longitude", ""));;
         return preferencesApplication.getString("longitude", "");
     }
 

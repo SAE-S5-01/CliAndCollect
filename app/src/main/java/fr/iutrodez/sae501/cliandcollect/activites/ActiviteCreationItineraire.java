@@ -69,7 +69,6 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         // Associer les adaptateurs aux RecyclerView
         recyclerClientsDispo.setAdapter(adapterClientsDispo);
         recyclerClientsSelectionnes.setAdapter(adapterClientsSelectionnes);
-
     }
 
     private void ajouterClient(int position) {
