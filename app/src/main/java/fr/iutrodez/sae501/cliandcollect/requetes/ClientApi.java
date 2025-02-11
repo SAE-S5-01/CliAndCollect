@@ -545,16 +545,13 @@ public class ClientApi {
      * @param modificationReussie La méthode à appeler en cas de modification réussie
      */
     public static void modifierItineraire(Context contexte, JSONObject donnees, String id, Runnable modificationReussie) {
-        HashMap<String,String> parametre = new HashMap<>();
-        parametre.put("id", id);
-
         spineurChargement = new ProgressDialog(contexte);
         spineurChargement.setMessage(contexte.getString(R.string.chargement_modification));
         spineurChargement.setCancelable(false);
         spineurChargement.show();
 
         try {
-            requeteApi(contexte, Request.Method.PUT, "/itineraire", parametre, donnees,
+            requeteApi(contexte, Request.Method.PUT, "/itineraire/" + id, null, donnees,
                 response -> {
                     try {
                         spineurChargement.dismiss();
