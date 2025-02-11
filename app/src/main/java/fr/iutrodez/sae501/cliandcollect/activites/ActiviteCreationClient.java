@@ -54,8 +54,7 @@ public class ActiviteCreationClient extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_client);
 
-        TextView titre = findViewById(R.id.titreDetailClient);
-        titre.setText(R.string.ajouter_client);
+        ((TextView) findViewById(R.id.titreDetailClient)).setText(R.string.ajouter_client);
 
         nomEntreprise = findViewById(R.id.saisieNom);
         saisieAdresse = findViewById(R.id.saisieAdresse);
@@ -66,13 +65,12 @@ public class ActiviteCreationClient extends AppCompatActivity {
         telephone = findViewById(R.id.telephone);
 
         Button obtenirCoordonnees = findViewById(R.id.obtenirCoordonnees);
-        Button boutonRetour = findViewById(R.id.boutonRetour);
-        boutonValider = findViewById(R.id.boutonModifier);
+        boutonValider = findViewById(R.id.boutonValider);
 
         obtenirCoordonnees.setOnClickListener(this::obtenirCoordonnees);
         obtenirCoordonnees.setBackgroundTintList(getResources().getColorStateList(R.color.bouton_principal));
 
-        boutonRetour.setOnClickListener(this::retour);
+        findViewById(R.id.boutonRetour).setOnClickListener(this::retour);
         boutonValider.setOnClickListener(this::valider);
 
         lanceurMap = registerForActivityResult(

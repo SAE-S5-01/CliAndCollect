@@ -73,10 +73,6 @@ public class Itineraire {
         }
     }
 
-    public LinkedHashMap<Long, String> setItineraire(LinkedHashMap<Long, String> ordreClients){
-        return this.ordreClients = ordreClients;
-    }
-
     public String getID(){
         return ID;
     }
@@ -91,6 +87,10 @@ public class Itineraire {
 
     public LinkedHashMap<Long, String> getOrdreClients() {
         return ordreClients;
+    }
+
+    public void setOrdreClients(LinkedHashMap<Long, String> ordreClients) {
+        this.ordreClients = ordreClients;
     }
 
     public ArrayList<Double[]> getListeCoordonnees() {

@@ -2,6 +2,7 @@
 <resources>
     <dimen name="app_marge_interieure">15dp</dimen>
     <dimen name="texte_defaut">18sp</dimen>
+    <dimen name="pages_taille_entete">24sp</dimen>
 
     <dimen name="connexion_largeur_champs">300dp</dimen>
     <dimen name="connexion_taille_titres">25sp</dimen>
@@ -18,13 +19,18 @@
     <dimen name="liste_client_marge_texte">5dp</dimen>
     <dimen name="liste_client_marge_haute">16dp</dimen>
 
-    <dimen name="detail_client_largeur_champs">160dp</dimen>
+    <dimen name="detail_client_largeur_champs">150dp</dimen>
     <dimen name="detail_client_taille_titres">20sp</dimen>
     <dimen name="detail_client_taille_texte_boutons">22sp</dimen>
     <dimen name="detail_client_largeur_boutons">145dp</dimen>
     <dimen name="detail_client_texte_radios">14sp</dimen>
     <dimen name="detail_client_marge_radios">0dp</dimen>
-    <dimen name="detail_client_marge_verticale_champs_texte">14dp</dimen>
+    <dimen name="detail_client_marge_verticale_champs_texte">10dp</dimen>
+
+    <dimen name="detail_itineraire_largeur_champs">150dp</dimen>
+    <dimen name="detail_itineraire_taille_titres">20sp</dimen>
+    <dimen name="detail_itineraire_hauteur_liste">300dp</dimen>
+    <dimen name="detail_itineraire_marge_verticale_champs_texte">12dp</dimen>
 
     <dimen name="pied_page_hauteur_min">60dp</dimen>
     <dimen name="pied_page_icone_padding_haut">12dp</dimen>

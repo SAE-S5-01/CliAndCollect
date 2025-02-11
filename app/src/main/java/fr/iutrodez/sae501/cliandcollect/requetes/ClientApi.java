@@ -38,6 +38,7 @@ import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
@@ -370,7 +371,7 @@ public class ClientApi {
 
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
         spineurChargement = new ProgressDialog(contexte);
-        spineurChargement.setMessage(contexte.getString(R.string.attente_inscription));
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_ajout));
         spineurChargement.setCancelable(false);
         spineurChargement.show();
 
@@ -501,13 +502,18 @@ public class ClientApi {
         return waypoints;
     }
 
-
-
     public static void creationItineraire(Context contexte, JSONObject donnees, Runnable creationReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_ajout));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
             requeteApi(contexte, Request.Method.POST, "/itineraire", null , donnees,
                 response -> {
                     try {
+                        spineurChargement.dismiss();
+
                         // En cas de succès, on ajoute l'itinéraire au singleton pour faire l'affichage
                         JSONObject jsonReponse = new JSONObject(response);
                         //((ActiviteCreationItineraire) contexte).runOnUiThread(creationReussie);
@@ -522,16 +528,25 @@ public class ClientApi {
                     }
                 },
                 error -> {
-                        // TODO gestion erreur api
-                        //gestionErreur(contexte, error);
-                        Log.e("erreur", error.toString());
+                    spineurChargement.dismiss();
+                    // TODO gestion erreur api
+                    //gestionErreur(contexte, error);
+                    Log.e("erreur", error.toString());
                 }
             );
         } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
             Log.e("erreur", e.toString());
         }
     }
 
+    /**
+     * Modification d'un itinéraire existant.
+     * @param contexte Le contexte de l'application
+     * @param donnees Les données de l'itinéraire
+     * @param id L'identifiant de l'itinéraire
+     * @param modificationReussie La méthode à appeler en cas de modification réussie
+     */
     public static void modifierItineraire(Context contexte, JSONObject donnees, String id, Runnable modificationReussie) {
         HashMap<String,String> parametre = new HashMap<>();
         parametre.put("id", id);
@@ -544,8 +559,12 @@ public class ClientApi {
         try {
             requeteApi(contexte, Request.Method.PUT, "/itineraire", parametre, donnees,
                 response -> {
-                    spineurChargement.dismiss();
-                    //((ActiviteDetailItineraire) contexte).runOnUiThread(modificationReussie);
+                    try {
+                        spineurChargement.dismiss();
+                        ((ActiviteDetailItineraire) contexte).runOnUiThread(modificationReussie);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 },
                 error -> {
                     spineurChargement.dismiss();
@@ -557,6 +576,12 @@ public class ClientApi {
         }
     }
 
+    /**
+     * Méthode permettant de supprimer un itinéraire.
+     * @param contexte Le contexte de l'application
+     * @param id L'identifiant de l'itinéraire à supprimer
+     * @param suppressionReussie La méthode à appeler en cas de suppression réussie
+     */
     public static void supprimerItineraire(Context contexte, String id, Runnable suppressionReussie) {
         spineurChargement = new ProgressDialog(contexte);
         spineurChargement.setMessage(contexte.getString(R.string.chargement_suppression));
@@ -733,7 +758,7 @@ public class ClientApi {
     }
 
     /**
-     * Méthode permettant de gérer les erreurs lors de la création d'un itinéraire.
+     * Méthode permettant de gérer les erreurs lors de la gestion d'un itinéraire.
      * @param contexte Le contexte de l'application
      * @param erreur L'erreur retournée par l'API
      */
@@ -742,10 +767,9 @@ public class ClientApi {
 
         if (contexte instanceof ActiviteCreationItineraire) {
             activite = (ActiviteCreationItineraire) contexte;
+        } else if (contexte instanceof ActiviteDetailItineraire) {
+            activite = (ActiviteDetailItineraire) contexte;
         }
-        // } else if (contexte instanceof ActiviteDetailItineraire) {
-        //    activite = (ActiviteDetailItineraire) contexte;
-        //}
 
         final AppCompatActivity finalActivite = activite;
 
@@ -757,12 +781,11 @@ public class ClientApi {
                 JSONObject erreurs = jsonResponse.getJSONObject("erreur");
 
                 activite.runOnUiThread(() -> {
-                    /*afficherErreurs(finalActivite, erreurs, new int[] {
-                        R.id.saisieNom, R.id.description, R.id.saisieAdresse,
-                        R.id.prenomContact, R.id.nomContact, R.id.telephone
+                    afficherErreurs(finalActivite, erreurs, new int[] {
+                        R.id.saisieNomItineraire
                     }, new String[] {
-                        "entreprise", "description", "adresse", "prenom", "nom", "telephone"
-                    });*/
+                        "nomItineraire"
+                    });
                 });
             } catch (Exception e) {
                 Toast.makeText(contexte, R.string.erreur_inconnue, Toast.LENGTH_LONG);
