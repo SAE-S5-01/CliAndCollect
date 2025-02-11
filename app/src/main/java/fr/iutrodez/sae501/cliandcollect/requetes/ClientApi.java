@@ -189,7 +189,10 @@ public class ClientApi {
 
                         JSONObject jsonReponse = new JSONObject(response);
                         String token = jsonReponse.getString("token");
+                        String longitude = jsonReponse.getString("x");
+                        String latitude = jsonReponse.getString("y");
                         Preferences.sauvegarderTokenApi(contexte, token);
+                        Preferences.sauvegarderCoordonnees(contexte, latitude, longitude);
                         ((Activity) contexte).runOnUiThread(connexionReussie);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
