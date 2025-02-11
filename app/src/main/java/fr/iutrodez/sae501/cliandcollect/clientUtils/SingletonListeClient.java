@@ -5,8 +5,12 @@
 
 package fr.iutrodez.sae501.cliandcollect.clientUtils;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
 /**
  * Singleton permettant de gérer la liste des clients
@@ -35,6 +39,15 @@ public class SingletonListeClient {
             instance = new SingletonListeClient();
         }
         return instance;
+    }
+
+    /**
+     * Récupère la liste des clients depuis l'API
+     * @param contexte Le contexte de l'application
+     * @param action L'action à effectuer après la récupération
+     */
+    public static void recupererClients(Context contexte, Runnable action) {
+        ClientApi.getListeClient(contexte, action);
     }
 
     /**
