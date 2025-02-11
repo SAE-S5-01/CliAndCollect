@@ -8,6 +8,8 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -98,6 +100,21 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
 
         findViewById(R.id.boutonRetour).setOnClickListener(this::retour);
         boutonValider.setOnClickListener(this::valider);
+
+        TextWatcher champModifieListener = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boutonValider.setEnabled(true);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        inputNomItineraire.addTextChangedListener(champModifieListener);
     }
 
     /**

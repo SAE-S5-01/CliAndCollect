@@ -92,6 +92,11 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
         findViewById(R.id.boutonRetour).setOnClickListener(this::retour);
         boutonValider.setOnClickListener(this::valider);
+
+        if (clientsDisponibles.isEmpty()) {
+            SnackbarCustom.show(this, R.string.erreur_aucun_client, SnackbarCustom.STYLE_ERREUR);
+            actionRetardee(() -> retour(null));
+        }
     }
 
     private void ajouterClient(int position) {
@@ -370,5 +375,14 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
     private void creationOk() {
         setResult(AppCompatActivity.RESULT_OK);
         finish();
+    }
+
+    /**
+     * Attendre 10 secondes puis effectuer l'action passée en paramètre
+     *
+     * @param action Action à effectuer
+     */
+    private void actionRetardee(Runnable action) {
+        new android.os.Handler().postDelayed(() -> action.run(), 3000);
     }
 }
