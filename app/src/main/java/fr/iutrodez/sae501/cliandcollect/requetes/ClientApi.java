@@ -14,10 +14,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
@@ -135,10 +139,19 @@ public class ClientApi {
         // Déterminer le type de requête
         Request request;
         if (donnees != null) {
-            // Utiliser JsonObjectRequest si un body JSON est présent
-            request = new JsonObjectRequest(methode, url, donnees,
-                                            response -> reussite.onResponse(response.toString()),
-                                            erreur) {
+            request = new JsonRequest<String>(methode, url, donnees.toString(),
+                response -> gestionReponseRequeteAvecDonnees(response, reussite, erreur),
+                erreur) {
+                @Override
+                protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                    try {
+                        String json = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                        return Response.success(json, HttpHeaderParser.parseCacheHeaders(response));
+                    } catch (UnsupportedEncodingException e) {
+                        return Response.error(new ParseError(e));
+                    }
+                }
+
                 @Override
                 public Map<String, String> getHeaders() {
                     return genererHeaders(route, contexte);
@@ -155,6 +168,29 @@ public class ClientApi {
         }
         // Ajouter la requête à la file d'attente
         RequeteVolley.getInstance(contexte).ajoutFileRequete(request);
+    }
+
+    /**
+     * Gestion d'une réponse de l'API à une requête contenant des données.
+     * @param response La réponse de l'API
+     * @param reussite La méthode à appeler en cas de réussite
+     * @param erreur La méthode à appeler en cas d'erreur
+     */
+    private static void gestionReponseRequeteAvecDonnees(String response,
+                                                  Response.Listener<String> reussite,
+                                                  Response.ErrorListener erreur) {
+        try {
+            // Vérifier si la réponse est un JSONArray ou un JSONObject
+            if (response.trim().startsWith("[")) {
+                JSONArray jsonArray = new JSONArray(response);
+                reussite.onResponse(jsonArray.toString());
+            } else {
+                JSONObject jsonObject = new JSONObject(response);
+                reussite.onResponse(jsonObject.toString());
+            }
+        } catch (JSONException e) {
+            erreur.onErrorResponse(new VolleyError("Réponse invalide", e));
+        }
     }
 
     /**
@@ -411,8 +447,18 @@ public class ClientApi {
         try {
             requeteApi(contexte, Request.Method.PUT, "/contact", parametre, donnees,
                 response -> {
-                    spineurChargement.dismiss();
-                    ((ActiviteDetailClient) contexte).runOnUiThread(modificationReussie);
+                    try {
+                        spineurChargement.dismiss();
+                        JSONArray jsonReponse = new JSONArray(response);
+
+                        for (int i = 0; i < jsonReponse.length(); i++) {
+                            SingletonListeItineraire.getInstance()
+                            .supprimerItineraire(jsonReponse.getString(i));
+                        }
+                        ((ActiviteDetailClient) contexte).runOnUiThread(modificationReussie);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                 },
                 error -> {
                     spineurChargement.dismiss();
