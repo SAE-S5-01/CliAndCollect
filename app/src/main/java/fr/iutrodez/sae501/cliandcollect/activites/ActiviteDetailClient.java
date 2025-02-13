@@ -247,11 +247,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
      * @return true si le contact est dans un itinéraire, false sinon
      */
     public static boolean estContactDansItineraire(Long idContact) {
-        for (Itineraire itineraire : SingletonListeItineraire.getInstance().getListeItineraires()) {
-            if (itineraire.getOrdreClients().containsKey(idContact)) {
-                return true;
-            }
-        }
-        return false;
+        return SingletonListeItineraire.getInstance().getListeItineraires().stream()
+               .anyMatch(itineraire -> itineraire.getOrdreClients().containsKey(idContact));
     }
 }
