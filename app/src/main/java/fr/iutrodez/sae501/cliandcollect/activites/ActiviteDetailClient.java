@@ -7,6 +7,7 @@ package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +24,8 @@ import org.json.JSONObject;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -132,33 +135,54 @@ public class ActiviteDetailClient extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Valider les modifications du client.
+     * @param view Le bouton "Valider"
+     */
     public void valider(View view) {
         intentionRetour.putExtra("ID", id);
         if (isModifie()) {
             if (nomEntreprise.getText().toString().isEmpty()) {
                 this.nomEntreprise.setError(getString(R.string.erreur_nom_entreprise_non_renseigne));
             } else {
-                JSONObject donnees = formulaireEnJson();
-                if (Reseau.reseauDisponible(ActiviteDetailClient.this, true)
-                    && donnees != null) {
-                    ClientApi.modificationClient(this, donnees, client.getID().toString(),
-                        () -> {
-                            client.setEntreprise(nomEntreprise.getText().toString());
-                            client.setDescription(description.getText().toString());
-                            client.setAdresse(saisieAdresse.getText().toString());
-                            client.setX(longitude);
-                            client.setY(latitude);
-                            client.setNomContact(nomContact.getText().toString());
-                            client.setPrenomContact(prenomContact.getText().toString());
-                            client.setTelephone(telephone.getText().toString());
-                            client.setEstProspect(isProspect);
-                            setResult(AppCompatActivity.RESULT_OK, intentionRetour);
-                            finish();
-                        });
+                if (!nomEntreprise.getText().toString().equals(client.getEntreprise())
+                    && estContactDansItineraire(client.getID())) {
+                    SnackbarCustom.show(ActiviteDetailClient.this,
+                                        R.string.info_modif_nom_entreprise,
+                                        SnackbarCustom.STYLE_INFORMATION);
+
+                    // On attend 3 secondes avant de continuer
+                    new Handler().postDelayed(this::secondePartieValidation, 3500);
+                } else {
+                    secondePartieValidation();
                 }
             }
         } else {
             SnackbarCustom.show(this, R.string.pasModifie, SnackbarCustom.STYLE_ATTENTION);
+        }
+    }
+
+    /**
+     * Seconde partie de la modification d'un contact exécutée ou non avec un délais de 3 secondes.
+     */
+    private void secondePartieValidation() {
+        JSONObject donnees = formulaireEnJson();
+        if (Reseau.reseauDisponible(ActiviteDetailClient.this, true)
+            && donnees != null) {
+            ClientApi.modificationClient(this, donnees, client.getID().toString(),
+                () -> {
+                    client.setEntreprise(nomEntreprise.getText().toString());
+                    client.setDescription(description.getText().toString());
+                    client.setAdresse(saisieAdresse.getText().toString());
+                    client.setX(longitude);
+                    client.setY(latitude);
+                    client.setNomContact(nomContact.getText().toString());
+                    client.setPrenomContact(prenomContact.getText().toString());
+                    client.setTelephone(telephone.getText().toString());
+                    client.setEstProspect(isProspect);
+                    setResult(AppCompatActivity.RESULT_OK, intentionRetour);
+                    finish();
+                });
         }
     }
 
@@ -215,5 +239,15 @@ public class ActiviteDetailClient extends AppCompatActivity {
             longitude = retour.getDoubleExtra("longitude", Double.NaN);
             saisieAdresse.setText(retour.getStringExtra("adresse"));
         }
+    }
+
+    /**
+     * Vérifier si un contact est dans un itinéraire.
+     * @param idContact L'identifiant du contact
+     * @return true si le contact est dans un itinéraire, false sinon
+     */
+    public static boolean estContactDansItineraire(Long idContact) {
+        return SingletonListeItineraire.getInstance().getListeItineraires().stream()
+               .anyMatch(itineraire -> itineraire.getOrdreClients().containsKey(idContact));
     }
 }

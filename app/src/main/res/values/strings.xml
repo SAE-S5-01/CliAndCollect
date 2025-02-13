@@ -59,6 +59,7 @@
     <string name="indication_telephone">Ex. : +33612345678</string>
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
+    <string name="info_modif_nom_entreprise">Ce client / prospect est présent dans un itinéraire, ce dernier sera mis à jour en conséquence</string>
     <string name="pasModifie">Aucune information n\'a été modifiée</string>
     <string name="erreur_aucun_client">Aucun client ou prospect n\'a été ajouté</string>
     <string name="erreur_creation_client">Erreur lors de la création d\'un client \/ prospect, veuillez réessayer plus tard</string>
