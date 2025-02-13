@@ -345,7 +345,7 @@ public class ClientApi {
      * @param contexte Le contexte de l'application
      * @param callback La méthode à appeler en cas de succès
      */
-    public static void getListeItineraire(Context contexte , Runnable callback) {
+    public static void getListeItineraires(Context contexte , Runnable callback) {
         requeteApi(contexte, Request.Method.GET, "/itineraire", null, null,
             response -> {
                 try {

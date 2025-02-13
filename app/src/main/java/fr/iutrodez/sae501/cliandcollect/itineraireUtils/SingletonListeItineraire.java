@@ -5,8 +5,12 @@
 
 package fr.iutrodez.sae501.cliandcollect.itineraireUtils;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
 /**
  * Singleton permettant de gérer la liste des itineraires
@@ -35,6 +39,15 @@ public class SingletonListeItineraire {
             instance = new SingletonListeItineraire();
         }
         return instance;
+    }
+
+    /**
+     * Récupère la liste des itinéraires depuis l'API
+     * @param contexte Le contexte de l'application
+     * @param action L'action à effectuer après la récupération
+     */
+    public static void recupererItineraires(Context contexte, Runnable action) {
+        ClientApi.getListeItineraires(contexte, action);
     }
 
     /**

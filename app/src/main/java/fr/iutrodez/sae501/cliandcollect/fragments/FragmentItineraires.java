@@ -4,7 +4,6 @@
  */
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -142,8 +141,9 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
      */
     private void recupererItineraires() {
         if (Reseau.reseauDisponible(this.getContext())) {
-            ClientApi.getListeItineraire(this.getContext(),
-                () -> mettreAJourListeItineraires(null));
+            SingletonListeClient.recupererClients(this.getContext(), () -> {
+                mettreAJourListeItineraires(null);
+            });
         } else {
             SnackbarCustom.show(this.getContext(),
                                 R.string.erreur_recuperation_itineraires,
