@@ -95,6 +95,7 @@
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
     <string name="detail_itineraire">Détails de l\'itinéraire</string>
     <string name="erreur_nom_itineraire_non_renseigne">Nom de l\'itinéraire non renseigné</string>
+    <string name="erreur_ajout_client_vide">Veuillez ajouter au moins 1 client / prospect</string>
     <string name="nombre_etape_depasse">Vous ne pouvez pas ajouter plus de 8 clients à votre itinéraire</string>
 
     <string name="supprimer_client">Supprimer un client / prospect</string>

@@ -188,6 +188,8 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
     public void valider(View view) {
         if (inputNomItineraire.getText().toString().isEmpty()) {
             inputNomItineraire.setError(getString(R.string.erreur_nom_itineraire_non_renseigne));
+        } else if (clientsAjoutes.isEmpty()) {
+            SnackbarCustom.show(this, R.string.erreur_ajout_client_vide, SnackbarCustom.STYLE_ERREUR);
         } else if (Reseau.reseauDisponible(this, true)) {
             JSONObject jsonFinal = new JSONObject();
             JSONObject listePoint = new JSONObject();
