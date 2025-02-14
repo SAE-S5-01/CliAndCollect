@@ -49,6 +49,9 @@
         <activity
             android:name=".activites.ActiviteCreationItineraire"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activites.ActiviteParcours"
+            android:screenOrientation="portrait" />
         <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
     </application>
 

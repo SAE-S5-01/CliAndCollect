@@ -5,20 +5,25 @@
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteParcours;
 
 /**
  * Gestion du fragment Parcours.
  * @author Loïc FAUGIERES
  */
 public class FragmentParcours extends Fragment implements View.OnClickListener {
+
+    private Button boutonParcours;
 
     /**
      * @return Une nouvelle instance de FragmentParcours.
@@ -57,6 +62,9 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // On récupère la vue (le layout) associée au fragment affiché
         View vueDuFragment = inflater.inflate(R.layout.fragment_parcours, container, false);
+        vueDuFragment.findViewById(R.id.startParcours).setOnClickListener(this);
+
+
 
         return vueDuFragment;
     }
@@ -68,7 +76,8 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+        Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
+        startActivity(intent);
     }
 
 }

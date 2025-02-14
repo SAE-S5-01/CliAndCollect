@@ -23,6 +23,7 @@ androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espres
 androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 osmbonuspack = { module = "com.github.MKergall:osmbonuspack", version.ref = "osmbonuspack" }
 osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "21.3.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.1.4" }
