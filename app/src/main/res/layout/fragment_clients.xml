@@ -43,7 +43,7 @@
         android:id="@+id/recycler_view_clients"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/liste_client_marge_haute"
+        android:layout_marginTop="@dimen/liste_marge_haute"
         android:layout_marginHorizontal="13dp" />
 
 </LinearLayout>
