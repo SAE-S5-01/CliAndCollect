@@ -60,6 +60,8 @@
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
     <string name="info_modif_nom_entreprise">Ce client / prospect est présent dans un itinéraire, ce dernier sera mis à jour en conséquence</string>
+    <string name="changement_adresse">Changement d\'adresse</string>
+    <string name="adresse_confirmation_modification">"L'adresse de ce client / prospect figure dans un itinéraire. Changer l'adresse supprimera cet itinéraire.\nVoulez-vous continuer ?"</string>
     <string name="pasModifie">Aucune information n\'a été modifiée</string>
     <string name="erreur_aucun_client">Aucun client ou prospect n\'a été ajouté</string>
     <string name="erreur_creation_client">Erreur lors de la création d\'un client \/ prospect, veuillez réessayer plus tard</string>

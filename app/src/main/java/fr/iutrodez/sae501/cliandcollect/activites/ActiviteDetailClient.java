@@ -11,15 +11,19 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.RadioGroup;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
@@ -128,6 +132,9 @@ public class ActiviteDetailClient extends AppCompatActivity {
         prenomContact.setText(client.getPrenomContact());
         nomContact.setText(client.getNomContact());
         telephone.setText(client.getTelephone());
+
+        latitude = client.getY();
+        longitude = client.getX();
     }
 
     public void retour(View view) {
@@ -197,9 +204,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
             donnees.put("prenomContact", prenomContact.getText().toString());
             donnees.put("nomContact", nomContact.getText().toString());
             donnees.put("prospect", clientProspect.getCheckedRadioButtonId() == R.id.prospect);
-            latitude = latitude != 0.0 ? latitude : client.getY();
             donnees.put("latitude", latitude);
-            longitude = longitude != 0.0 ? longitude : client.getX();
             donnees.put("longitude", longitude);
         } catch (Exception e) {
             SnackbarCustom.show(this,
@@ -231,14 +236,47 @@ public class ActiviteDetailClient extends AppCompatActivity {
         lanceurMap.launch(map);
     }
 
+    /**
+     * Gestion du retour de la vue de sélection d'une adresse.
+     * Si le changement porte sur l’adresse et que l’entreprise figure
+     * déjà dans un itinéraire, l’utilisateur sera prévenu et informé
+     * que les itinéraires comportant ce client seront supprimés.
+     * Une possibilité d'annulation est présente.
+     *
+     * @param retourMap Le retour de la vue de sélection d'une adresse
+     */
     private void retourMap(ActivityResult retourMap) {
         Intent retour = retourMap.getData();
 
         if (retourMap.getResultCode() == RESULT_OK) {
-            latitude = retour.getDoubleExtra("latitude", Double.NaN);
-            longitude = retour.getDoubleExtra("longitude", Double.NaN);
-            saisieAdresse.setText(retour.getStringExtra("adresse"));
+            String nouvelleAdresse = retour.getStringExtra("adresse");
+            double nouvelleLatitude = retour.getDoubleExtra("latitude", Double.NaN);
+            double nouvelleLongitude = retour.getDoubleExtra("longitude", Double.NaN);
+
+            if (!nouvelleAdresse.equals(client.getAdresse())
+                && estContactDansItineraire(client.getID())) {
+                new AlertDialog.Builder(this)
+                    .setTitle(R.string.changement_adresse)
+                    .setMessage(R.string.adresse_confirmation_modification)
+                    .setPositiveButton("Oui", (dialog, which) -> mettreAJourAdresse(nouvelleAdresse, nouvelleLatitude, nouvelleLongitude))
+                    .setNegativeButton("Non", (dialog, which) -> mettreAJourAdresse(client.getAdresse(), client.getY(), client.getX()))
+                    .show();
+            } else {
+                mettreAJourAdresse(nouvelleAdresse, nouvelleLatitude, nouvelleLongitude);
+            }
         }
+    }
+
+    /**
+     * Mettre à jour l'adresse du client.
+     * @param adresse L'adresse du client
+     * @param latitude La latitude
+     * @param longitude La longitude
+     */
+    private void mettreAJourAdresse(String adresse, double latitude, double longitude) {
+        this.saisieAdresse.setText(adresse);
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     /**

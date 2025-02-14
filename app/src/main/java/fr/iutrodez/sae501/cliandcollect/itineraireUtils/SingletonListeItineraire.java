@@ -67,6 +67,19 @@ public class SingletonListeItineraire {
     }
 
     /**
+     * Supprime un itineraire de la liste des itineraires
+     * @param id L'identifiant de l'itinéraire à supprimer
+     */
+    public static void supprimerItineraire(String id) {
+        for (Itineraire itineraire : getInstance().listeItineraires) {
+            if (itineraire.getID().equals(id)) {
+                getInstance().listeItineraires.remove(itineraire);
+                break;
+            }
+        }
+    }
+
+    /**
      * @return La liste des itinéraires
      */
     public static List<Itineraire> getListeItineraires() {
@@ -74,12 +87,12 @@ public class SingletonListeItineraire {
     }
 
     /**
-     * Récupère un itinéraire par son identifiant
-     * @param id L'identifiant du itineraire
+     * Récupère un itinéraire par son identifiant dans la liste
+     * @param idListe L'identifiant de l'itinéraire dans la liste
      * @return Le itineraire correspondant à l'identifiant
      */
-    public static Itineraire getItineraire(int id) {
-        return getInstance().listeItineraires.get(id);
+    public static Itineraire getItineraire(int idListe) {
+        return getInstance().listeItineraires.get(idListe);
     }
 
     /**
