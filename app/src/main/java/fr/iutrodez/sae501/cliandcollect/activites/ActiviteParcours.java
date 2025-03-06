@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -42,6 +43,9 @@ public class ActiviteParcours extends AppCompatActivity {
     private List<GeoPoint> pathPoints;
     private IMapController mapController;
 
+    private TextView prochaineDestination;
+
+
     private static final float DISTANCE_THRESHOLD = 15.0f; // Distance minimale en mètres
     private Location lastLocation = null;
 
@@ -49,6 +53,12 @@ public class ActiviteParcours extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_parcours);
+
+        prochaineDestination = findViewById(R.id.prochaineDestination);
+        prochaineDestination.setText("Prochain client : " + "Nom de la destination");
+
+        findViewById(R.id.boutonPause).setOnClickListener(v -> mettreEnPauseParcours());
+        findViewById(R.id.boutonStop).setOnClickListener(v -> stopperParcours());
 
         // Initialisation d'OSMDroid
         Configuration.getInstance().setUserAgentValue(getPackageName());
@@ -60,7 +70,8 @@ public class ActiviteParcours extends AppCompatActivity {
 
         // Initialisation du marqueur utilisateur
         userMarker = new Marker(map);
-        userMarker.setTitle("Ma Position");
+        userMarker.setTitle("Ma position");
+        userMarker.setIcon(getResources().getDrawable(R.drawable.ic_ma_position));
         map.getOverlays().add(userMarker);
 
         // Initialisation du tracé
@@ -98,9 +109,9 @@ public class ActiviteParcours extends AppCompatActivity {
         }
 
         LocationRequest locationRequest = LocationRequest.create()
-                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-                .setInterval(3000) // Toutes les 5 secondes
-                .setFastestInterval(2000); // Minimum 3 seconde entre 2 updates
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setInterval(3000) // Toutes les 5 secondes
+            .setFastestInterval(2000); // Minimum 3 seconde entre 2 updates
 
         locationCallback = new LocationCallback() {
             @Override
@@ -171,6 +182,18 @@ public class ActiviteParcours extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CODE_REQUETE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startLocationUpdates();
+        }
+    }
+
+    private void mettreEnPauseParcours() {
+        if (clientDeLocalisation != null) {
+            clientDeLocalisation.removeLocationUpdates(locationCallback);
+        }
+    }
+
+    private void stopperParcours() {
+        if (clientDeLocalisation != null) {
+            clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
     }
 }
