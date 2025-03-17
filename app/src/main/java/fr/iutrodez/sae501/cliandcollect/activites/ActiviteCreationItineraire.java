@@ -161,8 +161,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
             try {
                 jsonFinal.put("domicile", new JSONObject()
                     .put("y", Preferences.getLatitude(this))
-                    .put("x", Preferences.getLongitude(this))
-            );
+                    .put("x", Preferences.getLongitude(this)));
                 for (Client c : clientsAjoutes) {
                     JSONObject point = new JSONObject();
                     point.put("x", c.getX());

@@ -5,21 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    style="@style/AppStyle"
     tools:context=".fragments.FragmentParcours">
 
     <Button
         android:id="@+id/startParcours"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_marginHorizontal="3dp"
         android:text="@string/creation_parcours" />
 
     <LinearLayout
-        android:id="@+id/erreurPasDeParcours"
+        android:id="@+id/erreurPasDItineraire"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
-        android:layout_marginHorizontal="25dp"
         android:gravity="center"
         android:visibility="gone">
         <ImageView
@@ -35,26 +35,24 @@
             android:gravity="start"
             android:textSize="@dimen/detail_client_taille_titres"
             android:text="@string/erreur_aucun_parcours"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/parcoursEnCours"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="@dimen/listes_marge_haute"
         android:orientation="vertical"
         android:gravity="center">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
+            android:layout_marginHorizontal="3dp"
             android:textSize="@dimen/detail_client_taille_titres"
             android:text="Parcours en cours :"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_parcours_en_cours"
@@ -67,8 +65,7 @@
         android:id="@+id/parcoursEnPause"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="@dimen/listes_marge_haute"
         android:orientation="vertical"
         android:gravity="center">
         <TextView
@@ -76,10 +73,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:gravity="start"
+            android:layout_marginHorizontal="3dp"
             android:textSize="@dimen/detail_client_taille_titres"
             android:text="Parcours en pause :"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_parcours_en_pause"
@@ -92,8 +89,7 @@
         android:id="@+id/parcoursArretes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="@dimen/listes_marge_haute"
         android:orientation="vertical"
         android:gravity="center">
         <TextView
@@ -101,13 +97,37 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:gravity="start"
+            android:layout_marginHorizontal="3dp"
             android:textSize="@dimen/detail_client_taille_titres"
             android:text="Parcours arrêtés :"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_parcours_arretes"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/parcoursTermines"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/listes_marge_haute"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:layout_marginHorizontal="3dp"
+            android:textSize="@dimen/detail_client_taille_titres"
+            android:text="Parcours terminés :"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_parcours_termines"
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_marginTop="10dp" />
