@@ -1,6 +1,7 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
@@ -66,13 +68,13 @@ public class ActiviteParcours extends AppCompatActivity {
 
         findViewById(R.id.boutonPause).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
-        findViewById(R.id.boutonPause).setOnLongClickListener(v -> mettreEnPauseParcours());
+        findViewById(R.id.boutonPause).setOnLongClickListener(v -> modifierStatutParcours("EN_PAUSE"));
 
         findViewById(R.id.boutonPasser).setOnClickListener(v -> passerClient());
 
         findViewById(R.id.boutonStop).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
-        findViewById(R.id.boutonStop).setOnLongClickListener(v -> stopperParcours());
+        findViewById(R.id.boutonStop).setOnLongClickListener(v -> modifierStatutParcours("ARRETE"));
 
         // Initialisation d'OSMDroid
         Configuration.getInstance().setUserAgentValue(getPackageName());
@@ -199,55 +201,45 @@ public class ActiviteParcours extends AppCompatActivity {
         }
     }
 
-    private boolean mettreEnPauseParcours() {
-        if (clientDeLocalisation != null) {
-            clientDeLocalisation.removeLocationUpdates(locationCallback);
-        }
-
-        JSONObject objetNouvellesDonnees = new JSONObject();
-        try {
-            objetNouvellesDonnees.put("statut", "EN_PAUSE");
-
-            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
-                SnackbarCustom.show(this, "TODO : Mettre en pause parcours côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        SnackbarCustom.show(this, "TODO : Mettre en pause", SnackbarCustom.STYLE_VALIDATION);
-        return true;
-    }
-
+    /**
+     * Passe au prochain client.
+     */
     private void passerClient() {
         JSONObject objetNouvellesDonnees = new JSONObject();
         try {
             objetNouvellesDonnees.put("idDernierContactVisite", 5); // TODO : STUB
 
             ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
-                SnackbarCustom.show(this, "TODO : Passage prochain client côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
+                SnackbarCustom.show(this, "TODO : Passer prochain client côté Android (affichage + stockage singleton parcours)", SnackbarCustom.STYLE_ATTENTION);
             });
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean stopperParcours() {
+    /**
+     * Modifie le statut du parcours.
+     * @param statut Le nouveau statut du parcours.
+     * @return true si la modification a été effectuée, false sinon.
+     */
+    private boolean modifierStatutParcours(String statut) {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
 
         JSONObject objetNouvellesDonnees = new JSONObject();
         try {
-            objetNouvellesDonnees.put("statut", "ARRETE");
+            objetNouvellesDonnees.put("statut", statut);
 
             ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
-                SnackbarCustom.show(this, "TODO : Stopper parcours côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
+                SingletonListeParcours.getInstance().recupererParcours(this, () -> {
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                });
             });
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return true;
     }
 }
