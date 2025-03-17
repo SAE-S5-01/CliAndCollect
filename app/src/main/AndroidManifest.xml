@@ -29,10 +29,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activites.ActiviteMap"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".activites.ActiviteInscription"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activites.ActiviteGestionCompte"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activites.ActiviteDetailClient"
@@ -44,6 +44,9 @@
             android:name=".fragments.GestionFragment"
             android:screenOrientation="portrait" />
         <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
+        <activity
+            android:name=".activites.ActiviteMap"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activites.ActiviteDetailItineraire"
             android:screenOrientation="portrait" />

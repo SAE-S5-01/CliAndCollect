@@ -113,15 +113,12 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Lorsque le fragment est affiché, récupérer les clients si la liste est vide.
+     * Lorsque le fragment est affiché, récupérer les clients depuis l'API.
      */
     @Override
     public void onResume() {
         super.onResume();
-
-        if (clients.isEmpty()) {
-            recupererClients();
-        }
+        recupererClients();
     }
 
     /**
@@ -129,8 +126,9 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
      */
     private void recupererClients() {
         if (Reseau.reseauDisponible(this.getContext())) {
-            ClientApi.getListeClient(this.getContext(),
-                () -> mettreAJourListeClients(null));
+            SingletonListeClient.recupererClients(this.getContext(), () -> {
+                mettreAJourListeClients(null);
+            });
         } else {
             SnackbarCustom.show(this.getContext(),
                                 R.string.erreur_recuperation_clients,

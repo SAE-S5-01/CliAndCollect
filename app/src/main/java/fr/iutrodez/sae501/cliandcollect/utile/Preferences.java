@@ -7,6 +7,7 @@ package fr.iutrodez.sae501.cliandcollect.utile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -57,6 +58,26 @@ public class Preferences {
     public static String getMotDePasse(Context context) {
         init(context);
         return preferencesApplication.getString("mdp", "");
+    }
+
+    /**
+     * Récupérer la latitude du domicile de l'utilisateur.
+     * @param context Contexte de l'application.
+     * @return La latitude du domicile de l'utilisateur.
+     */
+    public static String getLatitude(Context context) {
+        init(context);
+        return preferencesApplication.getString("latitude", "");
+    }
+
+    /**
+     * Récupérer la longitude du domicile de l'utilisateur.
+     * @param context Contexte de l'application.
+     * @return La longitude du domicile de l'utilisateur.
+     */
+    public static String getLongitude(Context context) {
+        init(context);
+        return preferencesApplication.getString("longitude", "");
     }
 
     /**
@@ -111,7 +132,16 @@ public class Preferences {
         editeur.remove("mail");
         editeur.remove("mdp");
         editeur.remove("tokenApi");
+        editeur.remove("latitude");
+        editeur.remove("longitude");
         editeur.apply();
     }
 
+    public static void sauvegarderCoordonnees(Context context, String latitude, String longitude) {
+        init(context);
+        SharedPreferences.Editor editor = preferencesApplication.edit();
+        editor.putString("latitude", latitude);
+        editor.putString("longitude", longitude);
+        editor.apply();
+    }
 }
