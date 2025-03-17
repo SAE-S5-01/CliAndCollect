@@ -168,7 +168,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                     point.put("y", c.getY());
                     listePoint.put(String.valueOf(c.getID()), point);
                 }
-                jsonFinal.put("nom", inputNomItineraire.getText().toString());
+                jsonFinal.put("nomItineraire", inputNomItineraire.getText().toString());
                 jsonFinal.put("listePoint", listePoint);
             } catch (Exception e) {
                 Log.e("Itineraire", "Erreur lors de la génération du JSON : " + e);
