@@ -110,5 +110,6 @@
 
     <string name="creation_parcours">Démarrer un parcours</string>
     <string name="erreur_aucun_parcours">Aucun parcours n\'est en cours</string>
+    <string name="clic_long_pour_action">Effectuez un clic long pour faire cette action</string>
 
 </resources>

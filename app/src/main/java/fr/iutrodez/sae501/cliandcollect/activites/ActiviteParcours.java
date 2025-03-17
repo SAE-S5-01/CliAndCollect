@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 public class ActiviteParcours extends AppCompatActivity {
 
@@ -43,6 +45,7 @@ public class ActiviteParcours extends AppCompatActivity {
     private List<GeoPoint> pathPoints;
     private IMapController mapController;
 
+    private TextView prochainClient;
     private TextView prochaineDestination;
 
 
@@ -54,11 +57,18 @@ public class ActiviteParcours extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_parcours);
 
+        prochainClient = findViewById(R.id.prochainClient);
         prochaineDestination = findViewById(R.id.prochaineDestination);
-        prochaineDestination.setText("Prochain client : " + "Nom de la destination");
 
-        findViewById(R.id.boutonPause).setOnClickListener(v -> mettreEnPauseParcours());
-        findViewById(R.id.boutonStop).setOnClickListener(v -> stopperParcours());
+        findViewById(R.id.boutonPause).setOnClickListener(v ->
+            SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
+        findViewById(R.id.boutonPause).setOnLongClickListener(v -> mettreEnPauseParcours());
+
+        findViewById(R.id.boutonPasser).setOnClickListener(v -> passerClient());
+
+        findViewById(R.id.boutonStop).setOnClickListener(v ->
+            SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
+        findViewById(R.id.boutonStop).setOnLongClickListener(v -> stopperParcours());
 
         // Initialisation d'OSMDroid
         Configuration.getInstance().setUserAgentValue(getPackageName());
@@ -185,15 +195,23 @@ public class ActiviteParcours extends AppCompatActivity {
         }
     }
 
-    private void mettreEnPauseParcours() {
+    private boolean mettreEnPauseParcours() {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
+        SnackbarCustom.show(this, "TODO : Mettre en pause", SnackbarCustom.STYLE_VALIDATION);
+        return true;
     }
 
-    private void stopperParcours() {
+    private void passerClient() {
+        SnackbarCustom.show(this, "TODO : Passer au prochain client", SnackbarCustom.STYLE_VALIDATION);
+    }
+
+    private boolean stopperParcours() {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
+        SnackbarCustom.show(this, "TODO : Stopper le parcours", SnackbarCustom.STYLE_VALIDATION);
+        return true;
     }
 }
