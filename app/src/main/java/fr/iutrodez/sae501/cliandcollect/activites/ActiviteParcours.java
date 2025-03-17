@@ -64,10 +64,10 @@ public class ActiviteParcours extends AppCompatActivity {
         map.getOverlays().add(userMarker);
 
         // Initialisation du tracé
-        path = new Polyline();
-        path.setWidth(8f);
-        path.setColor(Color.BLUE);
-        map.getOverlays().add(path);
+            path = new Polyline();
+            path.setWidth(8f);
+            path.setColor(Color.BLUE);
+            map.getOverlays().add(path);
 
         pathPoints = new ArrayList<>();
 
