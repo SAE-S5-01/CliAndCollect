@@ -7,13 +7,10 @@ package fr.iutrodez.sae501.cliandcollect.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import androidx.activity.result.ActivityResult;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,8 +20,6 @@ import java.util.Date;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteParcours;
-import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
-import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
@@ -40,22 +35,19 @@ import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 public class FragmentParcours extends Fragment implements View.OnClickListener {
 
     private RecyclerView listeParcoursEnCours;
-
     private RecyclerView listeParcoursEnPause;
-
     private RecyclerView listeParcoursArretes;
+    private RecyclerView listeParcoursTermines;
 
     private ArrayList<Parcours> parcoursEnCours;
-
     private ArrayList<Parcours> parcoursEnPause;
-
     private ArrayList<Parcours> parcoursArretes;
+    private ArrayList<Parcours> parcoursTermines;
 
     private ParcoursAdapter adapterParcoursEnCours;
-
     private ParcoursAdapter adapterParcoursEnPause;
-
-    private ParcoursAdapter adapterParcoursArrete;
+    private ParcoursAdapter adapterParcoursArretes;
+    private ParcoursAdapter adapterParcoursTermines;
 
     private ArrayList<Itineraire> itineraires;
 
@@ -99,32 +91,37 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
         vueDuFragment.findViewById(R.id.startParcours).setOnClickListener(this);
 
-        vueDuFragment.findViewById(R.id.erreurPasDeParcours).setVisibility(View.GONE);
         vueDuFragment.findViewById(R.id.parcoursEnCours).setVisibility(View.VISIBLE);
         vueDuFragment.findViewById(R.id.parcoursEnPause).setVisibility(View.VISIBLE);
         vueDuFragment.findViewById(R.id.parcoursArretes).setVisibility(View.VISIBLE);
+        vueDuFragment.findViewById(R.id.parcoursTermines).setVisibility(View.VISIBLE);
 
         listeParcoursEnCours = vueDuFragment.findViewById(R.id.recycler_view_parcours_en_cours);
         listeParcoursEnPause = vueDuFragment.findViewById(R.id.recycler_view_parcours_en_pause);
         listeParcoursArretes = vueDuFragment.findViewById(R.id.recycler_view_parcours_arretes);
+        listeParcoursTermines = vueDuFragment.findViewById(R.id.recycler_view_parcours_termines);
 
         listeParcoursEnCours.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
         listeParcoursEnPause.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
         listeParcoursArretes.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
+        listeParcoursTermines.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
 
         parcoursEnCours = new ArrayList<>();
         parcoursEnPause = new ArrayList<>();
         parcoursArretes = new ArrayList<>();
+        parcoursTermines = new ArrayList<>();
 
         itineraires = new ArrayList<>();
 
         adapterParcoursEnCours = new ParcoursAdapter(parcoursEnCours, this::onParcoursEnCoursClick);
         adapterParcoursEnPause = new ParcoursAdapter(parcoursEnPause, this::onParcoursEnPauseClick);
-        adapterParcoursArrete = new ParcoursAdapter(parcoursArretes, this::onParcoursArreteClick);
+        adapterParcoursArretes = new ParcoursAdapter(parcoursArretes, this::onParcoursArreteClick);
+        adapterParcoursTermines = new ParcoursAdapter(parcoursTermines, this::onParcoursTermineClick);
 
         listeParcoursEnCours.setAdapter(adapterParcoursEnCours);
         listeParcoursEnPause.setAdapter(adapterParcoursEnPause);
-        listeParcoursArretes.setAdapter(adapterParcoursArrete);
+        listeParcoursArretes.setAdapter(adapterParcoursArretes);
+        listeParcoursTermines.setAdapter(adapterParcoursTermines);
 
         return vueDuFragment;
     }
@@ -175,6 +172,16 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
     }
 
     /**
+     * Méthode invoquée lors du clic sur la carte d'un parcours terminé
+     * @param i L'identifiant du parcours terminé
+     */
+    private void onParcoursTermineClick(int i) {
+        if (Reseau.reseauDisponible(this.getContext(), true)) {
+            // TODO : Afficher les détails du parcours
+        }
+    }
+
+    /**
      * Récupère la liste des itinéraires depuis l'API et la met à jour localement.
      */
     private void recupererItineraires() {
@@ -194,14 +201,23 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
     private void mettreAJourListeItineraires() {
         itineraires.clear();
         for (Itineraire itineraire : SingletonListeItineraire.getInstance().getListeItineraires()) {
-            itineraires.add(itineraire);
-            parcoursEnCours.add(new Parcours(itineraire.getNom(), new Date(), "En cours (stub)", itineraire.getListeCoordonnees().size()));
+            //itineraires.add(itineraire);
+            /*parcoursEnCours.add(new Parcours(itineraire.getNom(), new Date(), "En cours (stub)", itineraire.getListeCoordonnees().size()));
             parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
             parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
-            parcoursArretes.add(new Parcours(itineraire.getNom(), new Date(), "Arrêté (stub)", itineraire.getListeCoordonnees().size()));
+            parcoursArretes.add(new Parcours(itineraire.getNom(), new Date(), "Arrêté (stub)", itineraire.getListeCoordonnees().size()));*/
         }
+        mettreAJourTexteErreur();
         adapterParcoursEnCours.notifyDataSetChanged();
         adapterParcoursEnPause.notifyDataSetChanged();
-        adapterParcoursArrete.notifyDataSetChanged();
+        adapterParcoursArretes.notifyDataSetChanged();
+    }
+
+    /**
+     * Met à jour le texte d'erreur si aucun itinéraire n'existe.
+     */
+    private void mettreAJourTexteErreur() {
+        this.getView().findViewById(R.id.erreurPasDItineraire)
+            .setVisibility(itineraires.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }
