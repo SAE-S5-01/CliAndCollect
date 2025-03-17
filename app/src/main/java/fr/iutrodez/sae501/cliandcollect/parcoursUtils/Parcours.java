@@ -1,10 +1,19 @@
 package fr.iutrodez.sae501.cliandcollect.parcoursUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.time.OffsetDateTime;
 import java.util.Date;
+
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 
 public class Parcours {
 
-    private String nomItineraire;
+    private Long id;
+
+    private Itineraire itineraire;
 
     private Date dateParcours;
 
@@ -12,19 +21,31 @@ public class Parcours {
 
     private int nombreEtapes;
 
-    public Parcours(String nomItineraire, Date dateParcours, String etatParcours, int nombreEtapes) {
-        this.nomItineraire = nomItineraire;
-        this.dateParcours = dateParcours;
-        this.etatParcours = etatParcours;
-        this.nombreEtapes = nombreEtapes;
+    public Parcours(JSONObject objetParcours) throws JSONException {
+        this.id = objetParcours.getLong("id");
+        this.itineraire = SingletonListeItineraire.getInstance().getItineraire(objetParcours.getString("idItineraire"));
+        // Conversion de la date ISO 8601 en java.util.Date
+        String dateStr = objetParcours.getString("dateCreation");
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateStr);
+        this.dateParcours = Date.from(offsetDateTime.toInstant());
+        this.etatParcours = objetParcours.getString("statut");
+        this.nombreEtapes = itineraire.getListeCoordonnees().size();
     }
 
-    public String getNomItineraire() {
-        return nomItineraire;
+    public Long getId() {
+        return id;
     }
 
-    public void setNomItineraire(String nomItineraire) {
-        this.nomItineraire = nomItineraire;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Itineraire getItineraire() {
+        return itineraire;
+    }
+
+    public void setItineraire(Itineraire itineraire) {
+        this.itineraire = itineraire;
     }
 
     public Date getDateParcours() {

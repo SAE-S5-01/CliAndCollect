@@ -1,5 +1,5 @@
 /*
- * SingletonListeClient.java                                        31 jan. 2025
+ * SingletonListeItineraire.java                                    31 jan. 2025
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 
@@ -93,6 +93,20 @@ public class SingletonListeItineraire {
      */
     public static Itineraire getItineraire(int idListe) {
         return getInstance().listeItineraires.get(idListe);
+    }
+
+    /**
+     * Récupère un itinéraire par son identifiant
+     * @param id L'identifiant de l'itinéraire
+     * @return Le itinéraire correspondant à l'identifiant
+     */
+    public static Itineraire getItineraire(String id) {
+        for (Itineraire itineraire : getInstance().listeItineraires) {
+            if (itineraire.getID().equals(id)) {
+                return itineraire;
+            }
+        }
+        return null;
     }
 
     /**

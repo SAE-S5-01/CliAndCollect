@@ -24,6 +24,7 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -105,6 +106,7 @@ public class GestionFragment extends AppCompatActivity {
         if (Reseau.reseauDisponible(this)) {
             SingletonListeClient.recupererClients(this, () -> {});
             SingletonListeItineraire.recupererItineraires(this, () -> {});
+            SingletonListeParcours.recupererParcours(this, () -> {});
         }
     }
 

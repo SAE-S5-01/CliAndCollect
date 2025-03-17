@@ -50,6 +50,8 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.utile.Compte;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -402,6 +404,35 @@ public class ClientApi {
             error -> {
                 gestionErreur(contexte, error);
             }
+        );
+    }
+
+    /**
+     * Méthode permettant de récupérer la liste des parcours depuis l'API.
+     * @param contexte Le contexte de l'application
+     * @param callback La méthode à appeler en cas de succès
+     */
+    public static void getListeParcours(Context contexte , Runnable callback) {
+        requeteApi(contexte, Request.Method.GET, "/parcours", null, null,
+                response -> {
+                    try {
+                        JSONArray jsonReponse = new JSONArray(response);
+
+                        SingletonListeParcours.getInstance().viderListeParcours();
+                        for (int i = 0; i < jsonReponse.length(); i++) {
+                            JSONObject jsonParcours = jsonReponse.getJSONObject(i);
+                            Parcours parcours = new Parcours(jsonParcours);
+                            SingletonListeParcours.getInstance().ajouterParcours(parcours);
+                        }
+
+                        callback.run();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                error -> {
+                    gestionErreur(contexte, error);
+                }
         );
     }
 

@@ -44,7 +44,7 @@ public class ParcoursHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(Parcours parcours) {
-        nomItineraire.setText(parcours.getNomItineraire());
+        nomItineraire.setText(parcours.getItineraire().getNom());
         dateParcours.setText(formatteurDates.format(parcours.getDateParcours()));
         etatParcours.setText(parcours.getEtatParcours());
         nombreEtapes.setText(parcours.getNombreEtapes() + " étapes");

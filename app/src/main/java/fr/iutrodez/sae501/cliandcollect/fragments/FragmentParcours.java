@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResult;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,10 +21,13 @@ import java.util.Date;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteParcours;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.ParcoursAdapter;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -128,6 +132,9 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         if (itineraires.isEmpty()) {
             recupererItineraires();
         }
+        if (parcoursEnCours.isEmpty()) {
+            recupererParcours();
+        }
     }
 
     @Override
@@ -191,21 +198,64 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
     }
 
     /**
+     * Récupère la liste des parcours depuis l'API et la met à jour localement.
+     */
+    private void recupererParcours() {
+        if (Reseau.reseauDisponible(this.getContext())) {
+            SingletonListeParcours.recupererParcours(this.getContext(), () -> {
+                mettreAJourListesParcours(null);
+            });
+        } else {
+            SnackbarCustom.show(this.getContext(),
+                R.string.erreur_recuperation_parcours,
+                SnackbarCustom.STYLE_ERREUR);
+        }
+    }
+
+    /**
      * Met à jour la liste des itinéraires de la vue.
      */
     private void mettreAJourListeItineraires() {
         itineraires.clear();
         for (Itineraire itineraire : SingletonListeItineraire.getInstance().getListeItineraires()) {
             itineraires.add(itineraire);
-            parcoursEnCours.add(new Parcours(itineraire.getNom(), new Date(), "En cours (stub)", itineraire.getListeCoordonnees().size()));
-            /*parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
-            parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
-            parcoursArretes.add(new Parcours(itineraire.getNom(), new Date(), "Arrêté (stub)", itineraire.getListeCoordonnees().size()));*/
         }
+        mettreAJourAffichageEtErreur();
+    }
+
+    /**
+     * Met à jour les listes des parcours de la vue.
+     * @param resultat Le résultat de l'activité de création de parcours
+     */
+    private void mettreAJourListesParcours(ActivityResult resultat) {
+        parcoursEnCours.clear();
+        parcoursEnPause.clear();
+        parcoursArretes.clear();
+        parcoursTermines.clear();
+
+        for (Parcours parcours : SingletonListeParcours.getInstance().getListeParcours()) {
+            switch (parcours.getEtatParcours()) {
+                default:
+                case "EN_COURS":
+                    parcoursEnCours.add(parcours);
+                    break;
+                case "EN_PAUSE":
+                    parcoursEnPause.add(parcours);
+                    break;
+                case "ARRETE":
+                    parcoursArretes.add(parcours);
+                    break;
+                case "TERMINE":
+                    parcoursTermines.add(parcours);
+                    break;
+            }
+        }
+
         mettreAJourAffichageEtErreur();
         adapterParcoursEnCours.notifyDataSetChanged();
         adapterParcoursEnPause.notifyDataSetChanged();
         adapterParcoursArretes.notifyDataSetChanged();
+        adapterParcoursTermines.notifyDataSetChanged();
     }
 
     /**
