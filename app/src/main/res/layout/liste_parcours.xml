@@ -13,36 +13,42 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <TableRow>
+            <TableRow
+                android:gravity="center">
                 <TextView
                     android:id="@+id/nomItineraire"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="@dimen/liste_marge_texte"
                     android:textSize="@dimen/texte_defaut"
                     android:textColor="@color/dark_blue"
                     android:textStyle="bold" />
                 <TextView
                     android:id="@+id/dateParcours"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="@dimen/liste_marge_texte"
                     android:textSize="@dimen/texte_defaut"
                     android:textColor="@color/dark_blue"
                     android:textStyle="bold" />
             </TableRow>
-            <TableRow>
+            <TableRow
+                android:gravity="center">
                 <TextView
                     android:id="@+id/etatParcours"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="@dimen/liste_marge_texte"
                     android:textSize="@dimen/texte_defaut"
                     android:textColor="@color/black" />
                 <TextView
                     android:id="@+id/nombreEtapes"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="@dimen/liste_marge_texte"
                     android:textSize="@dimen/texte_defaut"
                     android:textColor="@color/black" />

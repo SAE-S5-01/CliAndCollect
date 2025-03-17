@@ -105,8 +105,10 @@ public class GestionFragment extends AppCompatActivity {
 
         if (Reseau.reseauDisponible(this)) {
             SingletonListeClient.recupererClients(this, () -> {});
-            SingletonListeItineraire.recupererItineraires(this, () -> {});
-            SingletonListeParcours.recupererParcours(this, () -> {});
+            SingletonListeItineraire.recupererItineraires(this, () -> {
+                SingletonListeParcours.recupererParcours(this, () -> {});
+            });
+
         }
     }
 

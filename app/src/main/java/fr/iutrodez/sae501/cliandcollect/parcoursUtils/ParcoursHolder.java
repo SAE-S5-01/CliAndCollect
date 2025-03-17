@@ -46,8 +46,22 @@ public class ParcoursHolder extends RecyclerView.ViewHolder {
     public void bind(Parcours parcours) {
         nomItineraire.setText(parcours.getItineraire().getNom());
         dateParcours.setText(formatteurDates.format(parcours.getDateParcours()));
-        etatParcours.setText(parcours.getEtatParcours());
-        nombreEtapes.setText(parcours.getNombreEtapes() + " étapes");
+        switch (parcours.getEtatParcours()) {
+            default:
+            case "EN_COURS":
+                etatParcours.setText("En cours");
+                break;
+            case "EN_PAUSE":
+                etatParcours.setText("En pause");
+                break;
+            case "TERMINE":
+                etatParcours.setText("Terminé");
+                break;
+            case "ANNULE":
+                etatParcours.setText("Annulé");
+                break;
+        }
+        nombreEtapes.setText(parcours.getNombreEtapes() + " étape(s)");
     }
 }
 
