@@ -55,11 +55,11 @@ public class ParcoursHolder extends RecyclerView.ViewHolder {
             case "EN_PAUSE":
                 etatParcours.setText("En pause");
                 break;
+            case "ARRETE":
+                etatParcours.setText("Arrêté");
+                break;
             case "TERMINE":
                 etatParcours.setText("Terminé");
-                break;
-            case "ANNULE":
-                etatParcours.setText("Annulé");
                 break;
         }
         nombreEtapes.setText(parcours.getNombreEtapes() + " étape(s)");
