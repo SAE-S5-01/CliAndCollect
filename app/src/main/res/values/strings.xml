@@ -108,7 +108,7 @@
     <string name="supprimer_itineraire">Supprimer un itinéraire</string>
     <string name="confirmation_suppression_itineraire">"Êtes-vous sûr de vouloir supprimer cet itinéraire ?"</string>
 
-    <string name="creation_parcours">Ajouter un parcours</string>
+    <string name="creation_parcours">Démarrer un parcours</string>
     <string name="erreur_aucun_parcours">Aucun parcours n\'est en cours</string>
 
 </resources>
