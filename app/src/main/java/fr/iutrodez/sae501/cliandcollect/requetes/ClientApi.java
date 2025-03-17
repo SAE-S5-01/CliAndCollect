@@ -492,30 +492,48 @@ public class ClientApi {
         }
     }
 
-    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<Long, PointGPS>> callback) {
+    /**
+     * Calcule et ordonne un itinéraire.
+     * @param donnees Les données de l'itinéraire
+     * @param contexte Le contexte de l'application
+     * @param actionSuccess La méthode à appeler en cas de succès
+     */
+    public static void calculerItineraire(JSONObject donnees, Context contexte,
+                                          Consumer<LinkedHashMap<Long, PointGPS>> actionSuccess) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_calcul_itineraire));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
-            requeteApi(contexte , Request.Method.POST , "/itineraire/calculer" , null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/itineraire/calculer", null, donnees,
                 response -> {
                     try {
+                        spineurChargement.dismiss();
+
                         JSONObject jsonReponse = new JSONObject(response);
                         LinkedHashMap<Long, PointGPS> point = parseItineraire(jsonReponse);
-                        ((Activity) contexte).runOnUiThread(() -> callback.accept(point));
 
+                        ((Activity) contexte).runOnUiThread(() -> actionSuccess.accept(point));
                     } catch (Exception e) {
-                        Log.e("Parsing json ", e.toString());
+                        e.printStackTrace();
                     }
                 } ,
                 error -> {
-                    // TODO gestion erreur api
-                    //gestionErreur(contexte, error);
-                    error.printStackTrace();
-                    Log.e("erreur", error.toString());
+                    spineurChargement.dismiss();
+                    gestionErreurItineraire(contexte, error);
                 }
             );
         } catch (Exception e) {
-            Log.e("erreur ", e.toString());
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
+
+    /**
+     * Parse un itinéraire pour le transformer en une liste ordonnée de points GPS.
+     * @param jsonResponse La réponse de l'API
+     * @return Un itinéraire ordonné
+     */
     public static LinkedHashMap<Long, PointGPS> parseItineraire(JSONObject jsonResponse) {
         LinkedHashMap<Long, PointGPS> waypoints = new LinkedHashMap<>();
 
@@ -524,7 +542,7 @@ public class ClientApi {
             JSONArray itineraireArray = jsonResponse.getJSONArray("itineraire");
             JSONObject depart = itineraireArray.getJSONObject(0);
             itineraireArray.remove(0);
-            waypoints.put(-1L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Départ"));
+            waypoints.put(-1L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), depart.getString("nom")));
 
             // Parcourir le tableau pour récupérer les points
             for (int i = 0; i < itineraireArray.length(); i++) {
@@ -538,9 +556,9 @@ public class ClientApi {
 
                 // Ajouter le point dans la map avec le nom comme clé
                 waypoints.put(id, new PointGPS(latitude, longitude, nom));
-
             }
-            waypoints.put(-2L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Arrivé"));
+
+            waypoints.put(-2L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Arrivée"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

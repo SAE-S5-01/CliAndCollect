@@ -178,15 +178,15 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         }
     }
 
+    /**
+     * Afficher la carte avec l'itinéraire calculé.
+     * @param points Les points de l'itinéraire
+     */
     private void afficherCarteAvecItineraire(LinkedHashMap<Long , PointGPS> points) {
         runOnUiThread(() -> {
             try {
                 // Créer un conteneur pour la MapView
                 LinearLayout mapContainer = new LinearLayout(this);
-                mapContainer.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    dpToPx(400)
-                ));
 
                 // Initialiser la MapView
                 mapView = new MapView(this);
@@ -216,19 +216,19 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
                 // Créer et afficher l'AlertDialog
                 AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setTitle(inputNomItineraire.getText().toString().isEmpty()
-                                ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
-                                : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
-                                inputNomItineraire.getText().toString()))
-                        .setView(mapContainer)
-                        .setPositiveButton("Valider", (dialogInterface, which) -> {
-                            if (mapView != null) {
-                                mapView.onDetach();
-                            }
-                            creationItineraire(points);
-                        })
-                        .setNegativeButton("Annuler", null)
-                        .create();
+                    .setTitle(inputNomItineraire.getText().toString().isEmpty()
+                            ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
+                            : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
+                            inputNomItineraire.getText().toString()))
+                    .setView(mapContainer)
+                    .setPositiveButton("Valider", (dialogInterface, which) -> {
+                        if (mapView != null) {
+                            mapView.onDetach();
+                        }
+                        creationItineraire(points);
+                    })
+                    .setNegativeButton("Annuler", null)
+                    .create();
 
                 dialog.setOnDismissListener(dialogInterface -> {
                     if (mapView != null) {
@@ -255,8 +255,8 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
                             // Créer l'URL pour ce segment avec les coordonnées des deux points
                             String url = String.format("https://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?alternatives=false&overview=full&steps=true",
-                                    segment.get(0).getLongitude(), segment.get(0).getLatitude(),
-                                    segment.get(1).getLongitude(), segment.get(1).getLatitude());
+                                segment.get(0).getLongitude(), segment.get(0).getLatitude(),
+                                segment.get(1).getLongitude(), segment.get(1).getLatitude());
 
                             Log.d("OSRM", "Request URL: " + url);
                             // Envoie de la requete http
@@ -266,19 +266,18 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                                 Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
                                 routes.add(roadOverlay);
                             } else {
-
                                 // Calculer et ajouter une ligne "à vol d'oiseau" (ligne droite)
-                                GeoPoint start = segment.get(0); // Premier point du segment
-                                GeoPoint end = segment.get(1);   // Deuxième point du segment
+                                GeoPoint start = segment.get(0);
+                                GeoPoint end = segment.get(1);
 
                                 // Créer une polyline pour la ligne droite
                                 Polyline birdFlightLine = new Polyline();
-                                birdFlightLine.addPoint(start); // Ajouter le premier point
-                                birdFlightLine.addPoint(end);   // Ajouter le deuxième point
+                                birdFlightLine.addPoint(start);
+                                birdFlightLine.addPoint(end);
 
                                 // Définir la couleur et la largeur de la ligne "à vol d'oiseau"
-                                birdFlightLine.setColor(Color.RED);  // Par exemple, en rouge
-                                birdFlightLine.setWidth(5);          // Largeur de la ligne
+                                birdFlightLine.setColor(Color.RED);
+                                birdFlightLine.setWidth(5);
 
                                 // Ajouter la ligne à vol d'oiseau aux overlays de la carte
                                 mapView.getOverlays().add(birdFlightLine);
@@ -328,12 +327,6 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    // Méthode utilitaire pour convertir dp en pixels
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
     }
 
     private void creationItineraire(LinkedHashMap<Long , PointGPS> listeEtape) {

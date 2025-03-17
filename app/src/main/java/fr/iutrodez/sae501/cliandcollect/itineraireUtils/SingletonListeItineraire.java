@@ -101,4 +101,14 @@ public class SingletonListeItineraire {
     public static void viderListeItineraire() {
         getInstance().listeItineraires.clear();
     }
+
+    /**
+     * Vérifier si un contact est dans un itinéraire.
+     * @param idContact L'identifiant du contact
+     * @return true si le contact est dans un itinéraire, false sinon
+     */
+    public static boolean estContactDansItineraire(Long idContact) {
+        return getInstance().getListeItineraires().stream()
+            .anyMatch(itineraire -> itineraire.getOrdreClients().containsKey(idContact));
+    }
 }

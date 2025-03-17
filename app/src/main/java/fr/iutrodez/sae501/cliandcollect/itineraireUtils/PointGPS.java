@@ -23,8 +23,8 @@ public class PointGPS extends GeoPoint {
      * @param longitude Longitude du point GPS
      * @param nom Nom du point GPS
      */
-    public PointGPS(double latitude, double longitude , String nom) {
-        super(latitude , longitude);
+    public PointGPS(double latitude, double longitude, String nom) {
+        super(latitude, longitude);
         this.nom = nom;
     }
 

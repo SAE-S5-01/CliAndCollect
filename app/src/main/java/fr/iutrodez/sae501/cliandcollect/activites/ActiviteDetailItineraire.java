@@ -219,10 +219,6 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
             try {
                 // Créer un conteneur pour la MapView
                 LinearLayout mapContainer = new LinearLayout(this);
-                mapContainer.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    dpToPx(400)
-                ));
 
                 // Initialiser la MapView
                 mapView = new MapView(this);
@@ -364,12 +360,6 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    // Méthode utilitaire pour convertir dp en pixels
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
     }
 
     private void creationItineraire(LinkedHashMap<Long, PointGPS> listeEtape) {

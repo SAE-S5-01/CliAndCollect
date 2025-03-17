@@ -153,7 +153,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
                 this.nomEntreprise.setError(getString(R.string.erreur_nom_entreprise_non_renseigne));
             } else {
                 if (!nomEntreprise.getText().toString().equals(client.getEntreprise())
-                    && estContactDansItineraire(client.getID())) {
+                    && SingletonListeItineraire.estContactDansItineraire(client.getID())) {
                     SnackbarCustom.show(ActiviteDetailClient.this,
                                         R.string.info_modif_nom_entreprise,
                                         SnackbarCustom.STYLE_INFORMATION);
@@ -254,7 +254,7 @@ public class ActiviteDetailClient extends AppCompatActivity {
             double nouvelleLongitude = retour.getDoubleExtra("longitude", Double.NaN);
 
             if (!nouvelleAdresse.equals(client.getAdresse())
-                && estContactDansItineraire(client.getID())) {
+                && SingletonListeItineraire.estContactDansItineraire(client.getID())) {
                 new AlertDialog.Builder(this)
                     .setTitle(R.string.changement_adresse)
                     .setMessage(R.string.adresse_confirmation_modification)
@@ -277,15 +277,5 @@ public class ActiviteDetailClient extends AppCompatActivity {
         this.saisieAdresse.setText(adresse);
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    /**
-     * Vérifier si un contact est dans un itinéraire.
-     * @param idContact L'identifiant du contact
-     * @return true si le contact est dans un itinéraire, false sinon
-     */
-    public static boolean estContactDansItineraire(Long idContact) {
-        return SingletonListeItineraire.getInstance().getListeItineraires().stream()
-               .anyMatch(itineraire -> itineraire.getOrdreClients().containsKey(idContact));
     }
 }
