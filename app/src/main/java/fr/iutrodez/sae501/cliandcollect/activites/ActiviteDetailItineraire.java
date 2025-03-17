@@ -47,6 +47,7 @@ import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
@@ -194,11 +195,9 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
             JSONObject jsonFinal = new JSONObject();
             JSONObject listePoint = new JSONObject();
             try {
-                jsonFinal.put("domicile",
-                    new JSONObject()
-                        .put("y", 42.7720709)
-                        .put("x", 2.98383)
-                );
+                jsonFinal.put("domicile", new JSONObject()
+                    .put("y", Preferences.getLatitude(this))
+                    .put("x", Preferences.getLongitude(this)));
                 for (Client c : clientsAjoutes) {
                     JSONObject point = new JSONObject();
                     point.put("x", c.getX());
@@ -254,9 +253,9 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
                 // Créer et afficher l'AlertDialog
                 AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle(inputNomItineraire.getText().toString().isEmpty()
-                              ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
-                              : String.format("%s : Voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?",
-                                              inputNomItineraire.getText().toString()))
+                        ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
+                        : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
+                                        inputNomItineraire.getText().toString()))
                     .setView(mapContainer)
                     .setPositiveButton("Valider", (dialogInterface, which) -> {
                         if (mapView != null) {

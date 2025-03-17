@@ -184,15 +184,15 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                 // Créer un conteneur pour la MapView
                 LinearLayout mapContainer = new LinearLayout(this);
                 mapContainer.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        dpToPx(400)
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dpToPx(400)
                 ));
 
                 // Initialiser la MapView
                 mapView = new MapView(this);
                 mapView.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
                 ));
                 mapContainer.addView(mapView);
 
@@ -218,7 +218,7 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                 AlertDialog dialog = new AlertDialog.Builder(this)
                         .setTitle(inputNomItineraire.getText().toString().isEmpty()
                                 ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
-                                : String.format("%s : Voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?",
+                                : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
                                 inputNomItineraire.getText().toString()))
                         .setView(mapContainer)
                         .setPositiveButton("Valider", (dialogInterface, which) -> {
