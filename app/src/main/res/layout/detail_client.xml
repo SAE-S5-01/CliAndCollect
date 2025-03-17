@@ -11,7 +11,7 @@
         android:orientation="vertical">
 
         <TableRow
-            android:layout_marginVertical="24dp">
+            android:layout_marginVertical="22dp">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -214,7 +214,7 @@
         </TableRow>
 
         <TableRow
-            android:layout_marginVertical="28dp">
+            android:layout_marginVertical="24dp">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

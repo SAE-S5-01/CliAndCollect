@@ -108,14 +108,9 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         listeParcoursEnPause = vueDuFragment.findViewById(R.id.recycler_view_parcours_en_pause);
         listeParcoursArretes = vueDuFragment.findViewById(R.id.recycler_view_parcours_arretes);
 
-        LinearLayoutManager gestionnaireLineaireParcoursEnCours = new LinearLayoutManager(vueDuFragment.getContext());
-        listeParcoursEnCours.setLayoutManager(gestionnaireLineaireParcoursEnCours);
-
-        LinearLayoutManager gestionnaireLineaireParcoursEnPause = new LinearLayoutManager(vueDuFragment.getContext());
-        listeParcoursEnPause.setLayoutManager(gestionnaireLineaireParcoursEnPause);
-
-        LinearLayoutManager gestionnaireLineaireParcoursArretes = new LinearLayoutManager(vueDuFragment.getContext());
-        listeParcoursArretes.setLayoutManager(gestionnaireLineaireParcoursArretes);
+        listeParcoursEnCours.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
+        listeParcoursEnPause.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
+        listeParcoursArretes.setLayoutManager(new LinearLayoutManager(vueDuFragment.getContext()));
 
         parcoursEnCours = new ArrayList<>();
         parcoursEnPause = new ArrayList<>();
