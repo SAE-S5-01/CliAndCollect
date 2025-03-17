@@ -20,6 +20,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 public class ActiviteParcours extends AppCompatActivity {
@@ -48,6 +51,7 @@ public class ActiviteParcours extends AppCompatActivity {
     private TextView prochainClient;
     private TextView prochaineDestination;
 
+    private int idParcoursCourant = 10; // TODO : STUB
 
     private static final float DISTANCE_THRESHOLD = 15.0f; // Distance minimale en mètres
     private Location lastLocation = null;
@@ -199,19 +203,51 @@ public class ActiviteParcours extends AppCompatActivity {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
+
+        JSONObject objetNouvellesDonnees = new JSONObject();
+        try {
+            objetNouvellesDonnees.put("statut", "EN_PAUSE");
+
+            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
+                SnackbarCustom.show(this, "TODO : Mettre en pause parcours côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         SnackbarCustom.show(this, "TODO : Mettre en pause", SnackbarCustom.STYLE_VALIDATION);
         return true;
     }
 
     private void passerClient() {
-        SnackbarCustom.show(this, "TODO : Passer au prochain client", SnackbarCustom.STYLE_VALIDATION);
+        JSONObject objetNouvellesDonnees = new JSONObject();
+        try {
+            objetNouvellesDonnees.put("idDernierContactVisite", 5); // TODO : STUB
+
+            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
+                SnackbarCustom.show(this, "TODO : Passage prochain client côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean stopperParcours() {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
-        SnackbarCustom.show(this, "TODO : Stopper le parcours", SnackbarCustom.STYLE_VALIDATION);
+
+        JSONObject objetNouvellesDonnees = new JSONObject();
+        try {
+            objetNouvellesDonnees.put("statut", "ARRETE");
+
+            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
+                SnackbarCustom.show(this, "TODO : Stopper parcours côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         return true;
     }
 }

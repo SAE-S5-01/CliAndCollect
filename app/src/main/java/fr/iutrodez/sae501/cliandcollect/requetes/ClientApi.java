@@ -45,6 +45,7 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteParcours;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
@@ -696,6 +697,70 @@ public class ClientApi {
         }
     }
 
+    /**
+     * Crée un nouveau parcours.
+     * @param contexte Le contexte de l'application
+     * @param donnees Les données du parcours
+     * @param envoiReussi La méthode à appeler en cas d'envoi réussi
+     */
+    public static void demarrerParcours(Context contexte, JSONObject donnees, Runnable envoiReussi) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_demarrage_parcours));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.POST, "/parcours", null, donnees,
+                response -> {
+                    try {
+                        spineurChargement.dismiss();
+                        // En cas de succès, on ajoute le parcours au singleton
+                        JSONObject jsonReponse = new JSONObject(response);
+                        ((ActiviteParcours) contexte).runOnUiThread(envoiReussi);
+                        Parcours parcoursDemarre = new Parcours(jsonReponse);
+                        SingletonListeParcours.getInstance().ajouterParcours(parcoursDemarre);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    /**
+     * Modifie un parcours existant.
+     * @param contexte Le contexte de l'application
+     * @param donnees Les données du parcours
+     * @param id L'identifiant du parcours
+     * @param modificationReussie La méthode à appeler en cas de modification réussie
+     */
+    public static void modifierParcours(Context contexte, JSONObject donnees, int id, Runnable modificationReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_modification));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.PUT, "/parcours/" + id, null, donnees,
+                response -> {
+                    spineurChargement.dismiss();
+                    ((ActiviteParcours) contexte).runOnUiThread(modificationReussie);
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
 
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.

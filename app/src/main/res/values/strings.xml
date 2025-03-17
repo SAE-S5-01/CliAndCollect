@@ -25,6 +25,7 @@
     <string name="attente_reseau">Vérification en cours du réseau ...</string>
     <string name="attente_connexion">Connexion en cours ...</string>
     <string name="attente_inscription">Inscription en cours ...</string>
+    <string name="chargement_demarrage_parcours">Initialisation du parcours en cours ...</string>
     <string name="chargement_ajout">Ajout(s) en cours ...</string>
     <string name="chargement_modification">Modification(s) en cours ...</string>
     <string name="chargement_suppression">Suppression en cours ...</string>
