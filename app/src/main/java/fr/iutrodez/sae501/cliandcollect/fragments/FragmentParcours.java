@@ -91,11 +91,6 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
         vueDuFragment.findViewById(R.id.startParcours).setOnClickListener(this);
 
-        vueDuFragment.findViewById(R.id.parcoursEnCours).setVisibility(View.VISIBLE);
-        vueDuFragment.findViewById(R.id.parcoursEnPause).setVisibility(View.VISIBLE);
-        vueDuFragment.findViewById(R.id.parcoursArretes).setVisibility(View.VISIBLE);
-        vueDuFragment.findViewById(R.id.parcoursTermines).setVisibility(View.VISIBLE);
-
         listeParcoursEnCours = vueDuFragment.findViewById(R.id.recycler_view_parcours_en_cours);
         listeParcoursEnPause = vueDuFragment.findViewById(R.id.recycler_view_parcours_en_pause);
         listeParcoursArretes = vueDuFragment.findViewById(R.id.recycler_view_parcours_arretes);
@@ -201,23 +196,32 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
     private void mettreAJourListeItineraires() {
         itineraires.clear();
         for (Itineraire itineraire : SingletonListeItineraire.getInstance().getListeItineraires()) {
-            //itineraires.add(itineraire);
-            /*parcoursEnCours.add(new Parcours(itineraire.getNom(), new Date(), "En cours (stub)", itineraire.getListeCoordonnees().size()));
-            parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
+            itineraires.add(itineraire);
+            parcoursEnCours.add(new Parcours(itineraire.getNom(), new Date(), "En cours (stub)", itineraire.getListeCoordonnees().size()));
+            /*parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
             parcoursEnPause.add(new Parcours(itineraire.getNom(), new Date(), "En pause (stub)", itineraire.getListeCoordonnees().size()));
             parcoursArretes.add(new Parcours(itineraire.getNom(), new Date(), "Arrêté (stub)", itineraire.getListeCoordonnees().size()));*/
         }
-        mettreAJourTexteErreur();
+        mettreAJourAffichageEtErreur();
         adapterParcoursEnCours.notifyDataSetChanged();
         adapterParcoursEnPause.notifyDataSetChanged();
         adapterParcoursArretes.notifyDataSetChanged();
     }
 
     /**
-     * Met à jour le texte d'erreur si aucun itinéraire n'existe.
+     * Met à jour le texte d'erreur si aucun itinéraire n'existe et l'affichage
+     * des différents types de parcours.
      */
-    private void mettreAJourTexteErreur() {
+    private void mettreAJourAffichageEtErreur() {
         this.getView().findViewById(R.id.erreurPasDItineraire)
             .setVisibility(itineraires.isEmpty() ? View.VISIBLE : View.GONE);
+        this.getView().findViewById(R.id.parcoursEnCours)
+            .setVisibility(parcoursEnCours.isEmpty() ? View.GONE : View.VISIBLE);
+        this.getView().findViewById(R.id.parcoursEnPause)
+            .setVisibility(parcoursEnPause.isEmpty() ? View.GONE : View.VISIBLE);
+        this.getView().findViewById(R.id.parcoursArretes)
+            .setVisibility(parcoursArretes.isEmpty() ? View.GONE : View.VISIBLE);
+        this.getView().findViewById(R.id.parcoursTermines)
+            .setVisibility(parcoursTermines.isEmpty() ? View.GONE : View.VISIBLE);
     }
 }
