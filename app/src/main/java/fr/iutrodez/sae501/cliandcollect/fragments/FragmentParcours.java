@@ -184,7 +184,7 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
      */
     private void recupererItineraires() {
         if (Reseau.reseauDisponible(this.getContext())) {
-            ClientApi.getListeItineraire(this.getContext(),
+            ClientApi.getListeItineraires(this.getContext(),
                 () -> mettreAJourListeItineraires());
         } else {
             SnackbarCustom.show(this.getContext(),
