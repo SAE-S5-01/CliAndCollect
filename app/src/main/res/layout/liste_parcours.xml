@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/bouton_secondaire"
+        android:padding="10dp">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TableRow>
+                <TextView
+                    android:id="@+id/nomItineraire"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/liste_marge_texte"
+                    android:textSize="@dimen/texte_defaut"
+                    android:textColor="@color/dark_blue"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/dateParcours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/liste_marge_texte"
+                    android:textSize="@dimen/texte_defaut"
+                    android:textColor="@color/dark_blue"
+                    android:textStyle="bold" />
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:id="@+id/etatParcours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/liste_marge_texte"
+                    android:textSize="@dimen/texte_defaut"
+                    android:textColor="@color/black" />
+                <TextView
+                    android:id="@+id/nombreEtapes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/liste_marge_texte"
+                    android:textSize="@dimen/texte_defaut"
+                    android:textColor="@color/black" />
+            </TableRow>
+        </TableLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

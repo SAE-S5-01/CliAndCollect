@@ -35,15 +35,14 @@
             android:gravity="start"
             android:textSize="@dimen/detail_client_taille_titres"
             android:text="@string/erreur_aucun_client"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_clients"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/liste_client_marge_haute"
+        android:layout_marginTop="@dimen/listes_marge_haute"
         android:layout_marginHorizontal="13dp" />
 
 </LinearLayout>

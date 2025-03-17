@@ -1,11 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <TableLayout
+        style="@style/AppStyle"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TableRow>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/prochaineDestination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textColor="@color/colorPrimary"
+                    android:text="Prochain client" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="20dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="610dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@color/light_grey"
+                android:gravity="center">
+                <org.osmdroid.views.MapView
+                    android:id="@+id/map"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_span="2" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="20dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/boutonPause"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/ic_pause" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/boutonStop"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/ic_stop" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

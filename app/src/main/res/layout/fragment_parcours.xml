@@ -1,32 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragments.FragmentParcours">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:text="Parcours (TODO page)"
-        android:textSize="50sp" />
 
     <Button
         android:id="@+id/startParcours"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:text="@string/ajouter_itineraire" />
+        android:text="@string/creation_parcours" />
 
+    <LinearLayout
+        android:id="@+id/erreurPasDeParcours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:layout_marginHorizontal="25dp"
+        android:gravity="center"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            android:contentDescription="@string/erreur_aucun_parcours"
+            app:tint="@android:color/holo_orange_light" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textSize="@dimen/detail_client_taille_titres"
+            android:text="@string/erreur_aucun_parcours"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+    </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dip"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="#0000FF" />
+    <LinearLayout
+        android:id="@+id/parcoursEnCours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="15dp"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textSize="@dimen/detail_client_taille_titres"
+            android:text="Parcours en cours :"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_parcours_en_cours"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/parcoursEnPause"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="15dp"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:textSize="@dimen/detail_client_taille_titres"
+            android:text="Parcours en pause :"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_parcours_en_pause"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/parcoursArretes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="15dp"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:textSize="@dimen/detail_client_taille_titres"
+            android:text="Parcours arrêtés :"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_parcours_arretes"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
 
 </LinearLayout>

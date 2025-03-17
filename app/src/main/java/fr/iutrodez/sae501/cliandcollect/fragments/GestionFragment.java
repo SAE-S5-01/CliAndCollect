@@ -1,5 +1,5 @@
 /*
- * ActivitePrincipale.java                                                27 nov. 2024
+ * GestionFragment.java                                             07 fev. 2025
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 package fr.iutrodez.sae501.cliandcollect.fragments;
@@ -21,12 +21,17 @@ import android.widget.ImageView;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
+import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 
 /**
- * Activité principale et point d'entrée de l'application.
+ * Gestion des fragments de l'application.
+ *
  * @author Loïc FAUGIERES
  */
 public class GestionFragment extends AppCompatActivity {
@@ -53,15 +58,11 @@ public class GestionFragment extends AppCompatActivity {
 
         boutonOptionMenu.setOnClickListener(view -> afficherMenuContextuel(view));
 
-        /*
-         * on récupère un accès sur le ViewPager et sur le TabLayout qui gèrera les onglets
-         */
+        /* on récupère un accès sur le ViewPager et sur le TabLayout qui gèrera les onglets */
         ViewPager2 gestionnairePagination = findViewById(R.id.activity_main_viewpager);
         gestionnaireOnglet = findViewById(R.id.footer_layout);
 
-        /*
-         * on associe au ViewPager un adaptateur pour gérer le défilement entre les fragments
-         */
+        /* on associe au ViewPager un adaptateur pour gérer le défilement entre les fragments */
         gestionnairePagination.setAdapter(new AdaptateurFragments(this));
 
         navigationButtonsIds = new int[] {
@@ -71,10 +72,7 @@ public class GestionFragment extends AppCompatActivity {
             R.id.pied_page_icone_itineraire
         };
 
-        /*
-         * On fait le lien entre
-         * le gestionnaire de pagination et le gestionnaire des onglets
-         */
+        // On fait le lien entre le gestionnaire de pagination et le gestionnaire des onglets
         new TabLayoutMediator(gestionnaireOnglet, gestionnairePagination,
             (tab, position) -> {
                 // Associer manuellement des vues personnalisées
@@ -95,26 +93,18 @@ public class GestionFragment extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-
-                TabLayout.Tab ongletActif = gestionnaireOnglet.getTabAt(position);
-
-                if (ongletActif != null && ongletActif.getCustomView() != null) {
-                    // Récupérer le bouton de l'onglet actif
-                    ImageView boutonActif
-                        = ongletActif.getCustomView()
-                                     .findViewById(navigationButtonsIds[position]);
-
-                    if (boutonActif != null) {
-                        setButtonState(boutonActif, true);
-                        resetOtherButtons(position);
-                    }
-                }
+                gestionPageSelectionnee(position);
             }
         });
 
         Intent intent = getIntent();
         if (intent != null && intent.getBooleanExtra(CLE_EXTRA_MSG_BIENVENUE, false)) {
             SnackbarCustom.show(this, R.string.inscription_reussie, SnackbarCustom.STYLE_VALIDATION);
+        }
+
+        if (Reseau.reseauDisponible(this)) {
+            SingletonListeClient.recupererClients(this, () -> {});
+            SingletonListeItineraire.recupererItineraires(this, () -> {});
         }
     }
 
@@ -161,11 +151,32 @@ public class GestionFragment extends AppCompatActivity {
             finish();
             resultat = true;
         } else if (item.getItemId() == R.id.menu_compte) {
-            // TODO vue mon compte
+            Intent pageCompte = new Intent(this, ActiviteGestionCompte.class);
+            startActivity(pageCompte);
+            finish();
             resultat = true;
         }
 
         return resultat;
+    }
+
+    /**
+     * Gère la sélection d'une page dans le gestionnaire de pagination
+     * @param position Position de la page sélectionnée
+     */
+    private void gestionPageSelectionnee(int position) {
+        TabLayout.Tab ongletActif = gestionnaireOnglet.getTabAt(position);
+
+        if (ongletActif != null && ongletActif.getCustomView() != null) {
+            // Récupérer le bouton de l'onglet actif
+            ImageView boutonActif
+            = ongletActif.getCustomView().findViewById(navigationButtonsIds[position]);
+
+            if (boutonActif != null) {
+                setButtonState(boutonActif, true);
+                resetOtherButtons(position);
+            }
+        }
     }
 
     /**

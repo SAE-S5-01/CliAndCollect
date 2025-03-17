@@ -4,7 +4,6 @@
  */
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteCreationItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailItineraire;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.ItineraireAdapter;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
@@ -99,7 +99,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
 
         creationItineraire = new Intent(FragmentItineraires.this.getContext(), ActiviteCreationItineraire.class);
         lanceurCreation = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::mettreAJourListeItineraires);
-        lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::gestionModificationItineraire);
+        lanceurDetails = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::mettreAJourListeItineraires);
 
         LinearLayoutManager gestionnaireLineaire = new LinearLayoutManager(vueDuFragment.getContext());
         listeItineraires.setLayoutManager(gestionnaireLineaire);
@@ -112,14 +112,27 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
     }
 
     /**
-     * Lorsque le fragment est affiché, récupérer les itineraires si la liste est vide.
+     * Lorsque le fragment est affiché, récupérer les itineraires depuis l'API.
      */
     @Override
     public void onResume() {
         super.onResume();
+        if (SingletonListeClient.getListeClient().isEmpty()) {
+            recupererClients();
+        }
+        recupererItineraires();
+    }
 
-        if (itineraires.isEmpty()) {
-            recupererItineraires();
+    /**
+     * Récupère la liste des clients depuis l'API et la met à jour localement.
+     */
+    private void recupererClients() {
+        if (Reseau.reseauDisponible(this.getContext())) {
+            SingletonListeClient.recupererClients(this.getContext(), () -> {});
+        } else {
+            SnackbarCustom.show(this.getContext(),
+                R.string.erreur_recuperation_clients,
+                SnackbarCustom.STYLE_ERREUR);
         }
     }
 
@@ -128,8 +141,9 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
      */
     private void recupererItineraires() {
         if (Reseau.reseauDisponible(this.getContext())) {
-            ClientApi.getListeItineraire(this.getContext(),
-                () -> mettreAJourListeItineraires(null));
+            SingletonListeClient.recupererClients(this.getContext(), () -> {
+                mettreAJourListeItineraires(null);
+            });
         } else {
             SnackbarCustom.show(this.getContext(),
                                 R.string.erreur_recuperation_itineraires,
@@ -156,17 +170,6 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
         if (Reseau.reseauDisponible(this.getContext(), true)) {
             detailItineraire.putExtra("ID", i);
             lanceurDetails.launch(detailItineraire);
-        }
-    }
-
-    private void gestionModificationItineraire(ActivityResult resultat) {
-        Intent retourFille = resultat.getData();
-        if (resultat.getResultCode() == Activity.RESULT_OK) {
-            int id = retourFille.getIntExtra("ID",0);
-            Itineraire itineraire = SingletonListeItineraire.getItineraire(id);
-            itineraires.remove(id);
-            itineraires.add(id, itineraire);
-            adapter.notifyItemChanged(id);
         }
     }
 

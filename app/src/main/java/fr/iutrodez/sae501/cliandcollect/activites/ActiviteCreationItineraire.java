@@ -1,16 +1,24 @@
+/*
+ * ActiviteCreationItineraire.java                                  10 fev. 2025
+ * IUT de Rodez, pas de copyright ni de "copyleft".
+ */
+
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -23,19 +31,28 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
+import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
-
+/**
+ * Activité de création d'un itinéraire.
+ *
+ * @author Lucas DESCRIAUD
+ * @author Loïc FAUGIERES
+ */
 public class ActiviteCreationItineraire extends AppCompatActivity {
     private MapView mapView;
     private IMapController mapController;
@@ -43,16 +60,20 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
     private RecyclerView recyclerClientsDispo, recyclerClientsSelectionnes;
     private ClientAdapter adapterClientsDispo, adapterClientsSelectionnes;
     private List<Client> clientsDisponibles, clientsAjoutes;
+    private Button boutonValider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ajouter_itineraire);
+        setContentView(R.layout.detail_itineraire);
+
+        ((TextView) findViewById(R.id.titreDetailItineraire)).setText(R.string.ajouter_itineraire);
 
         // Initialisation des vues
-        inputNomItineraire = findViewById(R.id.nomItineraire);
+        inputNomItineraire = findViewById(R.id.saisieNomItineraire);
         recyclerClientsDispo = findViewById(R.id.listeClient);
         recyclerClientsSelectionnes = findViewById(R.id.clientSelectionne);
+        boutonValider = findViewById(R.id.boutonValider);
 
         recyclerClientsDispo.setLayoutManager(new LinearLayoutManager(this));
         recyclerClientsSelectionnes.setLayoutManager(new LinearLayoutManager(this));
@@ -68,15 +89,24 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         // Associer les adaptateurs aux RecyclerView
         recyclerClientsDispo.setAdapter(adapterClientsDispo);
         recyclerClientsSelectionnes.setAdapter(adapterClientsSelectionnes);
+
+        findViewById(R.id.boutonRetour).setOnClickListener(this::retour);
+        boutonValider.setOnClickListener(this::valider);
+
+        if (clientsDisponibles.isEmpty()) {
+            SnackbarCustom.show(this, R.string.erreur_aucun_client, SnackbarCustom.STYLE_ERREUR);
+            actionRetardee(() -> retour(null));
+        }
     }
 
     private void ajouterClient(int position) {
-        if(clientsAjoutes.size() >= 8) {
-            Toast.makeText(this, R.string.nombre_etape_depasse, Toast.LENGTH_SHORT).show();
+        if (clientsAjoutes.size() >= 8) {
+            SnackbarCustom.show(this, R.string.nombre_etape_depasse, SnackbarCustom.STYLE_ATTENTION);
         } else {
             Client client = clientsDisponibles.remove(position);
             clientsAjoutes.add(client);
             mettreAJourListes();
+            boutonValider.setEnabled(true);
         }
     }
 
@@ -107,32 +137,44 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         }
     }
 
+    /**
+     * Clic sur le bouton "Retour".
+     * @param view Le bouton "Retour"
+     */
     public void retour(View view) {
         setResult(AppCompatActivity.RESULT_CANCELED);
         finish();
     }
 
+    /**
+     * Clic sur le bouton "Valider".
+     * @param view Le bouton "Valider"
+     */
     public void valider(View view) {
-        JSONObject jsonFinal = new JSONObject();
-        JSONObject listePoint = new JSONObject();
-        try {
-            jsonFinal.put("domicile", new JSONObject()
-                    .put("y", 42.7720709)
-                    .put("x", 2.98383)
+        if (inputNomItineraire.getText().toString().isEmpty()) {
+            inputNomItineraire.setError(getString(R.string.erreur_nom_itineraire_non_renseigne));
+        } else if (clientsAjoutes.isEmpty()) {
+            SnackbarCustom.show(this, R.string.erreur_ajout_client_vide, SnackbarCustom.STYLE_ERREUR);
+        } else if (Reseau.reseauDisponible(this, true)) {
+            JSONObject jsonFinal = new JSONObject();
+            JSONObject listePoint = new JSONObject();
+            try {
+                jsonFinal.put("domicile", new JSONObject()
+                    .put("y", Preferences.getLatitude(this))
+                    .put("x", Preferences.getLongitude(this))
             );
-            for (Client c : clientsAjoutes) {
-                JSONObject point = new JSONObject();
-                point.put("x", c.getX());
-                point.put("y", c.getY());
-                listePoint.put(String.valueOf(c.getID()), point);
+                for (Client c : clientsAjoutes) {
+                    JSONObject point = new JSONObject();
+                    point.put("x", c.getX());
+                    point.put("y", c.getY());
+                    listePoint.put(String.valueOf(c.getID()), point);
+                }
+                jsonFinal.put("nom", inputNomItineraire.getText().toString());
+                jsonFinal.put("listePoint", listePoint);
+            } catch (Exception e) {
+                Log.e("Itineraire", "Erreur lors de la génération du JSON : " + e);
             }
-            jsonFinal.put("nom", inputNomItineraire.getText().toString());
-            jsonFinal.put("listePoint", listePoint);
-        } catch (Exception e) {
-            Log.e("Itineraire", "Erreur lors de la génération du JSON : " + e);
-        }
 
-        if (Reseau.reseauDisponible(this, true)) {
             ClientApi.calculerItineraire(jsonFinal, this, this::afficherCarteAvecItineraire);
         }
     }
@@ -335,5 +377,14 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
     private void creationOk() {
         setResult(AppCompatActivity.RESULT_OK);
         finish();
+    }
+
+    /**
+     * Attendre 10 secondes puis effectuer l'action passée en paramètre
+     *
+     * @param action Action à effectuer
+     */
+    private void actionRetardee(Runnable action) {
+        new android.os.Handler().postDelayed(() -> action.run(), 3000);
     }
 }
