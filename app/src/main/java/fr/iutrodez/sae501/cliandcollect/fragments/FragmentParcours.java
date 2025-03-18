@@ -18,6 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,16 +143,22 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         if (itineraires.isEmpty()) {
             recupererItineraires();
         }
-        if (parcoursEnCours.isEmpty()) {
-            recupererParcours();
-        }
+
+        recupererParcours();
+
     }
 
     @Override
     public void onClick(View v) {
         //Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
         //startActivity(intent);
-        afficherListeDialog(this.getContext());
+        if (SingletonListeItineraire.getListeItineraires().size() != 0) {
+            afficherListeDialog(this.getContext());
+        } else {
+            SnackbarCustom.show(this.getContext(),
+                R.string.erreur_aucun_itineraire,
+                SnackbarCustom.STYLE_ERREUR);
+        }
 
     }
 
@@ -335,11 +344,19 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
         builder.setItems(nomsItineraires, (dialog, which) -> {
             String selectedId = idsItineraires[which];
+            JSONObject objetItineraire = new JSONObject();
+            try {
+                objetItineraire.put("idItineraire", selectedId);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            ClientApi.demarrerParcours(context, objetItineraire, (Long idParcours) -> {
+                Intent intent = new Intent(context, ActiviteParcours.class);
+                intent.putExtra("SELECTED_ITINERAIRE_ID", selectedId);
+                intent.putExtra("PARCOURS_ID", idParcours);
+                context.startActivity(intent);
+            });
 
-            // Lancer l'activité fille avec l'ID sélectionné
-            Intent intent = new Intent(context, ActiviteParcours.class);
-            intent.putExtra("SELECTED_ITINERAIRE_ID", selectedId);
-            context.startActivity(intent);
         });
 
         builder.setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss());

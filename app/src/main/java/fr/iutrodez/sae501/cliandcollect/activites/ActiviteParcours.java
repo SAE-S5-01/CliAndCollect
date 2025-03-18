@@ -66,7 +66,7 @@ public class ActiviteParcours extends AppCompatActivity {
     private TextView prochainClient;
     private TextView prochaineDestination;
 
-    private int idParcoursCourant = 10; // TODO : STUB
+    private Long idParcoursCourant;
 
     private static final float DISTANCE_THRESHOLD = 15.0f; // Distance minimale en mètres
     private Location lastLocation = null;
@@ -93,9 +93,9 @@ public class ActiviteParcours extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         String itineraireId = getIntent().getStringExtra("SELECTED_ITINERAIRE_ID");
+        idParcoursCourant = getIntent().getLongExtra("PARCOURS_ID", -1);
 
         if (itineraireId != null && !itineraireId.isEmpty()) {
-            Log.d("ActiviteFille", "ID reçu: " + itineraireId);
 
             // Charger l'itinéraire correspondant
             itineraireCourant = SingletonListeItineraire.getItineraire(itineraireId);
@@ -111,7 +111,7 @@ public class ActiviteParcours extends AppCompatActivity {
 
         findViewById(R.id.boutonPause).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
-        findViewById(R.id.boutonPause).setOnLongClickListener(v -> modifierStatutParcours("EN_PAUSE"));
+        findViewById(R.id.boutonPause).setOnLongClickListener(v -> mettreEnPauseParcours());
 
         findViewById(R.id.boutonPasser).setOnClickListener(v -> passerClient());
 
@@ -231,23 +231,7 @@ public class ActiviteParcours extends AppCompatActivity {
     }
 
     private boolean mettreEnPauseParcours() {
-        if (clientDeLocalisation != null) {
-            clientDeLocalisation.removeLocationUpdates(locationCallback);
-            Log.d("Parcours", "Parcours mis en pause");
-        }
-
-        JSONObject objetNouvellesDonnees = new JSONObject();
-        try {
-            objetNouvellesDonnees.put("statut", "EN_PAUSE");
-
-            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
-                SnackbarCustom.show(this, "TODO : Mettre en pause parcours côté Android (y compris dans parcours stocké dans singleton)", SnackbarCustom.STYLE_ATTENTION);
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        SnackbarCustom.show(this, "TODO : Mettre en pause", SnackbarCustom.STYLE_VALIDATION);
+        modifierStatutParcours("EN_PAUSE");
         return true;
     }
 
@@ -276,7 +260,6 @@ public class ActiviteParcours extends AppCompatActivity {
     private boolean modifierStatutParcours(String statut) {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
-            Log.d("Parcours", "Parcours stoppé");
         }
 
         JSONObject objetNouvellesDonnees = new JSONObject();

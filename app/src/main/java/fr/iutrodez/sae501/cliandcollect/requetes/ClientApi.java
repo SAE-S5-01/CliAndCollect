@@ -20,7 +20,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 
@@ -700,11 +699,11 @@ public class ClientApi {
 
     /**
      * Crée un nouveau parcours.
+     *
      * @param contexte Le contexte de l'application
-     * @param donnees Les données du parcours
-     * @param envoiReussi La méthode à appeler en cas d'envoi réussi
+     * @param donnees  Les données du parcours
      */
-    public static void demarrerParcours(Context contexte, JSONObject donnees, Runnable envoiReussi) {
+    public static void demarrerParcours(Context contexte, JSONObject donnees, Consumer<Long> actionReussie) {
         spineurChargement = new ProgressDialog(contexte);
         spineurChargement.setMessage(contexte.getString(R.string.chargement_demarrage_parcours));
         spineurChargement.setCancelable(false);
@@ -717,9 +716,9 @@ public class ClientApi {
                         spineurChargement.dismiss();
                         // En cas de succès, on ajoute le parcours au singleton
                         JSONObject jsonReponse = new JSONObject(response);
-                        ((ActiviteParcours) contexte).runOnUiThread(envoiReussi);
                         Parcours parcoursDemarre = new Parcours(jsonReponse);
                         SingletonListeParcours.getInstance().ajouterParcours(parcoursDemarre);
+                        actionReussie.accept(parcoursDemarre.getId());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -741,7 +740,7 @@ public class ClientApi {
      * @param id L'identifiant du parcours
      * @param modificationReussie La méthode à appeler en cas de modification réussie
      */
-    public static void modifierParcours(Context contexte, JSONObject donnees, int id, Runnable modificationReussie) {
+    public static void modifierParcours(Context contexte, JSONObject donnees, Long id, Runnable modificationReussie) {
         spineurChargement = new ProgressDialog(contexte);
         spineurChargement.setMessage(contexte.getString(R.string.chargement_modification));
         spineurChargement.setCancelable(false);
