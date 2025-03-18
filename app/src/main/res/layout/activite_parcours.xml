@@ -24,13 +24,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/parcours_taille_prochain_client"
                         android:text="Prochain client : " />
                     <TextView
                         android:id="@+id/prochainClient"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="@dimen/parcours_taille_prochain_client"
                         android:textColor="@color/colorPrimary"
                         android:text="ABC Solutions" />
                 </LinearLayout>
@@ -39,14 +39,13 @@
                     android:id="@+id/prochaineDestination"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/parcours_taille_adresse_client"
                     android:textColor="@color/bouton_principal_desactive"
                     android:text="123 Rue de l'Innovation, 75001 Paris, France" />
             </LinearLayout>
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="end"
                 android:layout_gravity="center">
@@ -54,7 +53,7 @@
                     android:id="@+id/clientsRestants"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/parcours_taille_prochain_client"
                     android:text="N° 1/8" />
             </LinearLayout>
         </TableRow>
@@ -63,7 +62,7 @@
             android:layout_marginTop="20dp">
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="590dp"
+                android:layout_height="@dimen/parcours_hauteur_carte"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:background="@color/light_grey"
