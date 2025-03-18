@@ -232,6 +232,8 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(position, clients.size());
 
+                SingletonListeItineraire.recupererItineraires(this.getContext(), () -> {});
+
                 mettreAJourTexteErreur();
             });
     }
