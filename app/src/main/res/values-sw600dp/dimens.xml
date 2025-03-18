@@ -33,6 +33,8 @@
     <dimen name="detail_itineraire_marge_verticale_champs_texte">16dp</dimen>
 
     <dimen name="parcours_hauteur_carte">590dp</dimen>
+    <dimen name="parcours_taille_prochain_client">20sp</dimen>
+    <dimen name="parcours_taille_adresse_client">15sp</dimen>
 
     <dimen name="pied_page_hauteur_min">70dp</dimen>
     <dimen name="pied_page_icone_padding_haut">15dp</dimen>
