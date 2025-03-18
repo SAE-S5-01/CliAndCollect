@@ -28,8 +28,6 @@ public class ParcoursHolder extends RecyclerView.ViewHolder {
 
     private TextView dateParcours;
 
-    private TextView etatParcours;
-
     private TextView nombreEtapes;
 
     private SimpleDateFormat formatteurDates;
@@ -38,31 +36,19 @@ public class ParcoursHolder extends RecyclerView.ViewHolder {
         super(itemView);
         nomItineraire = itemView.findViewById(R.id.nomItineraire);
         dateParcours = itemView.findViewById(R.id.dateParcours);
-        etatParcours = itemView.findViewById(R.id.etatParcours);
         nombreEtapes = itemView.findViewById(R.id.nombreEtapes);
         formatteurDates = new SimpleDateFormat("'Le' dd/MM/yyyy 'à' HH:mm", Locale.FRANCE);
         formatteurDates.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
     }
 
     public void bind(Parcours parcours) {
-        nomItineraire.setText(parcours.getItineraire().getNom());
+        nomItineraire.setText(parcours.getItineraire() != null
+                              ? parcours.getItineraire().getNom()
+                              : "Itinéraire supprimé");
         dateParcours.setText(formatteurDates.format(parcours.getDateParcours()));
-        switch (parcours.getEtatParcours()) {
-            default:
-            case "EN_COURS":
-                etatParcours.setText("En cours");
-                break;
-            case "EN_PAUSE":
-                etatParcours.setText("En pause");
-                break;
-            case "ARRETE":
-                etatParcours.setText("Arrêté");
-                break;
-            case "TERMINE":
-                etatParcours.setText("Terminé");
-                break;
-        }
-        nombreEtapes.setText(parcours.getNombreEtapes() + " étape(s)");
+        nombreEtapes.setText(parcours.getNombreEtapes() == -1
+                             ? "Nombre d'étapes inconnu"
+                             : parcours.getNombreEtapes() + " étape(s)");
     }
 }
 

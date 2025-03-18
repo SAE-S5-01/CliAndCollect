@@ -29,7 +29,7 @@ public class Parcours {
         OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateStr);
         this.dateParcours = Date.from(offsetDateTime.toInstant());
         this.etatParcours = objetParcours.getString("statut");
-        this.nombreEtapes = itineraire.getListeCoordonnees().size();
+        this.nombreEtapes = itineraire != null ? itineraire.getListeCoordonnees().size() : -1;
     }
 
     public Long getId() {
