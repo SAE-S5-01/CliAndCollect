@@ -109,6 +109,10 @@
     <string name="supprimer_itineraire">Supprimer un itinéraire</string>
     <string name="confirmation_suppression_itineraire">"Êtes-vous sûr de vouloir supprimer cet itinéraire ?"</string>
 
+    <string name="parcours_en_cours">Parcours en cours (%d) :</string>
+    <string name="parcours_en_pause">Parcours en pause (%d) :</string>
+    <string name="parcours_arretes">Parcours arrêtés (%d) :</string>
+    <string name="parcours_termines">Parcours terminés (%d) :</string>
     <string name="creation_parcours">Démarrer un parcours</string>
     <string name="erreur_aucun_parcours">Aucun parcours n\'est en cours</string>
     <string name="parcours_termine">Vous avez terminé le parcours</string>

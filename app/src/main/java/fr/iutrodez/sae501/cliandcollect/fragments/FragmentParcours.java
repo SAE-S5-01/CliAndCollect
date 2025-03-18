@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.appcompat.app.AlertDialog;
@@ -324,14 +325,26 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
         this.getView().findViewById(R.id.erreurPasDItineraire)
             .setVisibility(aucunItineraire ? View.VISIBLE : View.GONE);
+
         this.getView().findViewById(R.id.parcoursEnCours)
             .setVisibility(parcoursEnCours.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursEnCoursTitre))
+            .setText(String.format(getString(R.string.parcours_en_cours), parcoursEnCours.size()));
+
         this.getView().findViewById(R.id.parcoursEnPause)
             .setVisibility(parcoursEnPause.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursEnPauseTitre))
+            .setText(String.format(getString(R.string.parcours_en_pause), parcoursEnPause.size()));
+
         this.getView().findViewById(R.id.parcoursArretes)
             .setVisibility(parcoursArretes.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursArretesTitre))
+            .setText(String.format(getString(R.string.parcours_arretes), parcoursArretes.size()));
+
         this.getView().findViewById(R.id.parcoursTermines)
             .setVisibility(parcoursTermines.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursTerminesTitre))
+            .setText(String.format(getString(R.string.parcours_termines), parcoursTermines.size()));
     }
 
     private void afficherListeDialog(Context context) {
