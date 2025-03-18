@@ -5,6 +5,7 @@
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,17 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.activity.result.ActivityResult;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteParcours;
-import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
-import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
@@ -139,19 +139,24 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
-        startActivity(intent);
+        //Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
+        //startActivity(intent);
+        afficherListeDialog(this.getContext());
+
     }
 
     /**
      * Méthode invoquée lors du clic sur la carte d'un parcours en cours
-     * @param i L'identifiant du parcours en cours
+     * @param parcoursId L'identifiant du parcours en cours
      */
-    private void onParcoursEnCoursClick(int i) {
-        if (Reseau.reseauDisponible(this.getContext(), true)) {
-            // TODO : Afficher les détails du parcours
-        }
+    private void onParcoursEnCoursClick(int parcoursId) {
+        //Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
+        //intent.putExtra("PARCOURS_ID", parcoursId);
+        //startActivity(intent);
     }
+
+
+
 
     /**
      * Méthode invoquée lors du clic sur la carte d'un parcours en pause
@@ -274,4 +279,38 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         this.getView().findViewById(R.id.parcoursTermines)
             .setVisibility(parcoursTermines.isEmpty() ? View.GONE : View.VISIBLE);
     }
+
+    private void afficherListeDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Sélectionnez un itinéraire");
+
+        // Récupérer la liste des itinéraires
+        List<Itineraire> items = SingletonListeItineraire.getListeItineraires();
+
+        // Extraire les noms des itinéraires pour l'affichage
+        String[] nomsItineraires = new String[items.size()];
+        String[] idsItineraires = new String[items.size()];
+
+        for (int i = 0; i < items.size(); i++) {
+            nomsItineraires[i] = items.get(i).getNom();  // Affiché dans le dialogue
+            idsItineraires[i] = items.get(i).getID();   // Transmis à l'activité fille
+        }
+
+        builder.setItems(nomsItineraires, (dialog, which) -> {
+            String selectedId = idsItineraires[which];
+
+            // Lancer l'activité fille avec l'ID sélectionné
+            Intent intent = new Intent(context, ActiviteParcours.class);
+            intent.putExtra("SELECTED_ITINERAIRE_ID", selectedId);
+            context.startActivity(intent);
+        });
+
+        builder.setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 }
+
+

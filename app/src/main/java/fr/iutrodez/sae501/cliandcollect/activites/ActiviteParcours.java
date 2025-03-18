@@ -1,14 +1,24 @@
 package fr.iutrodez.sae501.cliandcollect.activites;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -34,7 +44,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
+import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 public class ActiviteParcours extends AppCompatActivity {
@@ -56,9 +71,39 @@ public class ActiviteParcours extends AppCompatActivity {
     private static final float DISTANCE_THRESHOLD = 15.0f; // Distance minimale en mètres
     private Location lastLocation = null;
 
+    private Itineraire itineraireCourant = null;
+    private Handler networkLocationHandler = new Handler(Looper.getMainLooper());
+    private Runnable networkLocationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isNetworkAvailable()) {
+                afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet.");
+            } else if (!isLocationEnabled()) {
+                afficherAlerte("Localisation désactivée", "Veuillez activer la localisation.");
+            }
+            // Vérifier toutes les 5 secondes
+            networkLocationHandler.postDelayed(this, 5000);
+        }
+    };
+
+    private AlertDialog currentAlertDialog = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String itineraireId = getIntent().getStringExtra("SELECTED_ITINERAIRE_ID");
+
+        if (itineraireId != null && !itineraireId.isEmpty()) {
+            Log.d("ActiviteFille", "ID reçu: " + itineraireId);
+
+            // Charger l'itinéraire correspondant
+            itineraireCourant = SingletonListeItineraire.getItineraire(itineraireId);
+        }
+        checkLocationPermission();
+    }
+
+    private void initialiserUI() {
         setContentView(R.layout.activite_parcours);
 
         prochainClient = findViewById(R.id.prochainClient);
@@ -74,67 +119,66 @@ public class ActiviteParcours extends AppCompatActivity {
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
         findViewById(R.id.boutonStop).setOnLongClickListener(v -> stopperParcours());
 
-        // Initialisation d'OSMDroid
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
-        // Configuration de la carte
         map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
 
-        // Initialisation du marqueur utilisateur
         userMarker = new Marker(map);
         userMarker.setTitle("Ma position");
         userMarker.setIcon(getResources().getDrawable(R.drawable.ic_ma_position));
         map.getOverlays().add(userMarker);
 
-        // Initialisation du tracé
-            path = new Polyline();
-            path.setWidth(8f);
-            path.setColor(Color.BLUE);
-            map.getOverlays().add(path);
+        path = new Polyline();
+        path.setWidth(8f);
+        path.setColor(Color.BLUE);
+        map.getOverlays().add(path);
 
         pathPoints = new ArrayList<>();
 
-        // Contrôle de la carte
         mapController = map.getController();
         mapController.setZoom(15.0);
         map.setMinZoomLevel(5.0);
-        map.setMaxZoomLevel(20.0);  
-        // Client de localisation
-        clientDeLocalisation = LocationServices.getFusedLocationProviderClient(this);
+        map.setMaxZoomLevel(20.0);
 
-        checkLocationPermission();
+        if (itineraireCourant != null) {
+            placerPoint(itineraireCourant);
+        }
+        clientDeLocalisation = LocationServices.getFusedLocationProviderClient(this);
+        startLocationUpdates();
     }
 
     private void checkLocationPermission() {
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, permissions, CODE_REQUETE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, CODE_REQUETE);
         } else {
-            startLocationUpdates();
+            initialiserUI();
         }
     }
 
-    private void startLocationUpdates() {   
+    private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
         LocationRequest locationRequest = LocationRequest.create()
-            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-            .setInterval(3000) // Toutes les 5 secondes
-            .setFastestInterval(2000); // Minimum 3 seconde entre 2 updates
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+                .setInterval(5000)
+                .setFastestInterval(3000);
 
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d("loc" , String.valueOf(locationResult.getLastLocation().getLatitude()));
-                if (locationResult != null) {
+                if (locationResult != null && locationResult.getLastLocation() != null) {
                     Location location = locationResult.getLastLocation();
-                    if (location != null) {
-                        updateUserLocation(location);
+                    Log.d("loc", "Latitude: " + location.getLatitude() + ", Longitude: " + location.getLongitude());
+                    updateUserLocation(location);
+                } else {
+                    if (!isNetworkAvailable()) {
+                        afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet.");
+                    } else if (!isLocationEnabled()) {
+                        afficherAlerte("Localisation désactivée", "Veuillez activer la localisation.");
                     }
                 }
             }
@@ -143,65 +187,53 @@ public class ActiviteParcours extends AppCompatActivity {
         clientDeLocalisation.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
+    }
+
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    private void afficherAlerte(String titre, String message) {
+        if (currentAlertDialog != null && currentAlertDialog.isShowing()) {
+            return;
+        }
+        currentAlertDialog = new AlertDialog.Builder(this)
+                .setTitle(titre)
+                .setMessage(message)
+                .setCancelable(false) // pour forcer l'utilisateur à prendre une action
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    currentAlertDialog = null;
+                })
+                .show();
+    }
+
+
     private void updateUserLocation(Location location) {
-        boolean updateValide = true;
-
-        if (lastLocation != null) {
-            float distance = location.distanceTo(lastLocation); // Distance entre l'ancienne et la nouvelle position
-            updateValide = distance >= DISTANCE_THRESHOLD; // Met à jour seulement si la distance est suffisante
+        if (lastLocation != null && location.distanceTo(lastLocation) < DISTANCE_THRESHOLD) {
+            return;
         }
 
-        if (updateValide) {
-            lastLocation = location;
-            GeoPoint userPosition = new GeoPoint(location.getLatitude(), location.getLongitude());
-            pathPoints.add(userPosition);
-            path.setPoints(pathPoints);
+        lastLocation = location;
+        GeoPoint userPosition = new GeoPoint(location.getLatitude(), location.getLongitude());
+        pathPoints.add(userPosition);
+        path.setPoints(pathPoints);
 
-            // Mise à jour du marqueur utilisateur
-            userMarker.setPosition(userPosition);
-            userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-
-            // Centrage sur la nouvelle position avec animation
-            mapController.animateTo(userPosition);
-
-            // Rafraîchir la carte
-            map.invalidate();
-        }
-    }
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (clientDeLocalisation != null) {
-            clientDeLocalisation.removeLocationUpdates(locationCallback);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates();
-        }
-
-        if (path != null) {
-            path.setPoints(pathPoints);
-            map.invalidate(); // Redessiner la carte
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CODE_REQUETE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates();
-        }
+        userMarker.setPosition(userPosition);
+        userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        mapController.animateTo(userPosition);
+        map.invalidate();
     }
 
     private boolean mettreEnPauseParcours() {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
+            Log.d("Parcours", "Parcours mis en pause");
         }
 
         JSONObject objetNouvellesDonnees = new JSONObject();
@@ -235,6 +267,7 @@ public class ActiviteParcours extends AppCompatActivity {
     private boolean stopperParcours() {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
+            Log.d("Parcours", "Parcours stoppé");
         }
 
         JSONObject objetNouvellesDonnees = new JSONObject();
@@ -250,4 +283,63 @@ public class ActiviteParcours extends AppCompatActivity {
 
         return true;
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        networkLocationHandler.post(networkLocationRunnable);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        networkLocationHandler.removeCallbacks(networkLocationRunnable);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CODE_REQUETE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission accordée
+                initialiserUI();
+            } else {
+                // TODO meilleure feedback
+                Toast.makeText(this, "Permission refusée", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void placerPoint(Itineraire itineraire) {
+
+        for (int i = 0 ; i < itineraire.getListeCoordonnees().size() ; i++) {
+
+            GeoPoint point = new GeoPoint(itineraire.getListeCoordonnees().get(i)[1],
+                    itineraire.getListeCoordonnees().get(i)[0]);
+
+            // Création d'un marqueur pour chaque point
+            Marker marker = new Marker(map);
+            marker.setPosition(point);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setTitle(itineraire.getOrdreClients().get(itineraire.getOrdreClients().keySet().toArray()[i]));
+
+            // Ajout du marqueur à la carte
+            map.getOverlays().add(marker);
+        }
+        Marker marker = new Marker(map);
+        GeoPoint domicile = new GeoPoint(Double.parseDouble(Preferences.getLatitude(this)),
+                Double.parseDouble(Preferences.getLongitude(this)));
+        marker.setPosition(domicile);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setTitle("Domicile - Arrivée");
+
+        Long idClient = itineraire.getOrdreClients().keySet().iterator().next();
+        prochainClient.setText(itineraire.getOrdreClients().get(idClient));
+        Client client = SingletonListeClient.getClient(idClient);
+        prochaineDestination.setText(client.getAdresse());
+        map.getOverlays().add(marker);
+
+        map.invalidate();
+    }
+
 }
