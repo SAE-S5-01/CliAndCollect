@@ -69,7 +69,7 @@ public class ClientApi {
         = "assets/config.properties";
 
     private static String BASE_URL;
-
+    public static String API_ORS_TOKEN;
     static {
         Properties properties = new Properties();
         try (InputStream inputStream
@@ -78,6 +78,7 @@ public class ClientApi {
             if (inputStream != null) {
                 properties.load(inputStream);
                 BASE_URL = properties.getProperty("BASE_URL");
+                API_ORS_TOKEN = properties.getProperty("API_ORS_TOKEN");
             } else {
                 throw new RuntimeException("Fichier de configuration illisible : "
                                            + CHEMIN_FICHIER_CONFIGURATION);
