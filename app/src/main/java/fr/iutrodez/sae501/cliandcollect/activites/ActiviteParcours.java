@@ -47,6 +47,7 @@ import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
@@ -63,10 +64,11 @@ public class ActiviteParcours extends AppCompatActivity {
     private List<GeoPoint> pathPoints;
     private IMapController mapController;
 
-    private TextView prochainClient;
+    private TextView nomProchainClient;
     private TextView prochaineDestination;
+    private TextView numeroProchainClient;
 
-    private Long idParcoursCourant;
+    private Parcours parcoursCourant;
 
     private static final float DISTANCE_THRESHOLD = 15.0f; // Distance minimale en mètres
     private Location lastLocation = null;
@@ -93,10 +95,11 @@ public class ActiviteParcours extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         String itineraireId = getIntent().getStringExtra("SELECTED_ITINERAIRE_ID");
-        idParcoursCourant = getIntent().getLongExtra("PARCOURS_ID", -1);
+        Long idParcoursCourant = getIntent().getLongExtra("PARCOURS_ID", -1);
+
+        parcoursCourant = SingletonListeParcours.getInstance().getParcours(idParcoursCourant);
 
         if (itineraireId != null && !itineraireId.isEmpty()) {
-
             // Charger l'itinéraire correspondant
             itineraireCourant = SingletonListeItineraire.getItineraire(itineraireId);
         }
@@ -106,8 +109,15 @@ public class ActiviteParcours extends AppCompatActivity {
     private void initialiserUI() {
         setContentView(R.layout.activite_parcours);
 
-        prochainClient = findViewById(R.id.prochainClient);
+        nomProchainClient = findViewById(R.id.prochainClient);
         prochaineDestination = findViewById(R.id.prochaineDestination);
+        numeroProchainClient = findViewById(R.id.numeroProchainClient);
+
+        Client prochainClient = getProchainClient();
+        nomProchainClient.setText(prochainClient.getEntreprise());
+        prochaineDestination.setText(prochainClient.getAdresse());
+        numeroProchainClient.setText("N° " + getNumeroClient(prochainClient) + "/"
+                                     + itineraireCourant.getOrdreClients().size());
 
         findViewById(R.id.boutonPause).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
@@ -163,24 +173,24 @@ public class ActiviteParcours extends AppCompatActivity {
         }
 
         LocationRequest locationRequest = LocationRequest.create()
-                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-                .setInterval(5000)
-                .setFastestInterval(3000);
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setInterval(5000)
+            .setFastestInterval(3000);
 
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (locationResult != null && locationResult.getLastLocation() != null) {
-                    Location location = locationResult.getLastLocation();
-                    Log.d("loc", "Latitude: " + location.getLatitude() + ", Longitude: " + location.getLongitude());
-                    updateUserLocation(location);
-                } else {
-                    if (!isNetworkAvailable()) {
-                        afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet.");
-                    } else if (!isLocationEnabled()) {
-                        afficherAlerte("Localisation désactivée", "Veuillez activer la localisation.");
-                    }
+            if (locationResult != null && locationResult.getLastLocation() != null) {
+                Location location = locationResult.getLastLocation();
+                Log.d("loc", "Latitude: " + location.getLatitude() + ", Longitude: " + location.getLongitude());
+                updateUserLocation(location);
+            } else {
+                if (!isNetworkAvailable()) {
+                    afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet.");
+                } else if (!isLocationEnabled()) {
+                    afficherAlerte("Localisation désactivée", "Veuillez activer la localisation.");
                 }
+            }
             }
         };
 
@@ -203,14 +213,14 @@ public class ActiviteParcours extends AppCompatActivity {
             return;
         }
         currentAlertDialog = new AlertDialog.Builder(this)
-                .setTitle(titre)
-                .setMessage(message)
-                .setCancelable(false) // pour forcer l'utilisateur à prendre une action
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.dismiss();
-                    currentAlertDialog = null;
-                })
-                .show();
+            .setTitle(titre)
+            .setMessage(message)
+            .setCancelable(false) // pour forcer l'utilisateur à choisir une action
+            .setPositiveButton("Ok", (dialog, which) -> {
+                dialog.dismiss();
+                currentAlertDialog = null;
+            })
+            .show();
     }
 
 
@@ -238,18 +248,78 @@ public class ActiviteParcours extends AppCompatActivity {
     /**
      * Passe au prochain client.
      */
-
     private void passerClient() {
         JSONObject objetNouvellesDonnees = new JSONObject();
-        try {
-            objetNouvellesDonnees.put("idDernierContactVisite", 5); // TODO : STUB
 
-            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
-                SnackbarCustom.show(this, "TODO : Passer prochain client côté Android (affichage + stockage singleton parcours)", SnackbarCustom.STYLE_ATTENTION);
-            });
+        Client nouveauClient = getProchainClient();
+        parcoursCourant.setDernierContactVisite(nouveauClient);
+
+        try {
+            objetNouvellesDonnees.put("idDernierContactVisite",
+                                      nouveauClient.getID());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        ClientApi.modifierParcours(this, objetNouvellesDonnees, parcoursCourant.getId(), () -> {
+            Client clientSuivant = getProchainClient();
+
+            if (clientSuivant != null) {
+                nomProchainClient.setText(clientSuivant.getEntreprise());
+                prochaineDestination.setText(clientSuivant.getAdresse());
+                numeroProchainClient.setText("N° " + getNumeroClient(clientSuivant) + "/"
+                                             + itineraireCourant.getOrdreClients().size());
+                SnackbarCustom.show(this,
+                                    "Nouvelle destination : "
+                                    + clientSuivant.getAdresse(),
+                                    SnackbarCustom.STYLE_INFORMATION);
+            } else {
+                SnackbarCustom.show(this, R.string.parcours_termine, SnackbarCustom.STYLE_INFORMATION);
+                modifierStatutParcours("TERMINE");
+            }
+        });
+    }
+
+    /**
+     * @return Le prochain client à visiter.
+     */
+    private Client getProchainClient() {
+        Client prochainClient = null;
+        boolean prochainClientTrouve = false;
+
+        if (parcoursCourant.getDernierContactVisite() == null) {
+            return SingletonListeClient.getInstance().getClient(itineraireCourant.getOrdreClients().keySet().iterator().next());
+        }
+
+        for (Long idClient : itineraireCourant.getOrdreClients().keySet()) {
+            if (prochainClientTrouve) {
+                prochainClient = SingletonListeClient.getInstance().getClient(idClient);
+                break;
+            }
+            if (itineraireCourant.getOrdreClients().get(idClient)
+                    .equals(parcoursCourant.getDernierContactVisite().getEntreprise())) {
+                prochainClientTrouve = true;
+            }
+        }
+
+        return prochainClient;
+    }
+
+    /**
+     * @return Le numéro du client actuel parmi les autres.
+     */
+    private int getNumeroClient(Client client) {
+        int numeroClient = 1;
+
+        for (Long idClient : itineraireCourant.getOrdreClients().keySet()) {
+            if (itineraireCourant.getOrdreClients().get(idClient)
+                    .equals(client.getEntreprise())) {
+                break;
+            } else {
+                numeroClient++;
+            }
+        }
+        return numeroClient;
     }
 
     /**
@@ -266,7 +336,7 @@ public class ActiviteParcours extends AppCompatActivity {
         try {
             objetNouvellesDonnees.put("statut", statut);
 
-            ClientApi.modifierParcours(this, objetNouvellesDonnees, idParcoursCourant, () -> {
+            ClientApi.modifierParcours(this, objetNouvellesDonnees, parcoursCourant.getId(), () -> {
                 SingletonListeParcours.getInstance().recupererParcours(this, () -> {
                     setResult(Activity.RESULT_OK);
                     finish();
@@ -322,17 +392,12 @@ public class ActiviteParcours extends AppCompatActivity {
         }
         Marker marker = new Marker(map);
         GeoPoint domicile = new GeoPoint(Double.parseDouble(Preferences.getLatitude(this)),
-                Double.parseDouble(Preferences.getLongitude(this)));
+            Double.parseDouble(Preferences.getLongitude(this)));
         marker.setPosition(domicile);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setTitle("Domicile - Arrivée");
 
-        Long idClient = itineraire.getOrdreClients().keySet().iterator().next();
-        prochainClient.setText(itineraire.getOrdreClients().get(idClient));
-        Client client = SingletonListeClient.getClient(idClient);
-        prochaineDestination.setText(client.getAdresse());
         map.getOverlays().add(marker);
-
         map.invalidate();
     }
 

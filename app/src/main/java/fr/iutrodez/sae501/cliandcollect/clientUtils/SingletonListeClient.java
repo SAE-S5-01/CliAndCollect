@@ -104,6 +104,27 @@ public class SingletonListeClient {
     }
 
     /**
+     * Récupère un client par son nom d'entreprise
+     * @param nomEntreprise Le nom de l'entreprise du client
+     * @return Le client correspondant au nom
+     */
+    public static Client getClient(String nomEntreprise) {
+        Client clientTrouve = null;
+
+        for (int i = 0;
+             i < getInstance().listeClients.size()
+             && clientTrouve == null;
+             i++) {
+            Client client = getInstance().listeClients.get(i);
+            if (client.getEntreprise().equals(nomEntreprise)) {
+                clientTrouve = client;
+            }
+        }
+
+        return clientTrouve;
+    }
+
+    /**
      * Vide la liste des clients
      */
     public static void viderListeClient() {

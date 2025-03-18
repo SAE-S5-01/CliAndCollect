@@ -5,7 +5,6 @@
 package fr.iutrodez.sae501.cliandcollect.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -282,7 +281,7 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         parcoursTermines.clear();
 
         for (Parcours parcours : SingletonListeParcours.getInstance().getListeParcours()) {
-            switch (parcours.getEtatParcours()) {
+            switch (parcours.getStatut()) {
                 default:
                 case "EN_COURS":
                     parcoursEnCours.add(parcours);

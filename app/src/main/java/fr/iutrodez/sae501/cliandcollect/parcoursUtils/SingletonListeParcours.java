@@ -10,6 +10,7 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 
 /**
@@ -86,12 +87,17 @@ public class SingletonListeParcours {
     }
 
     /**
-     * Récupère un parcours par son identifiant dans la liste
-     * @param idListe L'identifiant du parcours dans la liste
+     * Récupère un parcours par son identifiant
+     * @param id L'identifiant du parcours
      * @return Le parcours correspondant à l'identifiant
      */
-    public static Parcours getParcours(int idListe) {
-        return getInstance().listeParcours.get(idListe);
+    public static Parcours getParcours(Long id) {
+        for (Parcours parcours : getInstance().listeParcours) {
+            if (parcours.getId().equals(id)) {
+                return parcours;
+            }
+        }
+        return null;
     }
 
     /**

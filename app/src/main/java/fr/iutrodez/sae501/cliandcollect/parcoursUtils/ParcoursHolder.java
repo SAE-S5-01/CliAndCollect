@@ -45,7 +45,7 @@ public class ParcoursHolder extends RecyclerView.ViewHolder {
         nomItineraire.setText(parcours.getItineraire() != null
                               ? parcours.getItineraire().getNom()
                               : "Itinéraire supprimé");
-        dateParcours.setText(formatteurDates.format(parcours.getDateParcours()));
+        dateParcours.setText(formatteurDates.format(parcours.getDateCreation()));
         nombreEtapes.setText(parcours.getNombreEtapes() == -1
                              ? "Nombre d'étapes inconnu"
                              : parcours.getNombreEtapes() + " étape(s)");

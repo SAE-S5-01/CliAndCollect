@@ -111,6 +111,7 @@
 
     <string name="creation_parcours">Démarrer un parcours</string>
     <string name="erreur_aucun_parcours">Aucun parcours n\'est en cours</string>
+    <string name="parcours_termine">Vous avez terminé le parcours</string>
     <string name="clic_long_pour_action">Effectuez un clic long pour faire cette action</string>
     <string name="parcours_supprime">Parcours supprimé avec succès</string>
     <string name="supprimer_parcours">Supprimer un parcours</string>
