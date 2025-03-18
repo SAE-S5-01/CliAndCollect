@@ -112,10 +112,18 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
         itineraires = new ArrayList<>();
 
-        adapterParcoursEnCours = new ParcoursAdapter(parcoursEnCours, this::onParcoursEnCoursClick);
-        adapterParcoursEnPause = new ParcoursAdapter(parcoursEnPause, this::onParcoursEnPauseClick);
-        adapterParcoursArretes = new ParcoursAdapter(parcoursArretes, this::onParcoursArreteClick);
-        adapterParcoursTermines = new ParcoursAdapter(parcoursTermines, this::onParcoursTermineClick);
+        adapterParcoursEnCours
+        = new ParcoursAdapter(parcoursEnCours, this::onParcoursEnCoursClick,
+                              (position) -> supprimerParcours(position, parcoursEnCours));
+        adapterParcoursEnPause
+        = new ParcoursAdapter(parcoursEnPause, this::onParcoursEnPauseClick,
+                              (position) -> supprimerParcours(position, parcoursEnPause));
+        adapterParcoursArretes
+        = new ParcoursAdapter(parcoursArretes, this::onParcoursArreteClick,
+                              (position) -> supprimerParcours(position, parcoursArretes));
+        adapterParcoursTermines
+        = new ParcoursAdapter(parcoursTermines, this::onParcoursTermineClick,
+                              (position) -> supprimerParcours(position, parcoursTermines));
 
         listeParcoursEnCours.setAdapter(adapterParcoursEnCours);
         listeParcoursEnPause.setAdapter(adapterParcoursEnPause);
@@ -186,6 +194,32 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         if (Reseau.reseauDisponible(this.getContext(), true)) {
             // TODO : Afficher les détails du parcours
         }
+    }
+
+    /**
+     * Méthode invoquée lors de l'appui long sur un parcours
+     * @param position La position du parcours à supprimer
+     * @param liste La liste de parcours à laquelle appartient le parcours à supprimer
+     */
+    private void supprimerParcours(int position, ArrayList<Parcours> liste) {
+        new AlertDialog.Builder(getContext())
+            .setTitle(R.string.supprimer_parcours)
+            .setMessage(R.string.confirmation_suppression_parcours)
+            .setPositiveButton("Oui", (dialog, which) -> {
+                if (Reseau.reseauDisponible(this.getContext(), true)) {
+                    Parcours parcours = liste.get(position);
+                    ClientApi.supprimerParcours(this.getContext(), parcours.getId(),
+                        () -> {
+                            SnackbarCustom.show(this.getContext(),
+                                    R.string.parcours_supprime,
+                                    SnackbarCustom.STYLE_VALIDATION);
+                            SingletonListeParcours.supprimerParcours(parcours);
+                            mettreAJourListesParcours(null);
+                        });
+                }
+            })
+            .setNegativeButton("Non", null)
+            .show();
     }
 
     /**
@@ -268,8 +302,11 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
      * des différents types de parcours.
      */
     private void mettreAJourAffichageEtErreur() {
+        boolean aucunItineraire = parcoursEnCours.isEmpty() && parcoursEnPause.isEmpty()
+            && parcoursArretes.isEmpty() && parcoursTermines.isEmpty();
+
         this.getView().findViewById(R.id.erreurPasDItineraire)
-            .setVisibility(itineraires.isEmpty() ? View.VISIBLE : View.GONE);
+            .setVisibility(aucunItineraire ? View.VISIBLE : View.GONE);
         this.getView().findViewById(R.id.parcoursEnCours)
             .setVisibility(parcoursEnCours.isEmpty() ? View.GONE : View.VISIBLE);
         this.getView().findViewById(R.id.parcoursEnPause)

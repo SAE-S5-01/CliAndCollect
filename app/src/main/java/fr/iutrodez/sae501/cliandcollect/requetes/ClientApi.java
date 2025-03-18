@@ -763,6 +763,34 @@ public class ClientApi {
     }
 
     /**
+     * Méthode permettant de supprimer un parcours.
+     * @param contexte Le contexte de l'application
+     * @param id L'identifiant du parcours à supprimer
+     * @param suppressionReussie La méthode à appeler en cas de suppression réussie
+     */
+    public static void supprimerParcours(Context contexte, Long id, Runnable suppressionReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_suppression));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.DELETE, "/parcours/" + id, null, null,
+                response -> {
+                    spineurChargement.dismiss();
+                    ((Activity) contexte).runOnUiThread(suppressionReussie);
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.
      * @param contexte Le contexte de l'application
      * @param erreur L'erreur retournée par l'API

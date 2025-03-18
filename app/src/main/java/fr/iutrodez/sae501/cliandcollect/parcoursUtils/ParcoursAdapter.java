@@ -27,8 +27,14 @@ public class ParcoursAdapter extends RecyclerView.Adapter<ParcoursHolder> {
 
     private OnViewClickListener onViewClickListener;
 
+    private OnLongViewClickListener onLongViewClickListener;
+
     public interface OnViewClickListener {
-        void onViewClick(int festivalId);
+        void onViewClick(int idParcours);
+    }
+
+    public interface OnLongViewClickListener {
+        void onLongViewClick(int idParcours);
     }
 
     /**
@@ -36,9 +42,11 @@ public class ParcoursAdapter extends RecyclerView.Adapter<ParcoursHolder> {
      * @param donnees La liste des parcours
      * @param onViewClickListener L'écouteur de clic sur un élément de la liste
      */
-    public ParcoursAdapter(List<Parcours> donnees, OnViewClickListener onViewClickListener) {
+    public ParcoursAdapter(List<Parcours> donnees, OnViewClickListener onViewClickListener,
+                           OnLongViewClickListener onLongViewClickListener) {
         this.parcours = donnees;
         this.onViewClickListener = onViewClickListener;
+        this.onLongViewClickListener = onLongViewClickListener;
     }
 
     /**
@@ -61,6 +69,11 @@ public class ParcoursAdapter extends RecyclerView.Adapter<ParcoursHolder> {
 
         holder.itemView.setOnClickListener(v ->
             onViewClickListener.onViewClick(holder.getBindingAdapterPosition()));
+
+        holder.itemView.setOnLongClickListener(v -> {
+            onLongViewClickListener.onLongViewClick(holder.getBindingAdapterPosition());
+            return true;
+        });
     }
 
     @Override
