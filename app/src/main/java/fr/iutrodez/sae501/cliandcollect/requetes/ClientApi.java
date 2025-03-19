@@ -253,10 +253,9 @@ public class ClientApi {
     /**
      * Récupère les informations du compte de l'utilisateur.
      * @param contexte Le contexte de l'application
-     * @param getReussi La méthode à appeler en cas de récupération réussie
      * @param getEchoue La méthode à appeler en cas de récupération échouée
      */
-    public static void getCompte(Context contexte, Runnable getReussi, Runnable getEchoue) {
+    public static void getCompte(Context contexte, Runnable getEchoue) {
         requeteApi(contexte, Request.Method.GET, "/utilisateur", null, null,
             response -> {
                 try {
@@ -264,8 +263,6 @@ public class ClientApi {
                     // On retire le mot de passe qui est ici haché (donc inutile)
                     jsonReponse.remove("motDePasse");
                     new Compte(jsonReponse);
-
-                    ((ActiviteGestionCompte) contexte).runOnUiThread(getReussi);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

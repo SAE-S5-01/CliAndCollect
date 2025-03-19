@@ -34,7 +34,6 @@ public class Compte {
     /**
      * Instancier un compte
      * @param donnees Les données du compte
-     * @param contexte Le contexte de l'application
      */
     public Compte(JSONObject donnees) {
         try {

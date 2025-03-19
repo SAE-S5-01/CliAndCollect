@@ -100,32 +100,18 @@ public class ActiviteGestionCompte extends AppCompatActivity {
      */
     public void initialiserChamps() {
         if (Reseau.reseauDisponible(this, false)) {
-            ClientApi.getCompte(this, () -> {
-                compte = Compte.getInstance();
-                mail.setText(compte.getEmail());
-                nom.setText(compte.getNom());
-                prenom.setText(compte.getPrenom());
-                adresse.setText(compte.getAdresse());
-                latitude = compte.getLatitude();
-                longitude = compte.getLongitude();
-            }, () -> {
-                SnackbarCustom.show(this, R.string.erreur_recuperation_compte, SnackbarCustom.STYLE_ERREUR);
-                actionRetardee(() -> retour(null));
-            });
+            compte = Compte.getInstance();
+            mail.setText(compte.getEmail());
+            nom.setText(compte.getNom());
+            prenom.setText(compte.getPrenom());
+            adresse.setText(compte.getAdresse());
+            latitude = compte.getLatitude();
+            longitude = compte.getLongitude();
         } else {
             Intent menuConnexion = new Intent(ActiviteGestionCompte.this, ActiviteConnexion.class);
             startActivity(menuConnexion);
             finish();
         }
-    }
-
-    /**
-     * Attendre 3 secondes puis effectuer l'action passée en paramètre
-     *
-     * @param action Action à effectuer
-     */
-    private void actionRetardee(Runnable action) {
-        new android.os.Handler().postDelayed(() -> action.run(), 3000);
     }
 
     /**
