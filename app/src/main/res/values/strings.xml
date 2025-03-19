@@ -114,6 +114,10 @@
     <string name="parcours_arretes">Parcours arrêtés (%d) :</string>
     <string name="parcours_termines">Parcours terminés (%d) :</string>
     <string name="creation_parcours">Démarrer un parcours</string>
+    <string name="dernier_client">"Dernier client visité : "</string>
+    <string name="dernier_prospect">"Dernier prospect visité : "</string>
+    <string name="prochain_client">"Prochain client : "</string>
+    <string name="prochain_prospect">"Prochain prospect : "</string>
     <string name="erreur_aucun_parcours">Aucun parcours n\'est en cours</string>
     <string name="parcours_termine">Vous avez terminé le parcours</string>
     <string name="clic_long_pour_action">Effectuez un clic long pour faire cette action</string>

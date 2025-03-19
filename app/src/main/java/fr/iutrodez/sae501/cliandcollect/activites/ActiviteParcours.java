@@ -62,6 +62,7 @@ public class ActiviteParcours extends AppCompatActivity {
     private List<GeoPoint> pathPoints;
     private IMapController mapController;
 
+    private TextView texteProchainContact;
     private TextView nomProchainClient;
     private TextView prochaineDestination;
     private TextView numeroProchainClient;
@@ -108,18 +109,21 @@ public class ActiviteParcours extends AppCompatActivity {
     private void initialiserUI() {
         setContentView(R.layout.activite_parcours);
 
+        texteProchainContact = findViewById(R.id.texteProchainContact);
         nomProchainClient = findViewById(R.id.prochainClient);
         prochaineDestination = findViewById(R.id.prochaineDestination);
         numeroProchainClient = findViewById(R.id.numeroProchainClient);
 
         if (!parcoursCourant.getStatut().equals("EN_COURS")) {
-            findViewById(R.id.texteProchainClient).setVisibility(TextView.GONE);
-            nomProchainClient.setVisibility(TextView.GONE);
-            prochaineDestination.setVisibility(TextView.GONE);
-            numeroProchainClient.setText("N° " + itineraireCourant.getOrdreClients().size()
-                                         + "/" + itineraireCourant.getOrdreClients().size());
+            Client dernierContactVisite = parcoursCourant.getDernierContactVisite();
+            texteProchainContact.setText(dernierContactVisite.isProspect() ? R.string.dernier_prospect : R.string.dernier_client);
+            nomProchainClient.setText(dernierContactVisite.getEntreprise());
+            prochaineDestination.setText(dernierContactVisite.getAdresse());
+            numeroProchainClient.setText("N° " + getNumeroClient(dernierContactVisite) + "/"
+                                         + itineraireCourant.getOrdreClients().size());
         } else {
             Client prochainClient = getProchainClient();
+            texteProchainContact.setText(prochainClient.isProspect() ? R.string.prochain_prospect : R.string.prochain_client);
             nomProchainClient.setText(prochainClient.getEntreprise());
             prochaineDestination.setText(prochainClient.getAdresse());
             numeroProchainClient.setText("N° " + getNumeroClient(prochainClient) + "/"
@@ -294,6 +298,7 @@ public class ActiviteParcours extends AppCompatActivity {
             Client clientSuivant = getProchainClient();
 
             if (clientSuivant != null) {
+                texteProchainContact.setText(clientSuivant.isProspect() ? R.string.prochain_prospect : R.string.prochain_client);
                 nomProchainClient.setText(clientSuivant.getEntreprise());
                 prochaineDestination.setText(clientSuivant.getAdresse());
                 numeroProchainClient.setText("N° " + getNumeroClient(clientSuivant) + "/"
