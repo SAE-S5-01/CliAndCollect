@@ -184,7 +184,9 @@ public class ActiviteParcours extends AppCompatActivity {
         path.setColor(Color.BLUE);
         map.getOverlays().add(path);
 
-        pathPoints = new ArrayList<>();
+        pathPoints = parcoursCourant.getPositionsGpsPrecedentes() != null
+            ? parcoursCourant.getPositionsGpsPrecedentes()
+            : new ArrayList<>();
 
         mapController = map.getController();
         mapController.setZoom(15.0);
