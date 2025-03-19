@@ -49,6 +49,7 @@ import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
+import fr.iutrodez.sae501.cliandcollect.utile.Compte;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
@@ -416,25 +417,38 @@ public class ActiviteParcours extends AppCompatActivity {
     private void placerPoint(Itineraire itineraire) {
 
         for (int i = 0 ; i < itineraire.getListeCoordonnees().size() ; i++) {
-
             GeoPoint point = new GeoPoint(itineraire.getListeCoordonnees().get(i)[1],
-                    itineraire.getListeCoordonnees().get(i)[0]);
+                                          itineraire.getListeCoordonnees().get(i)[0]);
+
+            Long idClient = (Long) itineraire.getOrdreClients().keySet().toArray()[i];
+            Client client = SingletonListeClient.getInstance().getClient(idClient);
 
             // Création d'un marqueur pour chaque point
             Marker marker = new Marker(map);
             marker.setPosition(point);
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setTitle(itineraire.getOrdreClients().get(itineraire.getOrdreClients().keySet().toArray()[i]));
+            marker.setTitle(client.getEntreprise());
+            marker.setSubDescription(client.getAdresse());
+
+            // Choix de l'icône en fonction du type de contact
+            if (client.isProspect()) {
+                marker.setIcon(getResources().getDrawable(R.drawable.ic_point_prospect));
+            } else {
+                marker.setIcon(getResources().getDrawable(R.drawable.ic_point_client));
+            }
 
             // Ajout du marqueur à la carte
             map.getOverlays().add(marker);
         }
+
         Marker marker = new Marker(map);
         GeoPoint domicile = new GeoPoint(Double.parseDouble(Preferences.getLatitude(this)),
-            Double.parseDouble(Preferences.getLongitude(this)));
+                                         Double.parseDouble(Preferences.getLongitude(this)));
         marker.setPosition(domicile);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setTitle("Domicile - Arrivée");
+        marker.setSubDescription(Compte.getInstance().getAdresse());
+        marker.setIcon(getResources().getDrawable(R.drawable.ic_point_maison));
 
         map.getOverlays().add(marker);
         map.invalidate();
