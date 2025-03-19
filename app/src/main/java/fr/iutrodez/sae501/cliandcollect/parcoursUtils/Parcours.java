@@ -8,6 +8,7 @@ package fr.iutrodez.sae501.cliandcollect.parcoursUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class Parcours {
 
     private Client dernierContactVisite;
 
-    private ArrayList<PointGPS> positionsGpsPrecedentes;
+    private ArrayList<GeoPoint> positionsGpsPrecedentes;
 
     public Parcours(JSONObject objetParcours) throws JSONException {
         this.id = objetParcours.getLong("id");
@@ -65,10 +66,9 @@ public class Parcours {
 
             for (int i = 0; i < positionsGpsPrecedentes.length(); i++) {
                 JSONObject positionPrecedente = positionsGpsPrecedentes.getJSONObject(i);
-                this.positionsGpsPrecedentes.add(new PointGPS(
+                this.positionsGpsPrecedentes.add(new GeoPoint(
                     positionPrecedente.getDouble("y"),
-                    positionPrecedente.getDouble("x"),
-                    ""
+                    positionPrecedente.getDouble("x")
                 ));
             }
         }
@@ -122,11 +122,11 @@ public class Parcours {
         this.dernierContactVisite = dernierContactVisite;
     }
 
-    public ArrayList<PointGPS> getPositionsGpsPrecedentes() {
+    public ArrayList<GeoPoint> getPositionsGpsPrecedentes() {
         return positionsGpsPrecedentes;
     }
 
-    public void setPositionsGpsPrecedentes(ArrayList<PointGPS> positionsGpsPrecedentes) {
+    public void setPositionsGpsPrecedentes(ArrayList<GeoPoint> positionsGpsPrecedentes) {
         this.positionsGpsPrecedentes = positionsGpsPrecedentes;
     }
 }
