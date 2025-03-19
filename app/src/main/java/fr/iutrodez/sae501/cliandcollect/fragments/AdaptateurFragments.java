@@ -1,5 +1,5 @@
 /*
- * AdaptateurFragments.java                                          28 nov. 2024
+ * AdaptateurFragments.java                                         28 nov. 2024
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 package fr.iutrodez.sae501.cliandcollect.fragments;
@@ -18,7 +18,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 public class AdaptateurFragments extends FragmentStateAdapter {
 
     /** Nombre de fragments gérés par cet adaptateur, ou nombre d'onglets de la vue */
-   private static final int NB_FRAGMENT = 4;
+   private static final int NB_FRAGMENT = 3;
 
     /**
      * Constructeur de base
@@ -38,12 +38,10 @@ public class AdaptateurFragments extends FragmentStateAdapter {
          */
         switch (position) {
             case 0:
-                return FragmentAccueil.newInstance();
-            case 1:
                 return FragmentClients.newInstance();
-            case 2:
+            case 1:
                 return FragmentParcours.newInstance();
-            case 3:
+            case 2:
                 return FragmentItineraires.newInstance();
             default :
                 return null;

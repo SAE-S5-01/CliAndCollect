@@ -68,7 +68,6 @@ public class GestionFragment extends AppCompatActivity {
         gestionnairePagination.setAdapter(new AdaptateurFragments(this));
 
         navigationButtonsIds = new int[] {
-            R.id.pied_page_icone_accueil,
             R.id.pied_page_icone_client,
             R.id.pied_page_icone_parcours,
             R.id.pied_page_icone_itineraire
@@ -197,15 +196,12 @@ public class GestionFragment extends AppCompatActivity {
     throws IllegalStateException {
         switch (position) {
             case 0:
-                button.setImageResource(R.drawable.accueil);
-                break;
-            case 1:
                 button.setImageResource(R.drawable.client);
                 break;
-            case 2:
+            case 1:
                 button.setImageResource(R.drawable.parcours);
                 break;
-            case 3:
+            case 2:
                 button.setImageResource(R.drawable.itineraire);
                 break;
             default:

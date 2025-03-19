@@ -40,6 +40,6 @@
     <dimen name="pied_page_icone_padding_haut">15dp</dimen>
     <dimen name="pied_page_icone_espace_barre">12dp</dimen>
     <dimen name="pied_page_icone_padding_bas">9dp</dimen>
-    <dimen name="pied_page_icone_marge_exterieure_horizontale">30dp</dimen>
+    <dimen name="pied_page_icone_marge_exterieure_horizontale">40dp</dimen>
     <dimen name="pied_page_icone_dimensions">68dp</dimen>
 </resources>
