@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.appcompat.app.AlertDialog;
@@ -163,45 +164,54 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
     /**
      * Méthode invoquée lors du clic sur la carte d'un parcours en cours
-     * @param parcoursId L'identifiant du parcours en cours
+     * @param idListeParcours L'emplacement du parcours dans la liste
      */
-    private void onParcoursEnCoursClick(int parcoursId) {
-        //Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
-        //intent.putExtra("PARCOURS_ID", parcoursId);
-        //startActivity(intent);
+    private void onParcoursEnCoursClick(int idListeParcours) {
+        if (Reseau.reseauDisponible(this.getContext(), true)) {
+            lancerActiviteParcours(parcoursEnCours, idListeParcours);
+        }
     }
-
-
-
 
     /**
      * Méthode invoquée lors du clic sur la carte d'un parcours en pause
-     * @param i L'identifiant du parcours en pause
+     * @param idListeParcours L'emplacement du parcours dans la liste
      */
-    private void onParcoursEnPauseClick(int i) {
+    private void onParcoursEnPauseClick(int idListeParcours) {
         if (Reseau.reseauDisponible(this.getContext(), true)) {
-            // TODO : Afficher les détails du parcours
+            lancerActiviteParcours(parcoursEnPause, idListeParcours);
         }
     }
 
     /**
      * Méthode invoquée lors du clic sur la carte d'un parcours arrêté
-     * @param i L'identifiant du parcours arrêté
+     * @param idListeParcours L'emplacement du parcours dans la liste
      */
-    private void onParcoursArreteClick(int i) {
+    private void onParcoursArreteClick(int idListeParcours) {
         if (Reseau.reseauDisponible(this.getContext(), true)) {
-            // TODO : Afficher les détails du parcours
+            lancerActiviteParcours(parcoursArretes, idListeParcours);
         }
     }
 
     /**
      * Méthode invoquée lors du clic sur la carte d'un parcours terminé
-     * @param i L'identifiant du parcours terminé
+     * @param idListeParcours L'emplacement du parcours dans la liste
      */
-    private void onParcoursTermineClick(int i) {
+    private void onParcoursTermineClick(int idListeParcours) {
         if (Reseau.reseauDisponible(this.getContext(), true)) {
-            // TODO : Afficher les détails du parcours
+            lancerActiviteParcours(parcoursTermines, idListeParcours);
         }
+    }
+
+    /**
+     * Démarre l'activité de parcours en fournissant l'identifiant du parcours cliqué
+     * @param liste La liste de parcours à laquelle appartient le parcours cliqué
+     * @param idListeParcours L'emplacement du parcours dans la liste
+     */
+    private void lancerActiviteParcours(ArrayList<Parcours> liste, int idListeParcours) {
+        Parcours parcoursClique = liste.get(idListeParcours);
+        Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
+        intent.putExtra("PARCOURS_ID", parcoursClique.getId());
+        this.getContext().startActivity(intent);
     }
 
     /**
@@ -315,14 +325,26 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
 
         this.getView().findViewById(R.id.erreurPasDItineraire)
             .setVisibility(aucunItineraire ? View.VISIBLE : View.GONE);
+
         this.getView().findViewById(R.id.parcoursEnCours)
             .setVisibility(parcoursEnCours.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursEnCoursTitre))
+            .setText(String.format(getString(R.string.parcours_en_cours), parcoursEnCours.size()));
+
         this.getView().findViewById(R.id.parcoursEnPause)
             .setVisibility(parcoursEnPause.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursEnPauseTitre))
+            .setText(String.format(getString(R.string.parcours_en_pause), parcoursEnPause.size()));
+
         this.getView().findViewById(R.id.parcoursArretes)
             .setVisibility(parcoursArretes.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursArretesTitre))
+            .setText(String.format(getString(R.string.parcours_arretes), parcoursArretes.size()));
+
         this.getView().findViewById(R.id.parcoursTermines)
             .setVisibility(parcoursTermines.isEmpty() ? View.GONE : View.VISIBLE);
+        ((TextView) this.getView().findViewById(R.id.parcoursTerminesTitre))
+            .setText(String.format(getString(R.string.parcours_termines), parcoursTermines.size()));
     }
 
     private void afficherListeDialog(Context context) {
@@ -342,16 +364,14 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
         }
 
         builder.setItems(nomsItineraires, (dialog, which) -> {
-            String selectedId = idsItineraires[which];
             JSONObject objetItineraire = new JSONObject();
             try {
-                objetItineraire.put("idItineraire", selectedId);
+                objetItineraire.put("idItineraire", idsItineraires[which]);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
             ClientApi.demarrerParcours(context, objetItineraire, (Long idParcours) -> {
                 Intent intent = new Intent(context, ActiviteParcours.class);
-                intent.putExtra("SELECTED_ITINERAIRE_ID", selectedId);
                 intent.putExtra("PARCOURS_ID", idParcours);
                 context.startActivity(intent);
             });

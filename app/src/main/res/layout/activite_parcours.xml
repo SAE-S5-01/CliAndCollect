@@ -22,10 +22,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <TextView
+                        android:id="@+id/texteProchainContact"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/parcours_taille_prochain_client"
-                        android:text="Prochain client : " />
+                        android:text="@string/prochain_client" />
                     <TextView
                         android:id="@+id/prochainClient"
                         android:layout_width="wrap_content"

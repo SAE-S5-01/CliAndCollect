@@ -27,7 +27,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +46,6 @@ import fr.iutrodez.sae501.cliandcollect.R;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
-import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
 import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
@@ -65,6 +63,7 @@ public class ActiviteParcours extends AppCompatActivity {
     private List<GeoPoint> pathPoints;
     private IMapController mapController;
 
+    private TextView texteProchainContact;
     private TextView nomProchainClient;
     private TextView prochaineDestination;
     private TextView numeroProchainClient;
@@ -95,40 +94,63 @@ public class ActiviteParcours extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String itineraireId = getIntent().getStringExtra("SELECTED_ITINERAIRE_ID");
         Long idParcoursCourant = getIntent().getLongExtra("PARCOURS_ID", -1);
 
         parcoursCourant = SingletonListeParcours.getInstance().getParcours(idParcoursCourant);
+        itineraireCourant = parcoursCourant.getItineraire();
 
-        if (itineraireId != null && !itineraireId.isEmpty()) {
-            // Charger l'itinéraire correspondant
-            itineraireCourant = SingletonListeItineraire.getItineraire(itineraireId);
+        if (parcoursCourant.getStatut().equals("EN_PAUSE")) {
+            modifierStatutParcours("EN_COURS");
+            parcoursCourant.setStatut("EN_COURS");
         }
+
         checkLocationPermission();
     }
 
     private void initialiserUI() {
         setContentView(R.layout.activite_parcours);
 
+        texteProchainContact = findViewById(R.id.texteProchainContact);
         nomProchainClient = findViewById(R.id.prochainClient);
         prochaineDestination = findViewById(R.id.prochaineDestination);
         numeroProchainClient = findViewById(R.id.numeroProchainClient);
 
-        Client prochainClient = getProchainClient();
-        nomProchainClient.setText(prochainClient.getEntreprise());
-        prochaineDestination.setText(prochainClient.getAdresse());
-        numeroProchainClient.setText("N° " + getNumeroClient(prochainClient) + "/"
-                                     + itineraireCourant.getOrdreClients().size());
+        if (!parcoursCourant.getStatut().equals("EN_COURS")) {
+            Client dernierContactVisite = parcoursCourant.getDernierContactVisite();
+            texteProchainContact.setText(dernierContactVisite.isProspect() ? R.string.dernier_prospect : R.string.dernier_client);
+            nomProchainClient.setText(dernierContactVisite.getEntreprise());
+            prochaineDestination.setText(dernierContactVisite.getAdresse());
+            numeroProchainClient.setText("N° " + getNumeroClient(dernierContactVisite) + "/"
+                                         + itineraireCourant.getOrdreClients().size());
+        } else {
+            Client prochainClient = getProchainClient();
+            texteProchainContact.setText(prochainClient.isProspect() ? R.string.prochain_prospect : R.string.prochain_client);
+            nomProchainClient.setText(prochainClient.getEntreprise());
+            prochaineDestination.setText(prochainClient.getAdresse());
+            numeroProchainClient.setText("N° " + getNumeroClient(prochainClient) + "/"
+                                         + itineraireCourant.getOrdreClients().size());
+        }
 
         findViewById(R.id.boutonPause).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
-        findViewById(R.id.boutonPause).setOnLongClickListener(v -> mettreEnPauseParcours());
+        findViewById(R.id.boutonPause).setOnLongClickListener(v -> {
+            if (isParcoursEnCours()) modifierStatutParcours("EN_PAUSE");
+            else afficherErreurParcoursPasEnCours();
+            return true;
+        });
 
-        findViewById(R.id.boutonPasser).setOnClickListener(v -> passerClient());
+        findViewById(R.id.boutonPasser).setOnClickListener(v -> {
+            if (isParcoursEnCours()) passerClient();
+            else afficherErreurParcoursPasEnCours();
+        });
 
         findViewById(R.id.boutonStop).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
-        //findViewById(R.id.boutonStop).setOnLongClickListener(v -> modifierStatutParcours("ARRETE"));
+        findViewById(R.id.boutonStop).setOnLongClickListener(v -> {
+            if (isParcoursEnCours()) modifierStatutParcours("ARRETE");
+            else afficherErreurParcoursPasEnCours();
+            return true;
+        });
 
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
@@ -241,15 +263,26 @@ public class ActiviteParcours extends AppCompatActivity {
         map.invalidate();
     }
 
-    private boolean mettreEnPauseParcours() {
-        modifierStatutParcours("EN_PAUSE" , pathPoints);
-        return true;
+    /** @return true si le parcours est en cours, false sinon. */
+    private boolean isParcoursEnCours() {
+        return parcoursCourant.getStatut().equals("EN_COURS");
+    }
+
+    /**
+     * Affiche une erreur indiquant que le parcours n'est pas en cours.
+     */
+    private void afficherErreurParcoursPasEnCours() {
+        SnackbarCustom.show(this, R.string.erreur_parcours_pas_en_cours, SnackbarCustom.STYLE_ERREUR);
     }
 
     /**
      * Passe au prochain client.
      */
     private void passerClient() {
+        if (!isParcoursEnCours()) {
+            return;
+        }
+
         JSONObject objetNouvellesDonnees = new JSONObject();
 
         Client nouveauClient = getProchainClient();
@@ -266,6 +299,7 @@ public class ActiviteParcours extends AppCompatActivity {
             Client clientSuivant = getProchainClient();
 
             if (clientSuivant != null) {
+                texteProchainContact.setText(clientSuivant.isProspect() ? R.string.prochain_prospect : R.string.prochain_client);
                 nomProchainClient.setText(clientSuivant.getEntreprise());
                 prochaineDestination.setText(clientSuivant.getAdresse());
                 numeroProchainClient.setText("N° " + getNumeroClient(clientSuivant) + "/"
@@ -341,8 +375,10 @@ public class ActiviteParcours extends AppCompatActivity {
 
             ClientApi.modifierParcours(this, objetNouvellesDonnees, parcoursCourant.getId(), () -> {
                 SingletonListeParcours.getInstance().recupererParcours(this, () -> {
-                    setResult(Activity.RESULT_OK);
-                    finish();
+                    if (!statut.equals("EN_COURS")) {
+                        setResult(Activity.RESULT_OK);
+                        finish();
+                    }
                 });
             });
         } catch (JSONException e) {

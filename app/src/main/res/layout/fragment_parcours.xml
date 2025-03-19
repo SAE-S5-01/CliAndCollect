@@ -47,12 +47,13 @@
         android:gravity="center"
         android:visibility="gone">
         <TextView
+            android:id="@+id/parcoursEnCoursTitre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginHorizontal="3dp"
             android:textSize="@dimen/detail_client_taille_titres"
-            android:text="Parcours en cours (TODO) :"
+            android:text=""
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -71,6 +72,7 @@
         android:gravity="center"
         android:visibility="gone">
         <TextView
+            android:id="@+id/parcoursEnPauseTitre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -96,6 +98,7 @@
         android:gravity="center"
         android:visibility="gone">
         <TextView
+            android:id="@+id/parcoursArretesTitre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -121,6 +124,7 @@
         android:gravity="center"
         android:visibility="gone">
         <TextView
+            android:id="@+id/parcoursTerminesTitre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
