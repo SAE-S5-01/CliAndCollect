@@ -53,23 +53,7 @@ import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 public class ActiviteParcours extends AppCompatActivity {
-    //STUB
-    public static final GeoPoint[] POINTS = {
-        new GeoPoint(44.3519, 2.5734),
-        new GeoPoint(44.344353, 2.561994),
-        new GeoPoint(44.336805, 2.550588),
-        new GeoPoint(44.329258, 2.539182),
-        new GeoPoint(44.32171, 2.527776),
-        new GeoPoint(44.314163, 2.51637),
-        new GeoPoint(44.306615, 2.504964),
-        new GeoPoint(44.299068, 2.493558),
-        new GeoPoint(44.29152, 2.482152),
-        new GeoPoint(44.283973, 2.470745),
-        new GeoPoint(43.627342, 1.478418),
-        new GeoPoint(43.619795, 1.467012),
-        new GeoPoint(43.612247, 1.455606),
-        new GeoPoint(43.6047, 1.4442)
-    };
+
     private static final int CODE_REQUETE = 101;
     private MapView map;
     private FusedLocationProviderClient clientDeLocalisation;
@@ -113,10 +97,13 @@ public class ActiviteParcours extends AppCompatActivity {
         Long idParcoursCourant = getIntent().getLongExtra("PARCOURS_ID", -1);
 
         parcoursCourant = SingletonListeParcours.getInstance().getParcours(idParcoursCourant);
+        pathPoints = parcoursCourant.getPositionsGpsPrecedentes() != null
+                     ? parcoursCourant.getPositionsGpsPrecedentes()
+                     : new ArrayList<>();
         itineraireCourant = parcoursCourant.getItineraire();
 
         if (parcoursCourant.getStatut().equals("EN_PAUSE")) {
-            modifierStatutParcours("EN_COURS", pathPoints);
+            modifierStatutParcours("EN_COURS");
             parcoursCourant.setStatut("EN_COURS");
         }
 
@@ -150,7 +137,7 @@ public class ActiviteParcours extends AppCompatActivity {
         findViewById(R.id.boutonPause).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
         findViewById(R.id.boutonPause).setOnLongClickListener(v -> {
-            if (isParcoursEnCours()) modifierStatutParcours("EN_PAUSE", pathPoints);
+            if (isParcoursEnCours()) modifierStatutParcours("EN_PAUSE");
             else afficherErreurParcoursPasEnCours();
             return true;
         });
@@ -163,7 +150,7 @@ public class ActiviteParcours extends AppCompatActivity {
         findViewById(R.id.boutonStop).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
         findViewById(R.id.boutonStop).setOnLongClickListener(v -> {
-            if (isParcoursEnCours()) modifierStatutParcours("ARRETE", pathPoints);
+            if (isParcoursEnCours()) modifierStatutParcours("ARRETE");
             else afficherErreurParcoursPasEnCours();
             return true;
         });
@@ -183,10 +170,6 @@ public class ActiviteParcours extends AppCompatActivity {
         path.setWidth(8f);
         path.setColor(Color.BLUE);
         map.getOverlays().add(path);
-
-        pathPoints = parcoursCourant.getPositionsGpsPrecedentes() != null
-            ? parcoursCourant.getPositionsGpsPrecedentes()
-            : new ArrayList<>();
 
         mapController = map.getController();
         mapController.setZoom(15.0);
@@ -328,7 +311,7 @@ public class ActiviteParcours extends AppCompatActivity {
                                     SnackbarCustom.STYLE_INFORMATION);
             } else {
                 SnackbarCustom.show(this, R.string.parcours_termine, SnackbarCustom.STYLE_INFORMATION);
-                modifierStatutParcours("TERMINE", pathPoints);
+                modifierStatutParcours("TERMINE");
             }
         });
     }
@@ -378,10 +361,9 @@ public class ActiviteParcours extends AppCompatActivity {
     /**
      * Modifie le statut du parcours.
      * @param statut Le nouveau statut du parcours
-     * @param positionsGps Les positions GPS précédentes
      * @return true si la modification a été effectuée, false sinon.
      */
-    private boolean modifierStatutParcours(String statut , List<GeoPoint> positionsGps) {
+    private boolean modifierStatutParcours(String statut) {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
@@ -389,7 +371,7 @@ public class ActiviteParcours extends AppCompatActivity {
         JSONObject objetNouvellesDonnees = new JSONObject();
         try {
             objetNouvellesDonnees.put("statut", statut);
-            objetNouvellesDonnees.put("positionsGpsPrecedentes", convertirPointsEnJson(POINTS));
+            objetNouvellesDonnees.put("positionsGpsPrecedentes", convertirPointsEnJson(pathPoints));
 
             ClientApi.modifierParcours(this, objetNouvellesDonnees, parcoursCourant.getId(), () -> {
                 SingletonListeParcours.getInstance().recupererParcours(this, () -> {
@@ -463,7 +445,7 @@ public class ActiviteParcours extends AppCompatActivity {
      * @param points Les points à convertir
      * @return Un objet JSON contenant les points
      */
-    public static JSONArray convertirPointsEnJson(GeoPoint[] points) {
+    public static JSONArray convertirPointsEnJson(List<GeoPoint> points) {
         JSONArray jsonArray = new JSONArray();
 
         for (GeoPoint point : points) {
