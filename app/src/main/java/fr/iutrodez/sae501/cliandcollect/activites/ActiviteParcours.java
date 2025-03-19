@@ -29,6 +29,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -127,7 +128,7 @@ public class ActiviteParcours extends AppCompatActivity {
 
         findViewById(R.id.boutonStop).setOnClickListener(v ->
             SnackbarCustom.show(this, R.string.clic_long_pour_action, SnackbarCustom.STYLE_INFORMATION));
-        findViewById(R.id.boutonStop).setOnLongClickListener(v -> modifierStatutParcours("ARRETE"));
+        //findViewById(R.id.boutonStop).setOnLongClickListener(v -> modifierStatutParcours("ARRETE"));
 
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
@@ -241,7 +242,7 @@ public class ActiviteParcours extends AppCompatActivity {
     }
 
     private boolean mettreEnPauseParcours() {
-        modifierStatutParcours("EN_PAUSE");
+        modifierStatutParcours("EN_PAUSE" , pathPoints);
         return true;
     }
 
@@ -275,7 +276,7 @@ public class ActiviteParcours extends AppCompatActivity {
                                     SnackbarCustom.STYLE_INFORMATION);
             } else {
                 SnackbarCustom.show(this, R.string.parcours_termine, SnackbarCustom.STYLE_INFORMATION);
-                modifierStatutParcours("TERMINE");
+                modifierStatutParcours("TERMINE" , pathPoints);
             }
         });
     }
@@ -327,7 +328,7 @@ public class ActiviteParcours extends AppCompatActivity {
      * @param statut Le nouveau statut du parcours.
      * @return true si la modification a été effectuée, false sinon.
      */
-    private boolean modifierStatutParcours(String statut) {
+    private boolean modifierStatutParcours(String statut , List<GeoPoint> positionGps) {
         if (clientDeLocalisation != null) {
             clientDeLocalisation.removeLocationUpdates(locationCallback);
         }
@@ -335,6 +336,8 @@ public class ActiviteParcours extends AppCompatActivity {
         JSONObject objetNouvellesDonnees = new JSONObject();
         try {
             objetNouvellesDonnees.put("statut", statut);
+            //objetNouvellesDonnees.put("precedentesPositionGps" , positionGps.toArray());
+            objetNouvellesDonnees.put("precedentesPositionGps" ,convertirPointsEnJson(POINTS));
 
             ClientApi.modifierParcours(this, objetNouvellesDonnees, parcoursCourant.getId(), () -> {
                 SingletonListeParcours.getInstance().recupererParcours(this, () -> {
@@ -400,5 +403,25 @@ public class ActiviteParcours extends AppCompatActivity {
         map.getOverlays().add(marker);
         map.invalidate();
     }
+
+    public static JSONArray convertirPointsEnJson(GeoPoint[] points) {
+        JSONArray jsonArray = new JSONArray();
+
+        for (GeoPoint point : points) {
+            if (point != null) {    
+                JSONObject jsonPoint = new JSONObject();
+                try {
+                    jsonPoint.put("latitude", point.getLatitude());
+                    jsonPoint.put("longitude", point.getLongitude());
+                    jsonArray.put(jsonPoint);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return jsonArray;
+    }
+
 
 }
