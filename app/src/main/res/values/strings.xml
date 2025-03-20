@@ -25,6 +25,8 @@
     <string name="attente_reseau">Vérification en cours du réseau ...</string>
     <string name="attente_connexion">Connexion en cours ...</string>
     <string name="attente_inscription">Inscription en cours ...</string>
+    <string name="chargement_demarrage_parcours">Initialisation du parcours en cours ...</string>
+    <string name="chargement_ajout">Ajout(s) en cours ...</string>
     <string name="chargement_modification">Modification(s) en cours ...</string>
     <string name="chargement_suppression">Suppression en cours ...</string>
     <string name="inscription_reussie">Inscription réussie, bienvenue !</string>
@@ -32,7 +34,8 @@
     <string name="menu_compte">Gérer mon compte</string>
     <string name="erreur_inconnue">Une erreur inconnue est survenue, veuillez réessayer</string>
     <string name="erreur_inscription">Erreur lors de l\'inscription, veuillez réessayer plus tard</string>
-
+    <string name="modifier_compte">Modifier ses données personnelles</string>
+    <string name="erreur_modification_compte">Erreur lors de la modification de vos données, veuillez réessayer plus tard</string>
 
     <string name="valider">Valider</string>
     <string name="retour">Retour</string>
@@ -57,24 +60,32 @@
     <string name="indication_telephone">Ex. : +33612345678</string>
     <string name="client">Client</string>
     <string name="prospect">Prospect</string>
+    <string name="info_modif_nom_entreprise">Ce client / prospect est présent dans un itinéraire, ce dernier sera mis à jour en conséquence</string>
+    <string name="changement_adresse">Changement d\'adresse</string>
+    <string name="adresse_confirmation_modification">L\'adresse de ce client / prospect figure dans un itinéraire. Changer l\'adresse supprimera cet itinéraire.\nVoulez-vous continuer ?</string>
     <string name="pasModifie">Aucune information n\'a été modifiée</string>
     <string name="erreur_aucun_client">Aucun client ou prospect n\'a été ajouté</string>
     <string name="erreur_creation_client">Erreur lors de la création d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_modification_client">Erreur lors de l\'édition d\'un client \/ prospect, veuillez réessayer plus tard</string>
     <string name="erreur_recuperation_clients">Aucune connexion internet, impossible de récupérer les clients</string>
+    <string name="erreur_recuperation_parcours">Aucune connexion internet, impossible de récupérer les parcours</string>
+    <string name="erreur_recuperation_compte">Impossible de récupérer vos informations, réessayez plus tard</string>
 
     <string name="adresseClient">Adresse :</string>
-    <string name="nom_itineraire">Nom :</string>
-    <string name="liste_clients_itineraire">Étapes de l\'itinéraire :</string>
-    <string name="depart_itinéraire">Départ et arrivé de l\itinéraire : domicile</string>
+    <string name="nom_itineraire">Nom de l\'itinéraire :</string>
+    <string name="liste_clients_itineraire">Client(s) / prospect(s) à ajouter :</string>
+    <string name="etapes_itineraire">Étapes de l\'itinéraire :</string>
+    <string name="depart_itineraire">Départ et arrivée de l\'itinéraire : domicile</string>
     <string name="pasModifier">Aucune information n\'a été modifiée</string>
-    <string name="ajouter_itineraire">Ajouter un itinéraire</string>*
-    <string name="contact_a_ajouter">Veuillez entrer le nom de l\'entreprise du contact</string>
-    <string name="indication_nom_itineraire">Veuillez entrer le nom de l\'itinéraire</string>
-    <string name="indication_clients_itineraire">Veuillez sélectionner les clients à visiter</string>
+    <string name="ajouter_itineraire">Ajouter un itinéraire</string>
+    <string name="contact_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
+    <string name="indication_nom_itineraire">Entrez le nom de l\'itinéraire</string>
+    <string name="indication_clients_itineraire">Sélectionnez les clients à visiter</string>
     <string name="indication_contaxt_a_ajouter">Entrez le nom de l\'entreprise du contact</string>
     <string name="ajout_contact_itineraire">Ajouter le contact</string>
+    <string name="chargement_calcul_itineraire">Calcul de l\'itinéraire en cours ...</string>
     <string name="erreur_aucun_itineraire">Aucun itinéraire n\'a été ajouté</string>
+    <string name="erreur_nom_itineraire_existant">Le nom d\'itinéraire renseigné est déjà pris</string>
     <string name="erreur_creation_itineraire">Erreur lors de la création d\'un itinéraire, veuillez réessayer plus tard</string>
     <string name="erreur_modification_itineraire">Erreur lors de l\'édition d\'un itinéraire, veuillez réessayer plus tard</string>
     <string name="erreur_recuperation_itineraires">Aucune connexion internet, impossible de récupérer les itinéraires</string>
@@ -88,12 +99,31 @@
     <string name="recherche_adresse_placeholder">Rechercher un lieu</string>
     <string name="detail_itineraire">Détails de l\'itinéraire</string>
     <string name="erreur_nom_itineraire_non_renseigne">Nom de l\'itinéraire non renseigné</string>
+    <string name="erreur_ajout_client_vide">Ajoutez au moins 1 client / prospect</string>
     <string name="nombre_etape_depasse">Vous ne pouvez pas ajouter plus de 8 clients à votre itinéraire</string>
-    <string name="liste_contacts">Liste des contacts</string>
 
     <string name="supprimer_client">Supprimer un client / prospect</string>
-    <string name="confirmation_suppression_client">"Êtes-vous sûr de vouloir supprimer ce client / prospect ?"</string>
+    <string name="confirmation_suppression_client">Êtes-vous sûr de vouloir supprimer ce client / prospect ?</string>
+    <string name="confirmation_suppression_itineraire_avec_client">Ce client / prospect figure dans un itinéraire. Si vous le supprimez, l\'itinéraire associé sera également supprimé.\nVoulez-vous continuer ?</string>
 
     <string name="supprimer_itineraire">Supprimer un itinéraire</string>
     <string name="confirmation_suppression_itineraire">"Êtes-vous sûr de vouloir supprimer cet itinéraire ?"</string>
+
+    <string name="parcours_en_cours">Parcours en cours (%d) :</string>
+    <string name="parcours_en_pause">Parcours en pause (%d) :</string>
+    <string name="parcours_arretes">Parcours arrêtés (%d) :</string>
+    <string name="parcours_termines">Parcours terminés (%d) :</string>
+    <string name="creation_parcours">Démarrer un parcours</string>
+    <string name="dernier_client">"Dernier client visité : "</string>
+    <string name="dernier_prospect">"Dernier prospect visité : "</string>
+    <string name="prochain_client">"Prochain client : "</string>
+    <string name="prochain_prospect">"Prochain prospect : "</string>
+    <string name="erreur_aucun_parcours">Aucun parcours n\'est en cours</string>
+    <string name="parcours_termine">Vous avez terminé le parcours</string>
+    <string name="clic_long_pour_action">Effectuez un clic long pour faire cette action</string>
+    <string name="erreur_parcours_pas_en_cours">Ce parcours est annulé ou terminé, cette action est impossible</string>
+    <string name="parcours_supprime">Parcours supprimé avec succès</string>
+    <string name="supprimer_parcours">Supprimer un parcours</string>
+    <string name="confirmation_suppression_parcours">"Êtes-vous sûr de vouloir supprimer ce parcours ?"</string>
+    <string name="erreur_parcours_sans_itineraire">L\'itinéraire associé a ce parcours a été supprimé, impossible d\'afficher le parcours</string>
 </resources>

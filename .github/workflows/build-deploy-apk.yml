@@ -38,7 +38,8 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           echo "BASE_URL=http://${{ vars.API_SERVER }}/api" > app/src/main/assets/config.properties
-        # Configuration utilisée par l'application pour contacter l'API
+          echo "API_ORS_TOKEN=${{ secrets.API_ORS_TOKEN }}" >> app/src/main/assets/config.properties
+        # Configuration utilisée par l'application pour contacter les API
 
       # 6. Construire et signer l'APK avec Gradle
       - name: "Construire et signer l'APK avec Gradle"

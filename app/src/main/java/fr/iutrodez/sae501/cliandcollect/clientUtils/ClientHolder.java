@@ -31,7 +31,7 @@ public class ClientHolder extends RecyclerView.ViewHolder {
         adresse = itemView.findViewById(R.id.adresse);
     }
 
-    public void bind(Client client){
+    public void bind(Client client) {
         entreprise.setText(client.getEntreprise());
         adresse.setText(client.getAdresse());
     }

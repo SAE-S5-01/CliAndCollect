@@ -19,7 +19,7 @@ import fr.iutrodez.sae501.cliandcollect.R;
  * @author Lucas DESCRIAUD
  * @author Loïc FAUGIERES
  */
-public class ItineraireHolder extends RecyclerView.ViewHolder{
+public class ItineraireHolder extends RecyclerView.ViewHolder {
 
     private TextView nom;
 
@@ -33,7 +33,7 @@ public class ItineraireHolder extends RecyclerView.ViewHolder{
 
     public void bind(Itineraire itineraire) {
         nom.setText(itineraire.getNom());
-        nombreEtapes.setText(itineraire.getOrdreClients().size() + " étapes");
+        nombreEtapes.setText(itineraire.getOrdreClients().size() + " étape(s)");
     }
 }
 

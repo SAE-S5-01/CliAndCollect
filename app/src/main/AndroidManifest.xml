@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- Permet l'accès au local host (network security config)-->
@@ -29,10 +30,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activites.ActiviteMap"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".activites.ActiviteInscription"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activites.ActiviteGestionCompte"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activites.ActiviteDetailClient"
@@ -43,13 +44,19 @@
         <activity
             android:name=".fragments.GestionFragment"
             android:screenOrientation="portrait" />
+        <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
+        <activity
+            android:name=".activites.ActiviteMap"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activites.ActiviteDetailItineraire"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activites.ActiviteCreationItineraire"
             android:screenOrientation="portrait" />
-        <!-- L'orientation sur l'activité GestionFragment est héritée dans les fragments -->
+        <activity
+            android:name=".activites.ActiviteParcours"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

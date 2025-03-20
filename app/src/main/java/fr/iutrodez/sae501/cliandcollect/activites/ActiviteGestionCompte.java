@@ -1,29 +1,28 @@
 /*
- * ActiviteInscription.java                                         30 jan. 2025
+ * ActiviteGestionCompte.java                                       07 fev. 2025
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 
 package fr.iutrodez.sae501.cliandcollect.activites;
 
-import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONObject;
 
-import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.R;
+import fr.iutrodez.sae501.cliandcollect.fragments.GestionFragment;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Compte;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
@@ -31,12 +30,13 @@ import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
 
 /**
- * Activité de la page d'inscription.
+ * Activité de la page de gestion du compte utilisateur.
  *
  * @author Loïc FAUGIERES
- * @author Lucas DESCRIAUD
  */
-public class ActiviteInscription extends AppCompatActivity {
+public class ActiviteGestionCompte extends AppCompatActivity {
+
+    private Compte compte;
 
     private EditText mail;
     private EditText mdp;
@@ -50,7 +50,7 @@ public class ActiviteInscription extends AppCompatActivity {
     private CheckBox seRappelerDeMoi;
 
     private Button boutonObtenirCoordonnees;
-    private Button boutonSubmitInscription;
+    private Button boutonModifier;
 
     private ActivityResultLauncher<Intent> lanceurMap;
 
@@ -63,6 +63,9 @@ public class ActiviteInscription extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activite_compte);
 
+        TextView titre = findViewById(R.id.titrePageCompte);
+        titre.setText(R.string.modifier_compte);
+
         ImageView boutonOptionMenu = findViewById(R.id.boutonOptionMenu);
         boutonOptionMenu.setVisibility(View.INVISIBLE);
 
@@ -74,35 +77,78 @@ public class ActiviteInscription extends AppCompatActivity {
         adresse.setEnabled(false);
         seRappelerDeMoi = findViewById(R.id.seRappelerDeMoi);
         boutonObtenirCoordonnees = findViewById(R.id.boutonObtenirCoordonnees);
-        boutonSubmitInscription = findViewById(R.id.boutonInscription);
+        boutonObtenirCoordonnees.setActivated(true);
+        Button boutonRetour = findViewById(R.id.boutonRetour);
+        boutonModifier = findViewById(R.id.boutonModifier);
+
+        findViewById(R.id.actionInscription).setVisibility(View.GONE);
+        findViewById(R.id.actionsGestionCompte).setVisibility(View.VISIBLE);
+        seRappelerDeMoi.setChecked(!Preferences.getEmail(this).isEmpty());
+
+        initialiserChamps();
 
         boutonObtenirCoordonnees.setOnClickListener(this::obtenirCoordonnees);
-        boutonSubmitInscription.setOnClickListener(this::inscription);
+        boutonRetour.setOnClickListener(this::retour);
+        boutonModifier.setOnClickListener(this::validerModifications);
 
         lanceurMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                                                this::retourMap);
     }
 
     /**
-     * Méthode invoquée lors du clic sur le bouton d'inscription.
+     * Initialise les champs de la page avec les valeurs du compte.
+     */
+    public void initialiserChamps() {
+        if (Reseau.reseauDisponible(this, false)) {
+            compte = Compte.getInstance();
+            mail.setText(compte.getEmail());
+            nom.setText(compte.getNom());
+            prenom.setText(compte.getPrenom());
+            adresse.setText(compte.getAdresse());
+            latitude = compte.getLatitude();
+            longitude = compte.getLongitude();
+        } else {
+            Intent menuConnexion = new Intent(ActiviteGestionCompte.this, ActiviteConnexion.class);
+            startActivity(menuConnexion);
+            finish();
+        }
+    }
+
+    /**
+     * Clic sur le bouton "Retour".
+     * @param view Le bouton "Retour"
+     */
+    public void retour(View view) {
+        Intent menuPrincipal = new Intent(ActiviteGestionCompte.this, GestionFragment.class);
+        startActivity(menuPrincipal);
+        finish();
+    }
+
+    /**
+     * Méthode invoquée lors du clic sur le bouton de validation.
      * Récupère les informations saisies par l'utilisateur et les envoie à l'API.
      * Connecte l'utilisateur en cas d'informations valides
-     * @param view Le bouton d'inscription
-     *
+     * @param view Le bouton de validation
      */
-    private void inscription(View view) {
+    private void validerModifications(View view) {
         JSONObject donnees = donneeFormulaireEnJson();
         if (Reseau.reseauDisponible(this) && donnees != null) {
-            ClientApi.inscription(this, donnees, () -> {
+            ClientApi.modifierCompte(this, donnees, () -> {
                 Preferences
                 .sauvegarderInfosConnexion(this,
                                            mail.getText().toString(),
                                            mdp.getText().toString(),
                                            seRappelerDeMoi.isChecked());
-                new Compte(donnees);
 
-                Intent menuPrincipal = new Intent(ActiviteInscription.this, GestionFragment.class);
-                menuPrincipal.putExtra(GestionFragment.CLE_EXTRA_MSG_BIENVENUE, true);
+                compte.setEmail(mail.getText().toString());
+                compte.setMotDePasse(mdp.getText().toString());
+                compte.setNom(nom.getText().toString());
+                compte.setPrenom(prenom.getText().toString());
+                compte.setAdresse(adresse.getText().toString());
+                compte.setLatitude(latitude);
+                compte.setLongitude(longitude);
+
+                Intent menuPrincipal = new Intent(ActiviteGestionCompte.this, GestionFragment.class);
 
                 startActivity(menuPrincipal);
                 finish();
@@ -130,7 +176,7 @@ public class ActiviteInscription extends AppCompatActivity {
             SnackbarCustom.show(this,
                                 e.getMessage().equals("Forbidden numeric value: NaN")
                                 ? R.string.coordonnees_non_calculees
-                                : R.string.erreur_inscription,
+                                : R.string.erreur_modification_compte,
                                 SnackbarCustom.STYLE_ERREUR);
             donnees = null;
         }
@@ -142,7 +188,7 @@ public class ActiviteInscription extends AppCompatActivity {
      * @param view Le bouton "Obtenir les coordonnées"
      */
     public void obtenirCoordonnees(View view) {
-        Intent map = new Intent(ActiviteInscription.this, ActiviteMap.class);
+        Intent map = new Intent(ActiviteGestionCompte.this, ActiviteMap.class);
         lanceurMap.launch(map);
     }
 
@@ -154,7 +200,7 @@ public class ActiviteInscription extends AppCompatActivity {
             longitude = retour.getDoubleExtra("longitude", Double.NaN);
             adresse.setText(retour.getStringExtra("adresse"));
             boutonObtenirCoordonnees.setActivated(true);
-            boutonSubmitInscription.setEnabled(true);
+            boutonModifier.setEnabled(true);
         }
     }
 }

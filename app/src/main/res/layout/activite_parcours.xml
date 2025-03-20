@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        style="@style/AppStyle"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TableRow>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="start">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/texteProchainContact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/parcours_taille_prochain_client"
+                        android:text="@string/prochain_client" />
+                    <TextView
+                        android:id="@+id/prochainClient"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/parcours_taille_prochain_client"
+                        android:textColor="@color/colorPrimary"
+                        android:text="ABC Solutions" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/prochaineDestination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/parcours_taille_adresse_client"
+                    android:textColor="@color/bouton_principal_desactive"
+                    android:text="123 Rue de l'Innovation, 75001 Paris, France" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end"
+                android:layout_gravity="center">
+                <TextView
+                    android:id="@+id/numeroProchainClient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/parcours_taille_prochain_client"
+                    android:text="N° 1/8" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="20dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="@dimen/parcours_hauteur_carte"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@color/light_grey"
+                android:gravity="center">
+                <org.osmdroid.views.MapView
+                    android:id="@+id/map"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_span="2" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_marginTop="20dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/boutonPause"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/ic_pause" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/boutonPasser"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/ic_passer" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/boutonStop"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/ic_stop" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+</LinearLayout>
