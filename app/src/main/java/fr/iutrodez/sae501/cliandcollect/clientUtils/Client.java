@@ -131,4 +131,12 @@ public class Client {
         return adresse + " - " + entreprise;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;  // Vérification si c'est la même instance
+        if (obj == null || getClass() != obj.getClass()) return false;  // Vérifie le type
+        Client client = (Client) obj;  // Cast sécurisé
+
+        return this.ID.equals(client.getID());  // Comparaison d'ID
+    }
 }

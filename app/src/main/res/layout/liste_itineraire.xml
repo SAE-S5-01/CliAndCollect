@@ -14,7 +14,7 @@
             android:id="@+id/nomItineraire"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/liste_client_marge_texte"
+            android:layout_margin="@dimen/liste_marge_texte"
             android:textSize="@dimen/texte_defaut"
             android:textColor="@color/dark_blue"
             android:textStyle="bold" />
@@ -22,7 +22,7 @@
             android:id="@+id/nombreEtapes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/liste_client_marge_texte"
+            android:layout_margin="@dimen/liste_marge_texte"
             android:textSize="@dimen/texte_defaut"
             android:textColor="@color/black" />
     </LinearLayout>

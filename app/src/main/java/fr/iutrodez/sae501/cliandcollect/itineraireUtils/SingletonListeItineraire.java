@@ -1,5 +1,5 @@
 /*
- * SingletonListeClient.java                                        31 jan. 2025
+ * SingletonListeItineraire.java                                    31 jan. 2025
  * IUT de Rodez, pas de copyright ni de "copyleft".
  */
 
@@ -96,9 +96,33 @@ public class SingletonListeItineraire {
     }
 
     /**
+     * Récupère un itinéraire par son identifiant
+     * @param id L'identifiant de l'itinéraire
+     * @return Le itinéraire correspondant à l'identifiant
+     */
+    public static Itineraire getItineraire(String id) {
+        for (Itineraire itineraire : getInstance().listeItineraires) {
+            if (itineraire.getID().equals(id)) {
+                return itineraire;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Vide la liste des itineraires
      */
     public static void viderListeItineraire() {
         getInstance().listeItineraires.clear();
+    }
+
+    /**
+     * Vérifier si un contact est dans un itinéraire.
+     * @param idContact L'identifiant du contact
+     * @return true si le contact est dans un itinéraire, false sinon
+     */
+    public static boolean estContactDansItineraire(Long idContact) {
+        return getInstance().getListeItineraires().stream()
+            .anyMatch(itineraire -> itineraire.getOrdreClients().containsKey(idContact));
     }
 }

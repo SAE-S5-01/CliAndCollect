@@ -29,6 +29,7 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.ClientAdapter;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
+import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
 import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -200,23 +201,41 @@ public class FragmentClients extends Fragment implements View.OnClickListener {
             .setMessage(R.string.confirmation_suppression_client)
             .setPositiveButton("Oui", (dialog, which) -> {
                 if (Reseau.reseauDisponible(this.getContext(), true)) {
-                    ClientApi.supprimerClient(this.getContext(),
-                        clients.get(position).getID().toString(),
-                        () -> {
-                            Client clientASupprimer = clients.get(position);
-                            SingletonListeClient.supprimerClient(clientASupprimer);
-                            clients.remove(position);
-
-                            adapter.notifyItemRemoved(position);
-                            adapter.notifyItemRangeChanged(position, clients.size());
-
-                            mettreAJourTexteErreur();
-                        });
-
+                    if (SingletonListeItineraire.estContactDansItineraire(clients.get(position).getID())) {
+                        new AlertDialog.Builder(this.getContext())
+                            .setTitle(R.string.supprimer_client)
+                            .setMessage(R.string.confirmation_suppression_itineraire_avec_client)
+                            .setPositiveButton("Oui", (dialog2, which2) -> actionSuppressionClient(position))
+                            .setNegativeButton("Non", null)
+                            .show();
+                    } else {
+                        actionSuppressionClient(position);
+                    }
                 }
             })
             .setNegativeButton("Non", null)
             .show();
+    }
+
+    /**
+     * Action de suppression d'un client
+     * @param position La position du client à supprimer
+     */
+    private void actionSuppressionClient(int position) {
+        ClientApi.supprimerClient(this.getContext(),
+            clients.get(position).getID().toString(),
+            () -> {
+                Client clientASupprimer = clients.get(position);
+                SingletonListeClient.supprimerClient(clientASupprimer);
+                clients.remove(position);
+
+                adapter.notifyItemRemoved(position);
+                adapter.notifyItemRangeChanged(position, clients.size());
+
+                SingletonListeItineraire.recupererItineraires(this.getContext(), () -> {});
+
+                mettreAJourTexteErreur();
+            });
     }
 
 }

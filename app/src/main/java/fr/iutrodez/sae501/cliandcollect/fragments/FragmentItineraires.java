@@ -141,7 +141,7 @@ public class FragmentItineraires extends Fragment implements View.OnClickListene
      */
     private void recupererItineraires() {
         if (Reseau.reseauDisponible(this.getContext())) {
-            SingletonListeClient.recupererClients(this.getContext(), () -> {
+            SingletonListeItineraire.recupererItineraires(this.getContext(), () -> {
                 mettreAJourListeItineraires(null);
             });
         } else {

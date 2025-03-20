@@ -24,6 +24,8 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteConnexion;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
+import fr.iutrodez.sae501.cliandcollect.requetes.ClientApi;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.Reseau;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -66,7 +68,6 @@ public class GestionFragment extends AppCompatActivity {
         gestionnairePagination.setAdapter(new AdaptateurFragments(this));
 
         navigationButtonsIds = new int[] {
-            R.id.pied_page_icone_accueil,
             R.id.pied_page_icone_client,
             R.id.pied_page_icone_parcours,
             R.id.pied_page_icone_itineraire
@@ -103,8 +104,14 @@ public class GestionFragment extends AppCompatActivity {
         }
 
         if (Reseau.reseauDisponible(this)) {
+            ClientApi.getCompte(this, () -> {
+                SnackbarCustom.show(this, R.string.erreur_recuperation_compte, SnackbarCustom.STYLE_ERREUR);
+            });
             SingletonListeClient.recupererClients(this, () -> {});
-            SingletonListeItineraire.recupererItineraires(this, () -> {});
+            SingletonListeItineraire.recupererItineraires(this, () -> {
+                SingletonListeParcours.recupererParcours(this, () -> {});
+            });
+
         }
     }
 
@@ -189,15 +196,12 @@ public class GestionFragment extends AppCompatActivity {
     throws IllegalStateException {
         switch (position) {
             case 0:
-                button.setImageResource(R.drawable.accueil);
-                break;
-            case 1:
                 button.setImageResource(R.drawable.client);
                 break;
-            case 2:
+            case 1:
                 button.setImageResource(R.drawable.parcours);
                 break;
-            case 3:
+            case 2:
                 button.setImageResource(R.drawable.itineraire);
                 break;
             default:

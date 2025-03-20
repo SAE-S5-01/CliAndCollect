@@ -8,6 +8,8 @@ package fr.iutrodez.sae501.cliandcollect.requetes;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,7 +22,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,11 +47,14 @@ import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailClient;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteDetailItineraire;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteGestionCompte;
 import fr.iutrodez.sae501.cliandcollect.activites.ActiviteInscription;
+import fr.iutrodez.sae501.cliandcollect.activites.ActiviteParcours;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.Client;
 import fr.iutrodez.sae501.cliandcollect.clientUtils.SingletonListeClient;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.Itineraire;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.PointGPS;
 import fr.iutrodez.sae501.cliandcollect.itineraireUtils.SingletonListeItineraire;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.Parcours;
+import fr.iutrodez.sae501.cliandcollect.parcoursUtils.SingletonListeParcours;
 import fr.iutrodez.sae501.cliandcollect.utile.Compte;
 import fr.iutrodez.sae501.cliandcollect.utile.Preferences;
 import fr.iutrodez.sae501.cliandcollect.utile.SnackbarCustom;
@@ -66,7 +71,7 @@ public class ClientApi {
         = "assets/config.properties";
 
     private static String BASE_URL;
-
+    public static String API_ORS_TOKEN;
     static {
         Properties properties = new Properties();
         try (InputStream inputStream
@@ -75,6 +80,7 @@ public class ClientApi {
             if (inputStream != null) {
                 properties.load(inputStream);
                 BASE_URL = properties.getProperty("BASE_URL");
+                API_ORS_TOKEN = properties.getProperty("API_ORS_TOKEN");
             } else {
                 throw new RuntimeException("Fichier de configuration illisible : "
                                            + CHEMIN_FICHIER_CONFIGURATION);
@@ -250,10 +256,9 @@ public class ClientApi {
     /**
      * Récupère les informations du compte de l'utilisateur.
      * @param contexte Le contexte de l'application
-     * @param getReussi La méthode à appeler en cas de récupération réussie
      * @param getEchoue La méthode à appeler en cas de récupération échouée
      */
-    public static void getCompte(Context contexte, Runnable getReussi, Runnable getEchoue) {
+    public static void getCompte(Context contexte, Runnable getEchoue) {
         requeteApi(contexte, Request.Method.GET, "/utilisateur", null, null,
             response -> {
                 try {
@@ -261,8 +266,6 @@ public class ClientApi {
                     // On retire le mot de passe qui est ici haché (donc inutile)
                     jsonReponse.remove("motDePasse");
                     new Compte(jsonReponse);
-
-                    ((ActiviteGestionCompte) contexte).runOnUiThread(getReussi);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -405,6 +408,35 @@ public class ClientApi {
         );
     }
 
+    /**
+     * Méthode permettant de récupérer la liste des parcours depuis l'API.
+     * @param contexte Le contexte de l'application
+     * @param callback La méthode à appeler en cas de succès
+     */
+    public static void getListeParcours(Context contexte , Runnable callback) {
+        requeteApi(contexte, Request.Method.GET, "/parcours", null, null,
+                response -> {
+                    try {
+                        JSONArray jsonReponse = new JSONArray(response);
+
+                        SingletonListeParcours.getInstance().viderListeParcours();
+                        for (int i = 0; i < jsonReponse.length(); i++) {
+                            JSONObject jsonParcours = jsonReponse.getJSONObject(i);
+                            Parcours parcours = new Parcours(jsonParcours);
+                            SingletonListeParcours.getInstance().ajouterParcours(parcours);
+                        }
+
+                        callback.run();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                error -> {
+                    gestionErreur(contexte, error);
+                }
+        );
+    }
+
     public static void creationClient(Context contexte, JSONObject donnees, Runnable creationReussie) {
         spineurChargement = new ProgressDialog(contexte);
         spineurChargement.setMessage(contexte.getString(R.string.chargement_ajout));
@@ -492,30 +524,48 @@ public class ClientApi {
         }
     }
 
-    public static void calculerItineraire(JSONObject donnees, Context contexte, Consumer<LinkedHashMap<Long, PointGPS>> callback) {
+    /**
+     * Calcule et ordonne un itinéraire.
+     * @param donnees Les données de l'itinéraire
+     * @param contexte Le contexte de l'application
+     * @param actionSuccess La méthode à appeler en cas de succès
+     */
+    public static void calculerItineraire(JSONObject donnees, Context contexte,
+                                          Consumer<LinkedHashMap<Long, PointGPS>> actionSuccess) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_calcul_itineraire));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
         try {
-            requeteApi(contexte , Request.Method.POST , "/itineraire/calculer" , null , donnees,
+            requeteApi(contexte, Request.Method.POST, "/itineraire/calculer", null, donnees,
                 response -> {
                     try {
-                       JSONObject jsonReponse = new JSONObject(response);
-                        LinkedHashMap<Long, PointGPS> point = parseItineraire(jsonReponse);
-                        ((Activity) contexte).runOnUiThread(() -> callback.accept(point));
+                        spineurChargement.dismiss();
 
+                        JSONObject jsonReponse = new JSONObject(response);
+                        LinkedHashMap<Long, PointGPS> point = parseItineraire(jsonReponse);
+
+                        ((Activity) contexte).runOnUiThread(() -> actionSuccess.accept(point));
                     } catch (Exception e) {
-                        Log.e("Parsing json ", e.toString());
+                        e.printStackTrace();
                     }
                 } ,
                 error -> {
-                    // TODO gestion erreur api
-                    //gestionErreur(contexte, error);
-                    error.printStackTrace();
-                    Log.e("erreur", error.toString());
+                    spineurChargement.dismiss();
+                    gestionErreurItineraire(contexte, error);
                 }
             );
         } catch (Exception e) {
-            Log.e("erreur ", e.toString());
+            if (spineurChargement != null) spineurChargement.dismiss();
         }
     }
+
+    /**
+     * Parse un itinéraire pour le transformer en une liste ordonnée de points GPS.
+     * @param jsonResponse La réponse de l'API
+     * @return Un itinéraire ordonné
+     */
     public static LinkedHashMap<Long, PointGPS> parseItineraire(JSONObject jsonResponse) {
         LinkedHashMap<Long, PointGPS> waypoints = new LinkedHashMap<>();
 
@@ -524,7 +574,7 @@ public class ClientApi {
             JSONArray itineraireArray = jsonResponse.getJSONArray("itineraire");
             JSONObject depart = itineraireArray.getJSONObject(0);
             itineraireArray.remove(0);
-            waypoints.put(-1L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Départ"));
+            waypoints.put(-1L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), depart.getString("nom")));
 
             // Parcourir le tableau pour récupérer les points
             for (int i = 0; i < itineraireArray.length(); i++) {
@@ -538,9 +588,9 @@ public class ClientApi {
 
                 // Ajouter le point dans la map avec le nom comme clé
                 waypoints.put(id, new PointGPS(latitude, longitude, nom));
-
             }
-            waypoints.put(-2L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Arrivé"));
+
+            waypoints.put(-2L, new PointGPS(depart.getDouble("latitude"), depart.getDouble("longitude"), "Arrivée"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -647,6 +697,130 @@ public class ClientApi {
         }
     }
 
+    /**
+     * Crée un nouveau parcours.
+     *
+     * @param contexte Le contexte de l'application
+     * @param donnees  Les données du parcours
+     */
+    public static void demarrerParcours(Context contexte, JSONObject donnees, Consumer<Long> actionReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_demarrage_parcours));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.POST, "/parcours", null, donnees,
+                response -> {
+                    try {
+                        spineurChargement.dismiss();
+                        // En cas de succès, on ajoute le parcours au singleton
+                        JSONObject jsonReponse = new JSONObject(response);
+                        Parcours parcoursDemarre = new Parcours(jsonReponse);
+                        SingletonListeParcours.getInstance().ajouterParcours(parcoursDemarre);
+                        actionReussie.accept(parcoursDemarre.getId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    /**
+     * Modifie un parcours existant.
+     * @param contexte Le contexte de l'application
+     * @param donnees Les données du parcours
+     * @param id L'identifiant du parcours
+     * @param modificationReussie La méthode à appeler en cas de modification réussie
+     */
+    public static void modifierParcours(Context contexte, JSONObject donnees, Long id, Runnable modificationReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_modification));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.PUT, "/parcours/" + id, null, donnees,
+                response -> {
+                    spineurChargement.dismiss();
+                    ((ActiviteParcours) contexte).runOnUiThread(modificationReussie);
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    /**
+     * Méthode permettant de supprimer un parcours.
+     * @param contexte Le contexte de l'application
+     * @param id L'identifiant du parcours à supprimer
+     * @param suppressionReussie La méthode à appeler en cas de suppression réussie
+     */
+    public static void supprimerParcours(Context contexte, Long id, Runnable suppressionReussie) {
+        spineurChargement = new ProgressDialog(contexte);
+        spineurChargement.setMessage(contexte.getString(R.string.chargement_suppression));
+        spineurChargement.setCancelable(false);
+        spineurChargement.show();
+
+        try {
+            requeteApi(contexte, Request.Method.DELETE, "/parcours/" + id, null, null,
+                response -> {
+                    spineurChargement.dismiss();
+                    ((Activity) contexte).runOnUiThread(suppressionReussie);
+                },
+                error -> {
+                    spineurChargement.dismiss();
+                    gestionErreur(contexte, error);
+                }
+            );
+        } catch (Exception e) {
+            if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    public static void getProche(Context contexte ,Long idClient,
+                                 Double longitude , Double latitute , Consumer<ArrayList<Client>> contactProche) {
+        Map<String , String> parametre = new HashMap<>();
+        parametre.put("longitude", longitude.toString());
+        parametre.put("latitude", latitute.toString());
+        try {
+            requeteApi(contexte, Request.Method.GET, "/contact/" + idClient + "/proche",
+                    parametre, null,
+                    response -> {
+                        try {
+                            JSONArray jsonReponse = new JSONArray(response);
+                            ArrayList<Client> contacts = new ArrayList<>();
+
+                            for (int i = 0; i < jsonReponse.length(); i++) {
+                                JSONObject jsonContact = jsonReponse.getJSONObject(i);
+                                contacts.add(new Client(jsonContact)); // Convertir et ajouter à la liste
+                            }
+
+
+                            // Exécuter le callback sur le thread principal
+                            new Handler(Looper.getMainLooper()).post(() ->  contactProche.accept(contacts));
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    error -> {
+                    }
+            );
+        } catch (Exception e) {
+        }
+    }
 
     /**
      * Méthode permettant de gérer les erreurs lors de la communication avec l'API.
