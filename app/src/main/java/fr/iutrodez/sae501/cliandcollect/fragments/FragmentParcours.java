@@ -209,9 +209,15 @@ public class FragmentParcours extends Fragment implements View.OnClickListener {
      */
     private void lancerActiviteParcours(ArrayList<Parcours> liste, int idListeParcours) {
         Parcours parcoursClique = liste.get(idListeParcours);
-        Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
-        intent.putExtra("PARCOURS_ID", parcoursClique.getId());
-        this.getContext().startActivity(intent);
+        if (parcoursClique.getItineraire() != null) {
+            Intent intent = new Intent(this.getContext(), ActiviteParcours.class);
+            intent.putExtra("PARCOURS_ID", parcoursClique.getId());
+            this.getContext().startActivity(intent);
+        } else {
+            SnackbarCustom.show(this.getContext(),
+                R.string.erreur_parcours_sans_itineraire,
+                SnackbarCustom.STYLE_ERREUR);
+        }
     }
 
     /**

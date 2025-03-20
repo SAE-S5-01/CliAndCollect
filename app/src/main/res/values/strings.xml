@@ -125,5 +125,5 @@
     <string name="parcours_supprime">Parcours supprimé avec succès</string>
     <string name="supprimer_parcours">Supprimer un parcours</string>
     <string name="confirmation_suppression_parcours">"Êtes-vous sûr de vouloir supprimer ce parcours ?"</string>
-
+    <string name="erreur_parcours_sans_itineraire">L\'itinéraire associé a ce parcours a été supprimé, impossible d\'afficher le parcours</string>
 </resources>
