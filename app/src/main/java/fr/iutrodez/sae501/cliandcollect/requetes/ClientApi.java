@@ -8,6 +8,8 @@ package fr.iutrodez.sae501.cliandcollect.requetes;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -784,6 +787,38 @@ public class ClientApi {
             );
         } catch (Exception e) {
             if (spineurChargement != null) spineurChargement.dismiss();
+        }
+    }
+
+    public static void getProche(Context contexte ,Long idClient,
+                                 Double longitude , Double latitute , Consumer<ArrayList<Client>> contactProche) {
+        Map<String , String> parametre = new HashMap<>();
+        parametre.put("longitude", longitude.toString());
+        parametre.put("latitude", latitute.toString());
+        try {
+            requeteApi(contexte, Request.Method.GET, "/contact/" + idClient + "/proche",
+                    parametre, null,
+                    response -> {
+                        try {
+                            JSONArray jsonReponse = new JSONArray(response);
+                            ArrayList<Client> contacts = new ArrayList<>();
+
+                            for (int i = 0; i < jsonReponse.length(); i++) {
+                                JSONObject jsonContact = jsonReponse.getJSONObject(i);
+                                contacts.add(new Client(jsonContact)); // Convertir et ajouter à la liste
+                            }
+
+
+                            // Exécuter le callback sur le thread principal
+                            new Handler(Looper.getMainLooper()).post(() ->  contactProche.accept(contacts));
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    error -> {
+                    }
+            );
+        } catch (Exception e) {
         }
     }
 

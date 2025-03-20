@@ -11,7 +11,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.lang.ref.Cleaner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,20 +75,30 @@ public class ActiviteParcours extends AppCompatActivity {
 
     private Parcours parcoursCourant;
 
-    private static final float DISTANCE_THRESHOLD = 15.0f; // Distance minimale en mètres
+    private ArrayList<Client> notificationDejaEmise = new ArrayList<>();
+
+    private static final float DISTANCE_THRESHOLD = 10.0f; // Distance minimale en mètres
     private Location lastLocation = null;
 
     private Itineraire itineraireCourant = null;
-    private Handler networkLocationHandler = new Handler(Looper.getMainLooper());
-    private Runnable networkLocationRunnable = new Runnable() {
+    private HandlerThread handlerThread;
+    private Handler networkLocationHandler;
+
+    private AlertDialog notificationProche;
+    private final Runnable networkLocationRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!isNetworkAvailable()) {
-                afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet.");
-            } else if (!isLocationEnabled()) {
-                afficherAlerte("Localisation désactivée", "Veuillez activer la localisation.");
+            boolean reseauDisponible = isNetworkAvailable();
+            boolean localisationActivee = isLocationEnabled();
+            if (reseauDisponible && localisationActivee) {
+
+            } else if (!localisationActivee) {
+                runOnUiThread(() -> afficherAlerte("Localisation désactivée", "Veuillez activer la localisation."));
+            } else {
+                runOnUiThread(() -> afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet."));
             }
-            // Vérifier toutes les 5 secondes
+
+            // Replanifier la vérification après 5 secondes
             networkLocationHandler.postDelayed(this, 5000);
         }
     };
@@ -102,6 +116,16 @@ public class ActiviteParcours extends AppCompatActivity {
                      ? parcoursCourant.getPositionsGpsPrecedentes()
                      : new ArrayList<>();
         itineraireCourant = parcoursCourant.getItineraire();
+
+        // Initialiser et démarrer le HandlerThread
+        handlerThread = new HandlerThread("NetworkLocationThread");
+        handlerThread.start();
+
+        // Initialiser le Handler avec le Looper du HandlerThread
+        networkLocationHandler = new Handler(handlerThread.getLooper());
+
+        // Démarrer la vérification d'arrière-plan
+        networkLocationHandler.post(networkLocationRunnable);
 
         if (parcoursCourant.getStatut().equals("EN_PAUSE")) {
             modifierStatutParcours("EN_COURS");
@@ -162,26 +186,31 @@ public class ActiviteParcours extends AppCompatActivity {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
 
-        userMarker = new Marker(map);
-        userMarker.setTitle("Ma position");
-        userMarker.setIcon(getResources().getDrawable(R.drawable.ic_ma_position));
-        map.getOverlays().add(userMarker);
-
         path = new Polyline();
         path.setWidth(8f);
         path.setColor(Color.BLUE);
         map.getOverlays().add(path);
 
         mapController = map.getController();
-        mapController.setZoom(15.0);
+        mapController.setZoom(7.0);
+        mapController.setCenter(new GeoPoint(
+                Double.parseDouble(Preferences.getLatitude(this)),
+                Double.parseDouble(Preferences.getLongitude(this))));
         map.setMinZoomLevel(5.0);
         map.setMaxZoomLevel(20.0);
 
         if (itineraireCourant != null) {
             placerPoint(itineraireCourant);
         }
-        clientDeLocalisation = LocationServices.getFusedLocationProviderClient(this);
-        startLocationUpdates();
+        if (parcoursCourant.getStatut().equals("EN_COURS")) {
+            userMarker = new Marker(map);
+            userMarker.setTitle("Ma position");
+            userMarker.setIcon(getResources().getDrawable(R.drawable.ic_ma_position));
+            map.getOverlays().add(userMarker);
+
+            clientDeLocalisation = LocationServices.getFusedLocationProviderClient(this);
+            startLocationUpdates();
+        }
     }
 
     private void checkLocationPermission() {
@@ -253,6 +282,13 @@ public class ActiviteParcours extends AppCompatActivity {
         if (lastLocation != null && location.distanceTo(lastLocation) < DISTANCE_THRESHOLD) {
             return;
         }
+
+        Long idClient = getProchainClient().getID();
+        Double longitude = location.getLongitude();
+        Double latitude = location.getLatitude();
+        ClientApi.getProche(ActiviteParcours.this , idClient, longitude, latitude, contacts -> {
+            runOnUiThread(() -> afficherContactsProches(contacts));
+        });
 
         lastLocation = location;
         GeoPoint userPosition = new GeoPoint(location.getLatitude(), location.getLongitude());
@@ -427,7 +463,7 @@ public class ActiviteParcours extends AppCompatActivity {
             Marker marker = new Marker(map);
             marker.setPosition(point);
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setTitle(client.getEntreprise());
+            marker.setTitle((i+1) + " - " + client.getEntreprise());
             marker.setSubDescription(client.getAdresse());
 
             // Choix de l'icône en fonction du type de contact
@@ -474,9 +510,54 @@ public class ActiviteParcours extends AppCompatActivity {
                 }
             }
         }
-
         return jsonArray;
     }
 
+    private void afficherContactsProches(ArrayList<Client> proches) {
+        ArrayList<Client> procheNonNotifie = new ArrayList<>();
+
+        for (Client proche : proches) {
+            if (!notificationDejaEmise.contains(proche)) {
+                notificationDejaEmise.add(proche);
+                procheNonNotifie.add(proche);
+            }
+        }
+
+        if (!procheNonNotifie.isEmpty()) {
+
+            // Créer une liste de noms à afficher
+            String[] nomsClients = new String[procheNonNotifie.size()];
+            for (int i = 0; i < procheNonNotifie.size(); i++) {
+                Client c = procheNonNotifie.get(i);
+                nomsClients[i] = (c.isProspect() ? "Prospect" : "Prochain client")
+                        + " : " + c.getEntreprise() + " (" + c.getAdresse() + ")";
+            }
+
+            // Construire l'AlertDialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Contact(s) proche(s) détecté(s)")
+                    .setItems(nomsClients, (dialog, which) -> {
+                        // Gérer le clic sur un client dans la liste si nécessaire
+                    })
+                    .setPositiveButton("Fermer", (dialog, which) -> dialog.dismiss());
+
+            // Créer et afficher la boîte de dialogue
+            notificationProche = builder.create();
+            notificationProche.show();
+
+            // Ajouter une vibration à l’ouverture du popup
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null && vibrator.hasVibrator()) {
+                vibrator.vibrate(VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE)); // Vibration 300ms
+            }
+
+            // Fermer automatiquement après 15 secondes
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (notificationProche != null && notificationProche.isShowing()) {
+                    notificationProche.dismiss();
+                }
+            }, 15000); // 15 secondes
+        }
+    }
 
 }
