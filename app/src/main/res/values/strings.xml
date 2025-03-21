@@ -86,6 +86,7 @@
     <string name="chargement_calcul_itineraire">Calcul de l\'itinéraire en cours ...</string>
     <string name="erreur_aucun_itineraire">Aucun itinéraire n\'a été ajouté</string>
     <string name="erreur_nom_itineraire_existant">Le nom d\'itinéraire renseigné est déjà pris</string>
+    <string name="erreur_affichage_carte">Erreur lors de l\'affichage de la carte, veuillez réessayer dans quelques instants</string>
     <string name="erreur_creation_itineraire">Erreur lors de la création d\'un itinéraire, veuillez réessayer plus tard</string>
     <string name="erreur_modification_itineraire">Erreur lors de l\'édition d\'un itinéraire, veuillez réessayer plus tard</string>
     <string name="erreur_recuperation_itineraires">Aucune connexion internet, impossible de récupérer les itinéraires</string>
@@ -109,10 +110,10 @@
     <string name="supprimer_itineraire">Supprimer un itinéraire</string>
     <string name="confirmation_suppression_itineraire">"Êtes-vous sûr de vouloir supprimer cet itinéraire ?"</string>
 
-    <string name="parcours_en_cours">Parcours en cours (%d) :</string>
-    <string name="parcours_en_pause">Parcours en pause (%d) :</string>
-    <string name="parcours_arretes">Parcours arrêtés (%d) :</string>
-    <string name="parcours_termines">Parcours terminés (%d) :</string>
+    <string name="parcours_en_cours">Liste parcours en cours (%d) :</string>
+    <string name="parcours_en_pause">Liste parcours en pause (%d) :</string>
+    <string name="parcours_arretes">Liste parcours arrêtés (%d) :</string>
+    <string name="parcours_termines">Liste parcours terminés (%d) :</string>
     <string name="creation_parcours">Démarrer un parcours</string>
     <string name="dernier_client">"Dernier client visité : "</string>
     <string name="dernier_prospect">"Dernier prospect visité : "</string>
@@ -126,4 +127,5 @@
     <string name="supprimer_parcours">Supprimer un parcours</string>
     <string name="confirmation_suppression_parcours">"Êtes-vous sûr de vouloir supprimer ce parcours ?"</string>
     <string name="erreur_parcours_sans_itineraire">L\'itinéraire associé a ce parcours a été supprimé, impossible d\'afficher le parcours</string>
+    <string name="permission_localisation_refusee">Votre localisation est nécessaire pour afficher votre parcours</string>
 </resources>

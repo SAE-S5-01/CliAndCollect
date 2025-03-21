@@ -15,14 +15,13 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -42,7 +41,6 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
-import java.lang.ref.Cleaner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,26 +73,25 @@ public class ActiviteParcours extends AppCompatActivity {
 
     private Parcours parcoursCourant;
 
-    private ArrayList<Client> notificationDejaEmise = new ArrayList<>();
+    private ArrayList<Client> notificationsDejaEmises = new ArrayList<>();
 
     private static final float DISTANCE_THRESHOLD = 10.0f; // Distance minimale en mètres
-    private Location lastLocation = null;
 
-    private Itineraire itineraireCourant = null;
+    private Location lastLocation;
+
+    private Itineraire itineraireCourant;
     private HandlerThread handlerThread;
     private Handler networkLocationHandler;
 
     private AlertDialog notificationProche;
+    private AlertDialog currentAlertDialog;
+
     private final Runnable networkLocationRunnable = new Runnable() {
         @Override
         public void run() {
-            boolean reseauDisponible = isNetworkAvailable();
-            boolean localisationActivee = isLocationEnabled();
-            if (reseauDisponible && localisationActivee) {
-
-            } else if (!localisationActivee) {
+            if (!isLocalisationDisponible()) {
                 runOnUiThread(() -> afficherAlerte("Localisation désactivée", "Veuillez activer la localisation."));
-            } else {
+            } else if (!isReseauDisponible()) {
                 runOnUiThread(() -> afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet."));
             }
 
@@ -102,8 +99,6 @@ public class ActiviteParcours extends AppCompatActivity {
             networkLocationHandler.postDelayed(this, 5000);
         }
     };
-
-    private AlertDialog currentAlertDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,9 +127,16 @@ public class ActiviteParcours extends AppCompatActivity {
             parcoursCourant.setStatut("EN_COURS");
         }
 
-        checkLocationPermission();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, CODE_REQUETE);
+        } else {
+            initialiserUI();
+        }
     }
 
+    /**
+     * Initialise l'interface utilisateur.
+     */
     private void initialiserUI() {
         setContentView(R.layout.activite_parcours);
 
@@ -185,19 +187,24 @@ public class ActiviteParcours extends AppCompatActivity {
         map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
+        map.setMinZoomLevel(4.0);
+        map.setMaxZoomLevel(20.0);
 
         path = new Polyline();
         path.setWidth(8f);
-        path.setColor(Color.BLUE);
+        // Récupérer la couleur et la convertir en string hexadécimale
+        int colorInt = ContextCompat.getColor(this, R.color.colorPrimary);
+        String colorHex = String.format("#%06X", (0xFFFFFF & colorInt));
+        // Appliquer la couleur au Polyline
+        path.setColor(Color.parseColor(colorHex));
+
         map.getOverlays().add(path);
 
         mapController = map.getController();
-        mapController.setZoom(7.0);
+        mapController.setZoom(8);
         mapController.setCenter(new GeoPoint(
-                Double.parseDouble(Preferences.getLatitude(this)),
-                Double.parseDouble(Preferences.getLongitude(this))));
-        map.setMinZoomLevel(5.0);
-        map.setMaxZoomLevel(20.0);
+            Double.parseDouble(Preferences.getLatitude(this)),
+            Double.parseDouble(Preferences.getLongitude(this))));
 
         if (itineraireCourant != null) {
             placerPoint(itineraireCourant);
@@ -209,19 +216,14 @@ public class ActiviteParcours extends AppCompatActivity {
             map.getOverlays().add(userMarker);
 
             clientDeLocalisation = LocationServices.getFusedLocationProviderClient(this);
-            startLocationUpdates();
+            demarrerSuiviLocalisations();
         }
     }
 
-    private void checkLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, CODE_REQUETE);
-        } else {
-            initialiserUI();
-        }
-    }
-
-    private void startLocationUpdates() {
+    /**
+     * Démarre le suivi des localisations de l'utilisateur.
+     */
+    private void demarrerSuiviLocalisations() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -234,34 +236,41 @@ public class ActiviteParcours extends AppCompatActivity {
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-            if (locationResult != null && locationResult.getLastLocation() != null) {
-                Location location = locationResult.getLastLocation();
-                Log.d("loc", "Latitude: " + location.getLatitude() + ", Longitude: " + location.getLongitude());
-                updateUserLocation(location);
-            } else {
-                if (!isNetworkAvailable()) {
-                    afficherAlerte("Perte de connexion réseau", "Veuillez vérifier votre connexion internet.");
-                } else if (!isLocationEnabled()) {
-                    afficherAlerte("Localisation désactivée", "Veuillez activer la localisation.");
+                if (locationResult != null && locationResult.getLastLocation() != null) {
+                    Location location = locationResult.getLastLocation();
+                    mettreAJourLocalisation(location);
                 }
-            }
             }
         };
 
         clientDeLocalisation.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
     }
 
-    private boolean isNetworkAvailable() {
+    /**
+     * Vérifie si le réseau est disponible.
+     * @return true si le réseau est disponible, false sinon.
+     */
+    private boolean isReseauDisponible() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnected();
     }
 
-    private boolean isLocationEnabled() {
+    /**
+     * Vérifie si la localisation est disponible.
+     * @return true si la localisation est disponible, false sinon.
+     */
+    private boolean isLocalisationDisponible() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+               || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
+    /**
+     * Affiche une alerte à l'utilisateur.
+     * @param titre Le titre de l'alerte
+     * @param message Le message de l'alerte
+     */
     private void afficherAlerte(String titre, String message) {
         if (currentAlertDialog != null && currentAlertDialog.isShowing()) {
             return;
@@ -278,15 +287,21 @@ public class ActiviteParcours extends AppCompatActivity {
     }
 
 
-    private void updateUserLocation(Location location) {
-        if (lastLocation != null && location.distanceTo(lastLocation) < DISTANCE_THRESHOLD) {
+    /**
+     * Met à jour la position de l'utilisateur sur la carte.
+     * @param location
+     */
+    private void mettreAJourLocalisation(Location location) {
+        if (lastLocation == null) {
+            mapController.setZoom(20);
+        } else if (location.distanceTo(lastLocation) < DISTANCE_THRESHOLD) {
             return;
         }
 
         Long idClient = getProchainClient().getID();
         Double longitude = location.getLongitude();
         Double latitude = location.getLatitude();
-        ClientApi.getProche(ActiviteParcours.this , idClient, longitude, latitude, contacts -> {
+        ClientApi.getProche(this, idClient, longitude, latitude, contacts -> {
             runOnUiThread(() -> afficherContactsProches(contacts));
         });
 
@@ -294,8 +309,6 @@ public class ActiviteParcours extends AppCompatActivity {
         GeoPoint userPosition = new GeoPoint(location.getLatitude(), location.getLongitude());
         pathPoints.add(userPosition);
         path.setPoints(pathPoints);
-
-        if (lastLocation ==null) mapController.setZoom(15.0);
 
         userMarker.setPosition(userPosition);
         userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -438,6 +451,14 @@ public class ActiviteParcours extends AppCompatActivity {
         networkLocationHandler.removeCallbacks(networkLocationRunnable);
     }
 
+    /**
+     * Méthode appelée lorsque l'utilisateur a répondu à une demande de permission.
+     * @param requestCode Le code de la demande de permission.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -446,8 +467,11 @@ public class ActiviteParcours extends AppCompatActivity {
                 // Permission accordée
                 initialiserUI();
             } else {
-                // TODO meilleure feedback
-                Toast.makeText(this, "Permission refusée", Toast.LENGTH_SHORT).show();
+                SnackbarCustom.show(this, R.string.permission_localisation_refusee, SnackbarCustom.STYLE_ERREUR);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    setResult(Activity.RESULT_CANCELED);
+                    finish();
+                }, 3500);
             }
         }
     }
@@ -515,33 +539,39 @@ public class ActiviteParcours extends AppCompatActivity {
         return jsonArray;
     }
 
+    /**
+     * Affiche une notification pour les contacts proches.
+     * @param proches La liste des contacts proches
+     */
     private void afficherContactsProches(ArrayList<Client> proches) {
         ArrayList<Client> procheNonNotifie = new ArrayList<>();
 
         for (Client proche : proches) {
-            if (!notificationDejaEmise.contains(proche)) {
-                notificationDejaEmise.add(proche);
-                procheNonNotifie.add(proche);
+            if (!notificationsDejaEmises.contains(proche)) {
+                notificationsDejaEmises.add(proche);
+                if (!proche.isProspect() || !parcoursCourant.contientClient(proche)) {
+                    procheNonNotifie.add(proche);
+                }
             }
         }
 
-        if (!procheNonNotifie.isEmpty()) {
 
+        if (!procheNonNotifie.isEmpty()) {
             // Créer une liste de noms à afficher
             String[] nomsClients = new String[procheNonNotifie.size()];
             for (int i = 0; i < procheNonNotifie.size(); i++) {
                 Client c = procheNonNotifie.get(i);
                 nomsClients[i] = (c.isProspect() ? "Prospect" : "Prochain client")
-                        + " : " + c.getEntreprise() + " (" + c.getAdresse() + ")";
+                    + " : " + c.getEntreprise() + " (" + c.getAdresse() + ")";
             }
 
             // Construire l'AlertDialog
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Contact(s) proche(s) détecté(s)")
-                    .setItems(nomsClients, (dialog, which) -> {
-                        // Gérer le clic sur un client dans la liste si nécessaire
-                    })
-                    .setPositiveButton("Fermer", (dialog, which) -> dialog.dismiss());
+                .setItems(nomsClients, (dialog, which) -> {
+                    // Gérer le clic sur un client dans la liste si nécessaire
+                })
+                .setPositiveButton("Fermer", (dialog, which) -> dialog.dismiss());
 
             // Créer et afficher la boîte de dialogue
             notificationProche = builder.create();
@@ -561,5 +591,4 @@ public class ActiviteParcours extends AppCompatActivity {
             }, 15000); // 15 secondes
         }
     }
-
 }
