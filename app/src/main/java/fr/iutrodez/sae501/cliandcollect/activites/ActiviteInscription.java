@@ -99,6 +99,10 @@ public class ActiviteInscription extends AppCompatActivity {
                                            mail.getText().toString(),
                                            mdp.getText().toString(),
                                            seRappelerDeMoi.isChecked());
+                
+                String lat = donnees.optString("latitude" , "0.0");
+                String lon = donnees.optString("longitude", "0.0");
+                Preferences.sauvegarderCoordonnees(this, lat , lon);
                 new Compte(donnees);
 
                 Intent menuPrincipal = new Intent(ActiviteInscription.this, GestionFragment.class);

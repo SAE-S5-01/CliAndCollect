@@ -63,10 +63,12 @@ public class ActiviteMap extends AppCompatActivity {
         carte.setTileSource(TileSourceFactory.MAPNIK);
         carte.setMultiTouchControls(true);
         carte.setBuiltInZoomControls(true);
+        carte.setMinZoomLevel(4.0);
+        carte.setMaxZoomLevel(20.0);
+
         IMapController mapController = carte.getController();
         mapController.setZoom(15.5);
 
-        // TODO centrer sur géolocalisation
         GeoPoint startPoint = new GeoPoint(44.3511408, 2.5728493);
         mapController.setCenter(startPoint);
 

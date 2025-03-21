@@ -129,4 +129,12 @@ public class Parcours {
     public void setPositionsGpsPrecedentes(ArrayList<GeoPoint> positionsGpsPrecedentes) {
         this.positionsGpsPrecedentes = positionsGpsPrecedentes;
     }
+
+    /**
+     * @param client le client à tester
+     * @return true si le client est dans le parcours, false sinon
+     */
+    public boolean contientClient(Client client) {
+        return this.itineraire.getOrdreClients().get(client.getID()) != null;
+    }
 }

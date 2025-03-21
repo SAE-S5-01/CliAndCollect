@@ -5,6 +5,7 @@
 
 package fr.iutrodez.sae501.cliandcollect.activites;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,9 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -34,6 +37,12 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -214,18 +223,25 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
         }
     }
 
+    /**
+     * Afficher la carte avec l'itinéraire calculé.
+     * @param points Les points de l'itinéraire
+     */
     private void afficherCarteAvecItineraire(LinkedHashMap<Long, PointGPS> points) {
         runOnUiThread(() -> {
+            ProgressDialog spineurChargement = new ProgressDialog(this);
+            spineurChargement.setMessage(this.getString(R.string.chargement_calcul_itineraire));
+            spineurChargement.setCancelable(false);
+            spineurChargement.show();
+
             try {
-                // Créer un conteneur pour la MapView
+                // Création et configuration de la MapView dans un conteneur
                 LinearLayout mapContainer = new LinearLayout(this);
 
-                // Initialiser la MapView
                 mapView = new MapView(this);
                 mapView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
-                ));
+                    LinearLayout.LayoutParams.MATCH_PARENT));
                 mapContainer.addView(mapView);
 
                 // Configuration de base de la carte
@@ -238,20 +254,18 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
                 mapController = mapView.getController();
                 mapController.setZoom(14.0);
 
-                // Créer la liste des points
+                // Extraction et centrage sur les points dans l'ordre défini
                 ArrayList<PointGPS> waypoints = new ArrayList<>(points.values());
-
-                // Centrer la carte sur le premier point
                 if (!waypoints.isEmpty()) {
                     mapController.setCenter(waypoints.get(0));
                 }
 
-                // Créer et afficher l'AlertDialog
+                // Création de la boîte de dialogue affichant la carte
                 AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle(inputNomItineraire.getText().toString().isEmpty()
-                        ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
-                        : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
-                                        inputNomItineraire.getText().toString()))
+                              ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous valider la modification ?"
+                              : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous valider la modification ?",
+                                              inputNomItineraire.getText().toString()))
                     .setView(mapContainer)
                     .setPositiveButton("Valider", (dialogInterface, which) -> {
                         if (mapView != null) {
@@ -267,101 +281,164 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
                         mapView.onDetach();
                     }
                 });
-
                 dialog.show();
 
-                // Calculer l'itinéraire par segments dans un thread séparé
+                // Calculer l'itinéraire avec ORS dans un thread séparé
                 new Thread(() -> {
                     try {
-                        // Initialiser le RoadManager avec le nouveau service
-                        RoadManager roadManager = new OSRMRoadManager(this, getPackageName());
-                        ((OSRMRoadManager)roadManager).setMean(OSRMRoadManager.MEAN_BY_CAR);
+                        String apiKey = ClientApi.API_ORS_TOKEN;
+                        JSONObject jsonRequest = buildJsonRequest(waypoints);
 
-                        List<Polyline> routes = new ArrayList<>();
+                        URL url = new URL("https://api.openrouteservice.org/v2/directions/driving-car/geojson");
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("Authorization", apiKey);
+                        conn.setRequestProperty("Content-Type", "application/json");
 
-                        // Calculer route par segments de 2 points
-                        for (int i = 0; i < waypoints.size() - 1; i++) {
-                            ArrayList<GeoPoint> segment = new ArrayList<>();
-                            segment.add(waypoints.get(i));
-                            segment.add(waypoints.get(i + 1));
-
-                            // Créer l'URL pour ce segment avec les coordonnées des deux points
-                            String url = String.format("https://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?alternatives=false&overview=full&steps=true",
-                                    segment.get(0).getLongitude(), segment.get(0).getLatitude(),
-                                    segment.get(1).getLongitude(), segment.get(1).getLatitude());
-
-                            Log.d("OSRM", "Request URL: " + url);
-                            // Envoie de la requete http
-                            Road road = roadManager.getRoad(segment);
-
-                            if (road.mStatus == Road.STATUS_OK) {
-                                Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-                                routes.add(roadOverlay);
-                            } else {
-
-                                // Calculer et ajouter une ligne "à vol d'oiseau" (ligne droite)
-                                GeoPoint start = segment.get(0); // Premier point du segment
-                                GeoPoint end = segment.get(1);   // Deuxième point du segment
-
-                                // Créer une polyline pour la ligne droite
-                                Polyline birdFlightLine = new Polyline();
-                                birdFlightLine.addPoint(start); // Ajouter le premier point
-                                birdFlightLine.addPoint(end);   // Ajouter le deuxième point
-
-                                // Définir la couleur et la largeur de la ligne "à vol d'oiseau"
-                                birdFlightLine.setColor(Color.RED);  // Par exemple, en rouge
-                                birdFlightLine.setWidth(5);          // Largeur de la ligne
-
-                                // Ajouter la ligne à vol d'oiseau aux overlays de la carte
-                                mapView.getOverlays().add(birdFlightLine);
-                            }
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(jsonRequest.toString().getBytes("UTF-8"));
                         }
 
-                        // Afficher les routes sur l'UI thread
-                        runOnUiThread(() -> {
-                            if (!routes.isEmpty()) {
-                                // Ajouter toutes les routes
-                                for (Polyline route : routes) {
-                                    route.setColor(Color.BLUE);
-                                    route.setWidth(10);
-                                    mapView.getOverlays().add(route);
-                                }
+                        if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                            String response = readResponse(conn);
+                            JSONObject jsonResponse = new JSONObject(response);
+                            JSONArray features = jsonResponse.getJSONArray("features");
+                            if (features.length() > 0) {
+                                // Construction de la polyline selon l’ordre fourni
+                                Polyline routePolyline = buildRoutePolyline(features.getJSONObject(0));
+                                routePolyline.setWidth(10);
 
-                                // Ajouter les marqueurs pour chaque point
-                                for (GeoPoint point : waypoints) {
-                                    Marker marker = new Marker(mapView);
-                                    marker.setTitle(waypoints.indexOf(point) + 1 + " - " + waypoints.get(waypoints.indexOf(point)).getNom());
-                                    marker.setPosition(point);
-                                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                                    mapView.getOverlays().add(marker);
-                                }
+                                // Récupérer la couleur et la convertir en string hexadécimale
+                                int colorInt = ContextCompat.getColor(this, R.color.colorPrimaryDark);
+                                String colorHex = String.format("#%06X", (0xFFFFFF & colorInt));
+                                // Appliquer la couleur au Polyline
+                                routePolyline.setColor(Color.parseColor(colorHex));
 
-                                mapView.invalidate();
-                            } else {
-                                Toast.makeText(ActiviteDetailItineraire.this,
-                                    "Erreur lors du calcul de l'itinéraire ici",
-                                    Toast.LENGTH_SHORT).show();
+                                runOnUiThread(() -> {
+                                    mapView.getOverlays().add(routePolyline);
+                                    addMarkers(mapView, waypoints);
+                                    spineurChargement.dismiss();
+                                    mapView.invalidate();
+                                });
+                                return;
                             }
-                        });
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        }
+                        // En cas d'erreur ou de réponse vide : tracer des lignes "à vol d'oiseau"
                         runOnUiThread(() -> {
-                            Toast.makeText(ActiviteDetailItineraire.this,
-                                "Erreur lors du calcul de l'itinéraire: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                            spineurChargement.dismiss();
+                            drawBirdFlightLines(mapView, waypoints);
+                            addMarkers(mapView, waypoints);
+                            mapView.invalidate();
+                            SnackbarCustom.show(this, "Erreur lors du calcul de l'itinéraire avec ORS", SnackbarCustom.STYLE_ERREUR);
                         });
+                    } catch (Exception e) {
+                        spineurChargement.dismiss();
+                        e.printStackTrace();
+                        runOnUiThread(() ->
+                            SnackbarCustom.show(this, "Erreur lors du calcul de l'itinéraire : ", SnackbarCustom.STYLE_ERREUR));
                     }
                 }).start();
-
             } catch (Exception e) {
+                spineurChargement.dismiss();
                 e.printStackTrace();
-                Toast.makeText(this, "Erreur lors de l'affichage de la carte",
-                        Toast.LENGTH_SHORT).show();
+                SnackbarCustom.show(this, R.string.erreur_affichage_carte, SnackbarCustom.STYLE_ERREUR);
             }
         });
     }
 
+    /**
+     * Construit la requête JSON pour l'API OpenRouteService avec
+     * les coordonnées des points de l'itinéraire.
+     * @param waypoints Les points de l'itinéraire
+     * @throws JSONException En cas d'erreur de construction JSON
+     */
+    private JSONObject buildJsonRequest(ArrayList<PointGPS> waypoints) throws JSONException {
+        JSONObject jsonRequest = new JSONObject();
+        JSONArray coordinatesArray = new JSONArray();
+        for (PointGPS point : waypoints) {
+            JSONArray coord = new JSONArray();
+            coord.put(point.getLongitude());
+            coord.put(point.getLatitude());
+            coordinatesArray.put(coord);
+        }
+        jsonRequest.put("coordinates", coordinatesArray);
+        jsonRequest.put("instructions", false);
+        return jsonRequest;
+    }
+
+    /**
+     * Lit la réponse de la requête HTTP.
+     * @param conn La connexion HTTP
+     * @return La réponse de la requête
+     * @throws IOException En cas d'erreur de lecture de la réponse
+     */
+    private String readResponse(HttpURLConnection conn) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = in.readLine()) != null) {
+            response.append(line);
+        }
+        in.close();
+        return response.toString();
+    }
+
+    /**
+     * Construit une polyline à partir d'un objet JSON représentant une feature.
+     * @param feature L'objet JSON représentant une feature
+     * @return La polyline construite
+     * @throws JSONException En cas d'erreur de lecture des coordonnées
+     */
+    private Polyline buildRoutePolyline(JSONObject feature) throws JSONException {
+        Polyline polyline = new Polyline();
+        JSONObject geometry = feature.getJSONObject("geometry");
+        JSONArray coords = geometry.getJSONArray("coordinates");
+        for (int i = 0; i < coords.length(); i++) {
+            JSONArray coord = coords.getJSONArray(i);
+            double lon = coord.getDouble(0);
+            double lat = coord.getDouble(1);
+            polyline.addPoint(new GeoPoint(lat, lon));
+        }
+        return polyline;
+    }
+
+    /**
+     * Ajoute des marqueurs pour chaque point de l'itinéraire.
+     * @param mapView La carte
+     * @param waypoints Les points de l'itinéraire
+     */
+    private void addMarkers(MapView mapView, ArrayList<PointGPS> waypoints) {
+        for (int i = 0; i < waypoints.size(); i++) {
+            PointGPS point = waypoints.get(i);
+            Marker marker = new Marker(mapView);
+            marker.setPosition(point);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setTitle((i + 1) + " - " + point.getNom());
+            mapView.getOverlays().add(marker);
+        }
+    }
+
+    /**
+     * Dessine des lignes "à vol d'oiseau" entre chaque point de l'itinéraire.
+     * @param mapView La carte
+     * @param waypoints Les points de l'itinéraire
+     */
+    private void drawBirdFlightLines(MapView mapView, ArrayList<PointGPS> waypoints) {
+        for (int i = 0; i < waypoints.size() - 1; i++) {
+            Polyline birdFlightLine = new Polyline();
+            birdFlightLine.addPoint(waypoints.get(i));
+            birdFlightLine.addPoint(waypoints.get(i + 1));
+            birdFlightLine.setColor(Color.YELLOW);
+            birdFlightLine.setWidth(5);
+            mapView.getOverlays().add(birdFlightLine);
+        }
+    }
+
+    /**
+     * Créer l'itinéraire avec les points fournis.
+     * @param listeEtape Les points de l'itinéraire
+     */
     private void creationItineraire(LinkedHashMap<Long, PointGPS> listeEtape) {
         PointGPS domicile = listeEtape.get(-1L);
         listeEtape.remove(-1L); // Supprimer le point de départ
@@ -394,11 +471,13 @@ public class ActiviteDetailItineraire extends AppCompatActivity {
             ClientApi.modifierItineraire(this, jsonFinal, itineraire.getID(), this::modificationValide);
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(this, R.string.erreur_creation_itineraire,
-                           Toast.LENGTH_SHORT).show();
+            SnackbarCustom.show(this, R.string.erreur_creation_itineraire, SnackbarCustom.STYLE_ERREUR);
         }
     }
 
+    /**
+     * Action à effectuer après la modification de l'itinéraire.
+     */
     private void modificationValide() {
         itineraire.setNom(inputNomItineraire.getText().toString());
 

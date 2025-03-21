@@ -5,6 +5,7 @@
 
 package fr.iutrodez.sae501.cliandcollect.activites;
 
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,9 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,9 +24,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -191,18 +189,29 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
      */
     private void afficherCarteAvecItineraire(LinkedHashMap<Long, PointGPS> points) {
         runOnUiThread(() -> {
+            ProgressDialog spineurChargement = new ProgressDialog(this);
+            spineurChargement.setMessage(this.getString(R.string.chargement_calcul_itineraire));
+            spineurChargement.setCancelable(false);
+            spineurChargement.show();
+
             try {
+
                 // Création et configuration de la MapView dans un conteneur
                 LinearLayout mapContainer = new LinearLayout(this);
+
                 mapView = new MapView(this);
                 mapView.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT));
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT));
                 mapContainer.addView(mapView);
+
+                // Configuration de base de la carte
                 mapView.setTileSource(TileSourceFactory.MAPNIK);
                 mapView.setBuiltInZoomControls(true);
                 mapView.setMultiTouchControls(true);
                 Configuration.getInstance().setUserAgentValue(getPackageName());
+
+                // Initialiser le contrôleur de carte
                 mapController = mapView.getController();
                 mapController.setZoom(14.0);
 
@@ -214,19 +223,19 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
 
                 // Création de la boîte de dialogue affichant la carte
                 AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setTitle(inputNomItineraire.getText().toString().isEmpty()
-                                ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
-                                : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
-                                inputNomItineraire.getText().toString()))
-                        .setView(mapContainer)
-                        .setPositiveButton("Valider", (dialogInterface, which) -> {
-                            if (mapView != null) {
-                                mapView.onDetach();
-                            }
-                            creationItineraire(points);
-                        })
-                        .setNegativeButton("Annuler", null)
-                        .create();
+                    .setTitle(inputNomItineraire.getText().toString().isEmpty()
+                        ? "Itinéraire : voici l'itinéraire calculé pour votre tournée, voulez-vous le créer ?"
+                        : String.format("Voici l'itinéraire calculé pour votre tournée \"%s\", voulez-vous le créer ?",
+                                        inputNomItineraire.getText().toString()))
+                    .setView(mapContainer)
+                    .setPositiveButton("Valider", (dialogInterface, which) -> {
+                        if (mapView != null) {
+                            mapView.onDetach();
+                        }
+                        creationItineraire(points);
+                    })
+                    .setNegativeButton("Annuler", null)
+                    .create();
 
                 dialog.setOnDismissListener(dialogInterface -> {
                     if (mapView != null) {
@@ -259,11 +268,18 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                             if (features.length() > 0) {
                                 // Construction de la polyline selon l’ordre fourni
                                 Polyline routePolyline = buildRoutePolyline(features.getJSONObject(0));
-                                routePolyline.setColor(Color.BLUE);
                                 routePolyline.setWidth(10);
+
+                                // Récupérer la couleur et la convertir en string hexadécimale
+                                int colorInt = ContextCompat.getColor(this, R.color.colorPrimary);
+                                String colorHex = String.format("#%06X", (0xFFFFFF & colorInt));
+                                // Appliquer la couleur au Polyline
+                                routePolyline.setColor(Color.parseColor(colorHex));
+
                                 runOnUiThread(() -> {
                                     mapView.getOverlays().add(routePolyline);
                                     addMarkers(mapView, waypoints);
+                                    spineurChargement.dismiss();
                                     mapView.invalidate();
                                 });
                                 return;
@@ -271,29 +287,33 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
                         }
                         // En cas d'erreur ou de réponse vide : tracer des lignes "à vol d'oiseau"
                         runOnUiThread(() -> {
+                            spineurChargement.dismiss();
                             drawBirdFlightLines(mapView, waypoints);
                             addMarkers(mapView, waypoints);
                             mapView.invalidate();
-                            Toast.makeText(ActiviteCreationItineraire.this,
-                                    "Erreur lors du calcul de l'itinéraire avec ORS",
-                                    Toast.LENGTH_SHORT).show();
+                            SnackbarCustom.show(this, "Erreur lors du calcul de l'itinéraire avec ORS", SnackbarCustom.STYLE_ERREUR);
                         });
                     } catch (Exception e) {
+                        spineurChargement.dismiss();
                         e.printStackTrace();
-                        runOnUiThread(() -> Toast.makeText(ActiviteCreationItineraire.this,
-                                "Erreur lors du calcul de l'itinéraire: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() ->
+                            SnackbarCustom.show(this, "Erreur lors du calcul de l'itinéraire : ", SnackbarCustom.STYLE_ERREUR));
                     }
                 }).start();
-
             } catch (Exception e) {
+                spineurChargement.dismiss();
                 e.printStackTrace();
-                Toast.makeText(this, "Erreur lors de l'affichage de la carte", Toast.LENGTH_SHORT).show();
+                SnackbarCustom.show(this, R.string.erreur_affichage_carte, SnackbarCustom.STYLE_ERREUR);
             }
         });
     }
 
-    // Construit la requête JSON avec les coordonnées dans l'ordre fourni [longitude, latitude]
+    /**
+     * Construit la requête JSON pour l'API OpenRouteService avec
+     * les coordonnées des points de l'itinéraire.
+     * @param waypoints Les points de l'itinéraire
+     * @throws JSONException En cas d'erreur de construction JSON
+     */
     private JSONObject buildJsonRequest(ArrayList<PointGPS> waypoints) throws JSONException {
         JSONObject jsonRequest = new JSONObject();
         JSONArray coordinatesArray = new JSONArray();
@@ -308,7 +328,12 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         return jsonRequest;
     }
 
-    // Lit la réponse de la connexion HTTP
+    /**
+     * Lit la réponse de la requête HTTP.
+     * @param conn La connexion HTTP
+     * @return La réponse de la requête
+     * @throws IOException En cas d'erreur de lecture de la réponse
+     */
     private String readResponse(HttpURLConnection conn) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         StringBuilder response = new StringBuilder();
@@ -320,7 +345,12 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         return response.toString();
     }
 
-    // Construit la polyline de l'itinéraire à partir de la réponse ORS
+    /**
+     * Construit une polyline à partir d'un objet JSON représentant une feature.
+     * @param feature L'objet JSON représentant une feature
+     * @return La polyline construite
+     * @throws JSONException En cas d'erreur de lecture des coordonnées
+     */
     private Polyline buildRoutePolyline(JSONObject feature) throws JSONException {
         Polyline polyline = new Polyline();
         JSONObject geometry = feature.getJSONObject("geometry");
@@ -334,7 +364,11 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         return polyline;
     }
 
-    // Ajoute les marqueurs pour chaque waypoint
+    /**
+     * Ajoute des marqueurs pour chaque point de l'itinéraire.
+     * @param mapView La carte
+     * @param waypoints Les points de l'itinéraire
+     */
     private void addMarkers(MapView mapView, ArrayList<PointGPS> waypoints) {
         for (int i = 0; i < waypoints.size(); i++) {
             PointGPS point = waypoints.get(i);
@@ -346,21 +380,27 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
         }
     }
 
-    // Trace des lignes droites entre les points si l'itinéraire ORS n'est pas disponible
+    /**
+     * Dessine des lignes "à vol d'oiseau" entre chaque point de l'itinéraire.
+     * @param mapView La carte
+     * @param waypoints Les points de l'itinéraire
+     */
     private void drawBirdFlightLines(MapView mapView, ArrayList<PointGPS> waypoints) {
         for (int i = 0; i < waypoints.size() - 1; i++) {
             Polyline birdFlightLine = new Polyline();
             birdFlightLine.addPoint(waypoints.get(i));
             birdFlightLine.addPoint(waypoints.get(i + 1));
-            birdFlightLine.setColor(Color.RED);
+            birdFlightLine.setColor(Color.YELLOW);
             birdFlightLine.setWidth(5);
             mapView.getOverlays().add(birdFlightLine);
         }
     }
 
-
-
-    private void creationItineraire(LinkedHashMap<Long , PointGPS> listeEtape) {
+    /**
+     * Créer l'itinéraire avec les points fournis.
+     * @param listeEtape Les points de l'itinéraire
+     */
+    private void creationItineraire(LinkedHashMap<Long, PointGPS> listeEtape) {
         PointGPS domicile = listeEtape.get(-1L);
         listeEtape.remove(-1L); // Supprimer le point de départ
         listeEtape.remove(-2L); // Supprimer le point d'arrivée
@@ -370,8 +410,8 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
             JSONObject ordreClients = new JSONObject();
 
             jsonFinal.put("domicile", new JSONObject()
-                    .put("x", domicile.getLongitude())
-                    .put("y", domicile.getLatitude()));
+                     .put("x", domicile.getLongitude())
+                     .put("y", domicile.getLatitude()));
             // Parcourir la LinkedHashMap pour ajouter chaque point
             for (Map.Entry<Long, PointGPS> entry : listeEtape.entrySet()) {
                 Long clientKey = entry.getKey();
@@ -392,18 +432,20 @@ public class ActiviteCreationItineraire extends AppCompatActivity {
             ClientApi.creationItineraire(this, jsonFinal, this::creationOk);
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(this, R.string.erreur_creation_itineraire,
-                    Toast.LENGTH_SHORT).show();
+            SnackbarCustom.show(this, R.string.erreur_creation_itineraire, SnackbarCustom.STYLE_ERREUR);
         }
     }
 
+    /**
+     * Action à effectuer après la création de l'itinéraire.
+     */
     private void creationOk() {
         setResult(AppCompatActivity.RESULT_OK);
         finish();
     }
 
     /**
-     * Attendre 10 secondes puis effectuer l'action passée en paramètre
+     * Attendre 3 secondes puis effectuer l'action passée en paramètre
      *
      * @param action Action à effectuer
      */
