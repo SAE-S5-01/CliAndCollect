@@ -295,10 +295,11 @@ public class ActiviteParcours extends AppCompatActivity {
         pathPoints.add(userPosition);
         path.setPoints(pathPoints);
 
+        if (lastLocation ==null) mapController.setZoom(15.0);
+
         userMarker.setPosition(userPosition);
         userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         mapController.animateTo(userPosition);
-        mapController.setZoom(15.0);
         map.invalidate();
     }
 
