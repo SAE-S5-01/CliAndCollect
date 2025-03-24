@@ -147,11 +147,19 @@ public class ActiviteParcours extends AppCompatActivity {
 
         if (!parcoursCourant.getStatut().equals("EN_COURS")) {
             Client dernierContactVisite = parcoursCourant.getDernierContactVisite();
-            texteProchainContact.setText(dernierContactVisite.isProspect() ? R.string.dernier_prospect : R.string.dernier_client);
-            nomProchainClient.setText(dernierContactVisite.getEntreprise());
-            prochaineDestination.setText(dernierContactVisite.getAdresse());
-            numeroProchainClient.setText("N° " + getNumeroClient(dernierContactVisite) + "/"
-                                         + itineraireCourant.getOrdreClients().size());
+            if (dernierContactVisite != null) {
+                texteProchainContact.setText(dernierContactVisite.isProspect() ? R.string.dernier_prospect : R.string.dernier_client);
+                nomProchainClient.setText(dernierContactVisite.getEntreprise());
+                prochaineDestination.setText(dernierContactVisite.getAdresse());
+                numeroProchainClient.setText("N° " + getNumeroClient(dernierContactVisite) + "/"
+                                             + itineraireCourant.getOrdreClients().size());
+            } else {
+                texteProchainContact.setText(R.string.aucune_visite_effectuee);
+                nomProchainClient.setText("");
+                prochaineDestination.setText("");
+                numeroProchainClient.setText(itineraireCourant.getOrdreClients().size()
+                                             + " étape(s)");
+            }
         } else {
             Client prochainClient = getProchainClient();
             texteProchainContact.setText(prochainClient.isProspect() ? R.string.prochain_prospect : R.string.prochain_client);
